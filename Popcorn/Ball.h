@@ -2,9 +2,6 @@
 #include "Config.h"
 #include "Level.h"
 
-class AsEngine;
-
-
 class ABall
 {
 public:

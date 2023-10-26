@@ -6,6 +6,7 @@
 class AsBorder
 {
 public:
+   AsBorder();
    void Init();
    void Draw(HDC hdc, RECT &paint_area, HPEN bg_pen, HBRUSH bg_brush);
 

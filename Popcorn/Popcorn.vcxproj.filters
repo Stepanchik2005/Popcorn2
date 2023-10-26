@@ -31,6 +31,9 @@
     <Filter Include="Ball">
       <UniqueIdentifier>{eab60d16-144f-4132-a7ba-f277441f0216}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{bfa69b59-4c2b-4804-8bc3-0cbe0d97735f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -59,6 +62,9 @@
     </ClInclude>
     <ClInclude Include="Ball.h">
       <Filter>Ball</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform.h">
+      <Filter>Platform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -92,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="Ball.cpp">
       <Filter>Ball</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform.cpp">
+      <Filter>Platform</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

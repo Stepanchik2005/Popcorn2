@@ -18,6 +18,11 @@ int8_t Level_01[AsConfig::Level_Height][AsConfig::Level_Width]{
    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };
 
+ALevel::ALevel()
+ : Brick_Red_Pen(0),Brick_Blue_Pen(0),Letter_Pen(0),  Brick_Red_Brush(0), Brick_Blue_Brush(0),Level_Rect{}
+{
+}
+
 void ALevel::Init()
 {
     Letter_Pen = CreatePen(PS_SOLID, AsConfig::Global_Scale, RGB(255, 255, 255)); // белый
@@ -28,6 +33,42 @@ void ALevel::Init()
    Level_Rect.top = AsConfig::Level_Y_Offset * AsConfig::Global_Scale;
    Level_Rect.right = Level_Rect.left + AsConfig::Cell_Wight *  AsConfig::Level_Width * AsConfig::Global_Scale;
    Level_Rect.bottom = Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height * AsConfig::Global_Scale;
+}
+
+void ALevel::Draw(HDC hdc,RECT &paint_area)
+{//рисуем весь уровень кирпичей
+   RECT intersertion_rect;
+   int i, j;
+      if (! IntersectRect(&intersertion_rect, &paint_area, &Level_Rect))
+         return;
+
+   for (i = 0; i < AsConfig::Level_Height; ++i) {
+      for (j = 0; j < AsConfig::Level_Width; ++j) {
+         Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Wight, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (EBrick_Type)Level_01[i][j]);
+      }
+   }
+}
+
+void ALevel::Check_Level_Brick_Hit(int &next_y_pos, double &ball_direction)
+{   //отражение шарика от кирпича
+
+   int i(0), j(0);
+   int brick_y_pos = AsConfig::Level_Y_Offset + AsConfig::Level_Height * AsConfig::Cell_Height;
+   for (i = AsConfig::Level_Height - 1; i >= 0; i--) 
+   {
+      for (j = 0; j < AsConfig::Level_Width; j++) 
+      {
+         if (Level_01[i][j] == 0)
+            continue;
+
+         if (next_y_pos < brick_y_pos) 
+         {
+            next_y_pos = brick_y_pos - (next_y_pos - brick_y_pos);
+            ball_direction = -ball_direction;
+         }
+      }
+      brick_y_pos -= AsConfig::Cell_Height;
+   }
 }
 
 void ALevel::Draw_Brick(HDC hdc, int x, int y, EBrick_Type brick_type)
@@ -170,38 +211,5 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, EBrick_Type brick_type, EL
 }
 
 
-void ALevel::Draw(HDC hdc,RECT &paint_area)
-{//рисуем весь уровень кирпичей
-   RECT intersertion_rect;
-   int i, j;
-      if (! IntersectRect(&intersertion_rect, &paint_area, &Level_Rect))
-         return;
 
-   for (i = 0; i < AsConfig::Level_Height; ++i) {
-      for (j = 0; j < AsConfig::Level_Width; ++j) {
-         Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Wight, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (EBrick_Type)Level_01[i][j]);
-      }
-   }
-}
 
-void ALevel::Check_Level_Brick_Hit(int &next_y_pos, double &ball_direction)
-{   //отражение шарика от кирпича
-
-   int i(0), j(0);
-   int brick_y_pos = AsConfig::Level_Y_Offset + AsConfig::Level_Height * AsConfig::Cell_Height;
-   for (i = AsConfig::Level_Height - 1; i >= 0; i--) 
-   {
-      for (j = 0; j < AsConfig::Level_Width; j++) 
-      {
-         if (Level_01[i][j] == 0)
-            continue;
-
-         if (next_y_pos < brick_y_pos) 
-         {
-            next_y_pos = brick_y_pos - (next_y_pos - brick_y_pos);
-            ball_direction = -ball_direction;
-         }
-      }
-      brick_y_pos -= AsConfig::Cell_Height;
-   }
-}

@@ -134,6 +134,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Main.h" />
+    <ClInclude Include="Platform.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -144,6 +145,7 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Platform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Popcorn.rc" />
