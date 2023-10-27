@@ -1,11 +1,12 @@
 #include "Platform.h"
 //----------------------------------------------------------------------------
-// APlatrorm
+
 AsPlatform::AsPlatform()
  : Inner_width(21), X_Step(AsConfig::Global_Scale), Width(28), X_Pos(AsConfig::Border_X_Offset), Platform_Circle_Pen(0), Platform_Inner_Pen(0), Highlight_Pen(0),
    Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}
 {
 }
+//------------------------------------------------------------------------------------------------------------------------------------------------------
 
 void AsPlatform::Init()
  {
@@ -13,6 +14,7 @@ void AsPlatform::Init()
      AsConfig::Create_Pen_Brush(0, 128, 192, Platform_Inner_Pen, Platform_Inner_Brush);//
      Highlight_Pen = CreatePen(PS_SOLID, 0, RGB(255, 255, 255)); // белый
 }
+//------------------------------------------------------------------------------------------------------------------------------------------------------
 
 void AsPlatform::Draw(HDC hdc, HPEN bg_pen, HBRUSH bg_brush, RECT& paint_area)
 {
@@ -46,7 +48,7 @@ void AsPlatform::Draw(HDC hdc, HPEN bg_pen, HBRUSH bg_brush, RECT& paint_area)
 
    RoundRect(hdc, (x + 4) * AsConfig::Global_Scale, (y + 1) * AsConfig::Global_Scale, (x + 4 + Inner_width - 1) * AsConfig::Global_Scale, (y + 1 + 5) * AsConfig::Global_Scale, 3 * AsConfig::Global_Scale, 3 * AsConfig::Global_Scale);
 }
-
+//------------------------------------------------------------------------------------------------------------------------------------------------------
 
 void AsPlatform::Redraw_Platform(HWND hwnd)
 {// перерисовка платформы

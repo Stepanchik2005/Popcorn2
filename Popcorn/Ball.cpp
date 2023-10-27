@@ -1,15 +1,17 @@
 #include "Ball.h"
-
+//------------------------------------------------------------------------------------------------------------------------------------------------------
 ABall::ABall()
     : Ball_X_Pos(20), Ball_Y_Pos(170), Ball_Speed(3.0), Ball_Direction(M_PI - M_PI_4), Ball_Pen(0), Ball_Brush(0),  Ball_Rect{}, Prev_Ball_Rect{}
  {
  }
+//------------------------------------------------------------------------------------------------------------------------------------------------------
 
  void ABall:: Init()
  {
     AsConfig::Create_Pen_Brush(255, 255, 255, Ball_Pen, Ball_Brush);
 
  }
+ //------------------------------------------------------------------------------------------------------------------------------------------------------
 
  void ABall::Move(HWND hwnd, ALevel *level, int platform_x_pos, int platform_width)
 {
@@ -71,6 +73,7 @@ ABall::ABall()
    InvalidateRect(hwnd, &Prev_Ball_Rect, FALSE);
    InvalidateRect(hwnd, &Ball_Rect, FALSE);
 }
+ //------------------------------------------------------------------------------------------------------------------------------------------------------
 
 void ABall::Draw(HDC hdc, RECT& paint_area, HPEN bg_pen, HBRUSH bg_brush)
 {

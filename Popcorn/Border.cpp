@@ -1,17 +1,20 @@
 #include "Border.h"
 
 
-//AsBorder----------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------
 AsBorder::AsBorder()
    : Border_Blue_Pen(0), Border_White_Pen(0), Border_Blue_Brush(0), Border_White_Brush(0)
 {    
 }
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+
 void AsBorder::Init()
 {
    AsConfig::Create_Pen_Brush(85, 225, 255, Border_Blue_Pen, Border_Blue_Brush);
    AsConfig::Create_Pen_Brush(255, 255, 255, Border_White_Pen, Border_White_Brush);// белый
 }
-  
+  //------------------------------------------------------------------------------------------------------------------------------------------------------
+
 void AsBorder::Draw(HDC hdc, RECT& paint_area, HPEN bg_pen, HBRUSH bg_brush)
 {// рисуем все рамки
    int i;
@@ -25,7 +28,7 @@ void AsBorder::Draw(HDC hdc, RECT& paint_area, HPEN bg_pen, HBRUSH bg_brush)
    for (i = 0; i < 50; i++)
      Draw_Element(hdc, 3 + i * 4, 0, true,  bg_pen,bg_brush);
 }
-
+//------------------------------------------------------------------------------------------------------------------------------------------------------
 
 void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border, HPEN bg_pen, HBRUSH bg_brush)
 {//рисуем элемент рамки
