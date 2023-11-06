@@ -15,22 +15,22 @@ void AsBorder::Init()
 }
   //------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void AsBorder::Draw(HDC hdc, RECT& paint_area, HPEN bg_pen, HBRUSH bg_brush)
+void AsBorder::Draw(HDC hdc, RECT& paint_area)
 {// рисуем все рамки
    int i;
    //рисуем левую рамку
    for (i = 0; i < 50; i++)
-      Draw_Element(hdc, 2, 1 + i * 4, false, bg_pen,bg_brush);
+      Draw_Element(hdc, 2, 1 + i * 4, false);
    //рисуем правую рамку
    for (i = 0; i < 50; i++)
-      Draw_Element(hdc, 201, 1 + i * 4, false,  bg_pen,bg_brush);
+      Draw_Element(hdc, 201, 1 + i * 4, false);
    //рисуем верхнюю рамку
    for (i = 0; i < 50; i++)
-     Draw_Element(hdc, 3 + i * 4, 0, true,  bg_pen,bg_brush);
+     Draw_Element(hdc, 3 + i * 4, 0, true);
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border, HPEN bg_pen, HBRUSH bg_brush)
+void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border)
 {//рисуем элемент рамки
    //голубая часть рамки
    SelectObject(hdc, Border_Blue_Pen);
@@ -50,8 +50,8 @@ void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border, HPEN bg_pen,
    else
       Rectangle(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, (x + 1) * AsConfig::Global_Scale, (y + 4) * AsConfig::Global_Scale);
    // фоновая часть рамки
-   SelectObject(hdc, bg_pen);
-   SelectObject(hdc, bg_brush);
+   SelectObject(hdc, AsConfig::BG_Pen);
+   SelectObject(hdc, AsConfig::BG_Brush);
 
 
    if (top_border)

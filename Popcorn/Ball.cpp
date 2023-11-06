@@ -75,15 +75,15 @@ ABall::ABall()
 }
  //------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void ABall::Draw(HDC hdc, RECT& paint_area, HPEN bg_pen, HBRUSH bg_brush)
+void ABall::Draw(HDC hdc, RECT& paint_area)
 {
     RECT intersertion_rect;
       if (!IntersectRect(&intersertion_rect, &paint_area, &Ball_Rect))
          return;
 
    // 1. перерисовываем старое место шарика
-   SelectObject(hdc, bg_pen);
-   SelectObject(hdc, bg_brush);
+   SelectObject(hdc, AsConfig::BG_Pen);
+   SelectObject(hdc, AsConfig::BG_Brush);
 
    Ellipse(hdc, Prev_Ball_Rect.left , Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
    

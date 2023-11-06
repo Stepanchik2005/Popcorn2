@@ -5,7 +5,7 @@ class AsPlatform{
 public:
     AsPlatform();
     void Init();
-    void Draw(HDC hdc, HPEN bg_pen, HBRUSH bg_brush, RECT& paint_area);
+    void Draw(HDC hdc, RECT& paint_area);
     void Redraw_Platform(HWND hwnd);
 
     int X_Pos;

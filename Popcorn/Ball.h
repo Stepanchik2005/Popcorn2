@@ -8,7 +8,7 @@ public:
    ABall();
    void Init();
    void Move(HWND hwnd,  ALevel *level, int platform_x_pos, int platform_width);
-   void Draw(HDC hdc, RECT &paint_area, HPEN bg_pen, HBRUSH bg_brush);
+   void Draw(HDC hdc, RECT &paint_area);
 
    double Ball_Direction;
 
