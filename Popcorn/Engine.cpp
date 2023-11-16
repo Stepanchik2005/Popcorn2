@@ -3,24 +3,27 @@
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
 AsEngine::AsEngine()
-: Hwnd(0),Level{},Border{}
+: Level{},Border{}
 {
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------
     
 void AsEngine::Init_Engine(HWND hwnd)
 {
-   Hwnd = hwnd;
+   AsConfig::Hwnd = hwnd;
 
+   AActive_Brick::Setup_Colors();
 
    Level.Init();
 
    Ball.Init();
    Platform.Init();
    Border.Init();
-   Platform.Redraw_Platform(hwnd);
+   Platform.Redraw_Platform();
 
-   SetTimer(Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
+   Platform.Setup_State(EPS_Roll_In);
+
+   SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -33,13 +36,12 @@ void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
       Draw_Brick_Letter(hdc, 20 + i * Cell_Wight * Global_Scale, 130, EBT_Red,ELT_O, i);
    }*/
 
-      Level.Draw(Hwnd,hdc, paint_area);
-      Platform.Draw(hdc, paint_area);
-
+      Level.Draw(hdc, paint_area);
+     
       Ball.Draw(hdc, paint_area);
-
+      Platform.Draw(hdc, paint_area);
       Border.Draw(hdc, paint_area);
-      AActive_Brick::Setup_Colors();
+     
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -52,7 +54,7 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 
       if (Platform.X_Pos <= AsConfig::Border_X_Offset)
          Platform.X_Pos = AsConfig::Border_X_Offset;
-      Platform.Redraw_Platform(Hwnd);
+      Platform.Redraw_Platform();
       break;
 
    case EKT_Right:
@@ -60,7 +62,7 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 
       if (Platform.X_Pos >= AsConfig::Max_X_Pos - Platform.Width + 1)
          Platform.X_Pos = AsConfig::Max_X_Pos - Platform.Width + 1;
-      Platform.Redraw_Platform(Hwnd);
+      Platform.Redraw_Platform();
 
       break;
 
@@ -74,8 +76,12 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 
 int AsEngine::On_Timer()
 {
-   Ball.Move(Hwnd, &Level, Platform.X_Pos, Platform.Width);
-   Level.Active_Brick.Act(Hwnd);
+   ++AsConfig::Current_Time_Tick;
+   Ball.Move(&Level, Platform.X_Pos, Platform.Width);
+   Level.Active_Brick.Act();
+
+   //if(AsConfig::Current_Time_Tick % 10 == 0)
+   Platform.Act();
    return 0;
 }
 

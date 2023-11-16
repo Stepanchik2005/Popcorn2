@@ -9,20 +9,18 @@ HPEN AActive_Brick::Fading_Blue_Bricks_Pen[Max_Fade_Step];
 HBRUSH AActive_Brick::Fading_Blue_Bricks_Brushes[Max_Fade_Step];
 HPEN AActive_Brick::Fading_Red_Bricks_Pen[Max_Fade_Step];
 HBRUSH AActive_Brick::Fading_Red_Bricks_Brushes[Max_Fade_Step];
-void AActive_Brick::Act(HWND hwnd)
+void AActive_Brick::Act()
 {
    if(Fade_Step < Max_Fade_Step - 1)
    {
      ++Fade_Step;
-     InvalidateRect(hwnd, &brick_rect, FALSE);
+     InvalidateRect(AsConfig::Hwnd, &brick_rect, FALSE);
    }
 }
 
- void AActive_Brick::Draw(HWND hwnd, HDC hdc,RECT &paint_area)
+ void AActive_Brick::Draw(HDC hdc,RECT &paint_area)
  {
   
- 
-
    switch(Brick_Type)
    {
    case EBT_Blue:
@@ -59,7 +57,7 @@ void AActive_Brick::Setup_Colors()
 }
 unsigned char AActive_Brick::Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step)
 {
-    return color - step * (color - bg_color) / AActive_Brick::Max_Fade_Step - 1;
+    return color - step * (color - bg_color) / (AActive_Brick::Max_Fade_Step - 1);
 }
 void AActive_Brick::Get_Fading_Color(const AColor &color,int step, HPEN &pen, HBRUSH &brush)
 {

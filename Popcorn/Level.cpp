@@ -42,7 +42,7 @@ void ALevel::Init()
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void ALevel::Draw(HWND hwnd, HDC hdc,RECT &paint_area)
+void ALevel::Draw(HDC hdc,RECT &paint_area)
 {//рисуем весь уровень кирпичей
    RECT intersertion_rect;
    int i, j;
@@ -53,7 +53,7 @@ void ALevel::Draw(HWND hwnd, HDC hdc,RECT &paint_area)
           for (j = 0; j < AsConfig::Level_Width; ++j) 
               Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Wight, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (EBrick_Type)Level_01[i][j]);
 
-      Active_Brick.Draw(hwnd, hdc, paint_area);
+      Active_Brick.Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 

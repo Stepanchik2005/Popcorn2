@@ -10,27 +10,22 @@ class AActive_Brick
 {
 public: 
    AActive_Brick(EBrick_Type Brick_Type);
-   void Draw(HWND hwnd, HDC hdc,RECT &paint_area);
-   void Act(HWND hwnd);
-
-   static unsigned char Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step);
-
-
+   void Draw( HDC hdc,RECT &paint_area);
+   void Act();
    static void Setup_Colors();
-   static void Get_Fading_Color(const AColor &color,int step, HPEN &pen, HBRUSH &brush);
 
+private:
+   static unsigned char Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step);
+   static void Get_Fading_Color(const AColor &color,int step, HPEN &pen, HBRUSH &brush);
 
    int Fade_Step;
 
    static const int Max_Fade_Step = 40;
 
-  
-private:
-  
-    HPEN pen;
-    HBRUSH brush;
-    EBrick_Type Brick_Type;
-    RECT brick_rect{};
+   HPEN pen;
+   HBRUSH brush;
+   EBrick_Type Brick_Type;
+   RECT brick_rect{};
 
 
 

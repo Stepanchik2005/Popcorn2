@@ -17,7 +17,7 @@ public:
    ALevel();
 
    void Init();
-   void Draw(HWND hwnd,HDC hdc,RECT &paint_area);
+   void Draw(HDC hdc,RECT &paint_area);
    void Check_Level_Brick_Hit(int &next_y_pos, double &ball_direction);
 
    AActive_Brick Active_Brick;

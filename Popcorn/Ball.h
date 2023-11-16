@@ -7,7 +7,7 @@ class ABall
 public:
    ABall();
    void Init();
-   void Move(HWND hwnd,  ALevel *level, int platform_x_pos, int platform_width);
+   void Move(ALevel *level, int platform_x_pos, int platform_width);
    void Draw(HDC hdc, RECT &paint_area);
 
    double Ball_Direction;
