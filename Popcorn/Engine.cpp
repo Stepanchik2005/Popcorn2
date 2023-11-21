@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
 AsEngine::AsEngine()
-: Level{},Border{}
+: Level{},Border{}, Game_State(EGS_Play_Level)
 {
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -16,12 +16,14 @@ void AsEngine::Init_Engine(HWND hwnd)
 
    Level.Init();
 
-   Ball.Init();
+   
    Platform.Init();
+   Ball.Init();
    Border.Init();
    Platform.Redraw_Platform();
 
-   Platform.Setup_State(EPS_Roll_In);
+   Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
+   Platform.Setup_State(EPS_Normal);
 
    SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
 }
@@ -67,6 +69,12 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
       break;
 
    case EKT_Space:
+      if(Platform.Get_State() == EPS_Ready)
+      {
+         Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
+         Game_State = EGS_Play_Level;
+         Platform.Setup_State(EPS_Normal);
+      }
        break;
    }
 
@@ -77,9 +85,40 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 int AsEngine::On_Timer()
 {
    ++AsConfig::Current_Time_Tick;
-   Ball.Move(&Level, Platform.X_Pos, Platform.Width);
-   Level.Active_Brick.Act();
+  
+  // Level.Active_Brick.Act();
 
+   switch(Game_State)
+   {
+   case EGS_Play_Level:
+      Ball.Move(&Level, Platform.X_Pos, Platform.Width);
+
+      if(Ball.Get_State() == EBS_Lost)
+      {
+         Game_State = EGS_Lost_Ball;
+         Platform.Setup_State(EPS_Meltdown);
+      }
+
+      break;
+   
+   case EGS_Lost_Ball:
+       if(Platform.Get_State() == EPS_Missing)
+       {
+         Game_State = EGS_Restart_Level;
+         Platform.Setup_State(EPS_Roll_In);
+       }
+       break;   
+    
+   case EGS_Restart_Level:
+       if(Platform.Get_State() == EPS_Ready)
+       {
+          Game_State = EGS_Play_Level;
+          Ball.Set_State(EBS_On_Platform, Platform.X_Pos + Platform.Width / 2);
+         
+       }
+       break;
+
+   }
    //if(AsConfig::Current_Time_Tick % 10 == 0)
    Platform.Act();
    return 0;

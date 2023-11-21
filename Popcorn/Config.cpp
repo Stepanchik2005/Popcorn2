@@ -11,6 +11,7 @@ HPEN AsConfig::BG_Pen;
 HBRUSH AsConfig::BG_Brush;
 HWND AsConfig::Hwnd;
 int AsConfig::Current_Time_Tick = 0;
+bool AsConfig::Level_Has_Floor = false;
 void AsConfig::Setup_Colors()
 {
    AsConfig::Create_Pen_Brush(AsConfig::BG_Color, AsConfig::BG_Pen, AsConfig::BG_Brush);

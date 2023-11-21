@@ -57,7 +57,7 @@ void ALevel::Draw(HDC hdc,RECT &paint_area)
 }
 //------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void ALevel::Check_Level_Brick_Hit(int &next_y_pos, double &ball_direction)
+void ALevel::Check_Level_Brick_Hit(double &next_y_pos, double &ball_direction)
 {   //отражение шарика от кирпича
 
    int i(0), j(0);
@@ -142,7 +142,7 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, EBrick_Type brick_type, EL
    int back_part_offset;
    HPEN back_pen, front_pen;
    HBRUSH back_brush, front_brush;
-   XFORM xform, old_xform;
+   XFORM xform{}, old_xform{};
 
    if (brick_type != EBT_Blue && brick_type != EBT_Red)
       return;// 

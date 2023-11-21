@@ -3,6 +3,7 @@
 enum EPlatform_State
 {
    EPS_Missing,
+   EPS_Ready,
    EPS_Normal,
    EPS_Meltdown,
    EPS_Roll_In,
@@ -22,7 +23,8 @@ public:
     int Width;
     int Rolling_Step;
     int X_Step;
-    
+
+    EPlatform_State Get_State();
 
 private:
    void Clear_BG(HDC hdc);
