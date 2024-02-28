@@ -1,20 +1,18 @@
-#pragma once
-#include <Windows.h>
-#include "Config.h"
+﻿#pragma once
 
+#include "Ball.h"
 
-class AsBorder
+//------------------------------------------------------------------------------------------------------------
+class AsBorder: public AHit_Checker
 {
 public:
-   AsBorder();
-   void Init();
-   void Draw(HDC hdc, RECT &paint_area);
+	AsBorder();
 
+	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball);
 
+	void Draw(HDC hdc, RECT &paint_area);
 
 private:
-   void Draw_Element(HDC hdc, int x, int y, bool top_border);
-
-   HPEN   Border_Blue_Pen, Border_White_Pen;
-   HBRUSH  Border_Blue_Brush, Border_White_Brush;
+	void Draw_Element(HDC hdc, int x, int y, bool top_border);
 };
+//------------------------------------------------------------------------------------------------------------

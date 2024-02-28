@@ -3,39 +3,42 @@
   <ItemGroup>
     <Filter Include="Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Main">
-      <UniqueIdentifier>{0f632f82-148b-4402-8dc8-3b57806b0546}</UniqueIdentifier>
+      <UniqueIdentifier>{0d12d7d1-0b44-4e11-8d40-384a198bfd76}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine">
-      <UniqueIdentifier>{01218263-9cbf-4f4d-aee1-1da1440cb188}</UniqueIdentifier>
+      <UniqueIdentifier>{b24a35de-62d5-4d1d-813e-f6f217c3ed02}</UniqueIdentifier>
     </Filter>
     <Filter Include="Border">
-      <UniqueIdentifier>{6240fb53-96c2-4eaf-8bed-311f34a82761}</UniqueIdentifier>
+      <UniqueIdentifier>{fa44af56-897d-4df7-9c5a-02d5ce74f94d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Level">
-      <UniqueIdentifier>{9bb118d6-700d-4b6e-b6f2-1ddc89c255de}</UniqueIdentifier>
+      <UniqueIdentifier>{af0f142b-c080-4e29-8c92-82778d40dffd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Config">
-      <UniqueIdentifier>{97ba875b-27d7-4ca5-95b4-fe04b1c15704}</UniqueIdentifier>
+      <UniqueIdentifier>{d47e0b6f-9d2a-4b7b-b735-bcd2c5b78711}</UniqueIdentifier>
     </Filter>
     <Filter Include="Ball">
-      <UniqueIdentifier>{eab60d16-144f-4132-a7ba-f277441f0216}</UniqueIdentifier>
+      <UniqueIdentifier>{6c14793c-3234-4996-8754-a4855ea913d0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform">
-      <UniqueIdentifier>{bfa69b59-4c2b-4804-8bc3-0cbe0d97735f}</UniqueIdentifier>
+      <UniqueIdentifier>{9ff61a79-88c6-46d8-82c7-55c53a2bf2ba}</UniqueIdentifier>
     </Filter>
     <Filter Include="Active_Brick">
-      <UniqueIdentifier>{de8f8eab-3697-4559-b79a-8f0bc88aef50}</UniqueIdentifier>
+      <UniqueIdentifier>{63e4d4d8-864f-4cdb-9635-a2888618aef0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Falling_Letter">
+      <UniqueIdentifier>{72caa4b7-957d-469d-b449-1b62828d166d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -50,9 +53,6 @@
     </ClInclude>
     <ClInclude Include="Main.h">
       <Filter>Main</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine.h">
-      <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Border.h">
       <Filter>Border</Filter>
@@ -71,6 +71,12 @@
     </ClInclude>
     <ClInclude Include="Active_Brick.h">
       <Filter>Active_Brick</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Falling_Letter.h">
+      <Filter>Falling_Letter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +116,9 @@
     </ClCompile>
     <ClCompile Include="Active_Brick.cpp">
       <Filter>Active_Brick</Filter>
+    </ClCompile>
+    <ClCompile Include="Falling_Letter.cpp">
+      <Filter>Falling_Letter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
