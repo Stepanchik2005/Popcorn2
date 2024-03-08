@@ -1,9 +1,6 @@
 #include "Active_Brick.h"
 
-//AGraphics_Objects
-AGraphics_Objects::~AGraphics_Objects()
-{
-}
+
 
 
 
@@ -567,7 +564,6 @@ AAdvertisement::AAdvertisement(int level_x, int level_y, int width, int height)
 {
 	const int scale = AsConfig::Global_Scale;
 
-	int i, j;
 
 	Empty_Region = CreateRectRgn(0,0,0,0);
 
@@ -678,11 +674,11 @@ void AAdvertisement::Draw(HDC hdc, RECT &paint_area)
 
 	deformation = (int) ( (1.0 - Deformation_Ratio)) * (double)scale * 3.0;
 
-	ball_width = shadow_width + deformation;
-	ball_height = shadow_height - deformation;
+	ball_width = (int) ( (double)shadow_width + deformation);
+	ball_height = (int) ( (double)shadow_height - deformation);
 
 	x = Ball_X - ball_width / 2;
-	y = (Ball_Y - ball_height / 2.0) + Ball_Offset / 5 + 8 * scale;
+	y = (Ball_Y - ball_height / 2.0) + Ball_Offset / 5.0 + (double) (8 * scale);
 
 	Ellipse(hdc, x, y, x + ball_width,  y + ball_height);
 
@@ -706,11 +702,11 @@ void AAdvertisement::Draw(HDC hdc, RECT &paint_area)
 	
 
 	deformation = (1.0 - Deformation_Ratio) * scale * 3.0;
-	ball_width = Ball_Width + deformation;
-	ball_height = Ball_Height - deformation;
+	ball_width = (int)( (double)Ball_Width + deformation);
+	ball_height = (int)( (double)Ball_Height - deformation);
 
 	x = Ball_X - ball_width / 2;
-	y = (Ball_Y - ball_height / 2.0) - Ball_Offset;
+	y = (Ball_Y - ball_height / 2.0) - (int)Ball_Offset;
 
 	AsConfig::Red_Color.Select(hdc);
 	Ellipse(hdc, x, y, x + ball_width,  y + ball_height);

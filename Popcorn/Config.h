@@ -45,6 +45,11 @@ public:
 
 	static HWND Hwnd;
 
+	static const double Moving_Size_Step;
+	static const double D_Global_Scale;
+	static const double Accelerate_Ball_Speed;
+	static const double Initial_Ball_Speed;
+
 	static const int Global_Scale = 3;
 	static const int Border_X_Offset = 6;
 	static const int Border_Y_Offset = 4;
@@ -63,6 +68,10 @@ public:
 	static const int Max_Active_Brick_Size = 10;
 	static const int Max_Falling_Letters_Size = 10;
 	static const int Max_Random_Number_For_Letter = 1; // вероятность	1 / Max_Random_Number_For_Letter выпадения буквы
-	static const double Moving_Size_Step;
+	static const int Max_Balls_Count = 5;
+	static const int Max_Movers_Count = 10;
+	static const int Max_Life_Count = 12;
+	static const int Floor_Y_Pos = AsConfig::Max_Y_Pos - 1;
+	static const int Max_Graphics_Objects_Count = 10;
 };
 //------------------------------------------------------------------------------------------------------------

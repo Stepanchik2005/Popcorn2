@@ -74,7 +74,9 @@ void AColor::Select_Pen(HDC hdc) const
 
 
 // AsConfig
-bool AsConfig::Level_Has_Floor = false;
+
+
+bool AsConfig::Level_Has_Floor = true;
 int AsConfig::Current_Timer_Tick = 0;
 
 const AColor AsConfig::BG_Color(15, 63, 31);
@@ -92,6 +94,9 @@ const AColor AsConfig::Unbreakable_Red_Hightlight_Color(AsConfig::Red_Color, 2 *
 HWND AsConfig::Hwnd;
 
 const double AsConfig::Moving_Size_Step = 1.0 / AsConfig::Global_Scale;
+const double AsConfig::D_Global_Scale = 3.0;
+const double AsConfig::Accelerate_Ball_Speed = 1.001;
+const double AsConfig::Initial_Ball_Speed = 3.0;
 //------------------------------------------------------------------------------------------------------------
 int AsConfig::Rand(int range)
 {// Вычисляет псевдослучайное число в диапазоне [0, .. range - 1]

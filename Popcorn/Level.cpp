@@ -6,14 +6,14 @@
 char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 1,
-	1, 9, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0,
-	2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0,
-	1, 1, 1, 1, 0, 0, 0, 0, 0, 10, 10, 0,
-	1, 1, 1, 1, 0, 0, 0, 0, 0, 10, 10, 0,
-	2, 2, 2, 2, 0, 0, 0, 0, 0, 10, 10, 0,
-	2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -48,7 +48,7 @@ ALevel::~ALevel()
 //------------------------------------------------------------------------------------------------------------
 
 ALevel::ALevel()
-: Level_Rect{}, Active_Brick_Counter(0), Falling_Letters_Counter(0), Teleport_Counter(0), Teleport_Pos(0), Advertisement(0)
+: Level_Rect{}, Active_Brick_Counter(0), Falling_Letters_Counter(0), Teleport_Counter(0), Teleport_Pos(0), Advertisement(0), Need_To_Stop_All_Activity(false)
 {
 }
 //------------------------------------------------------------------------------------------------------------
@@ -149,6 +149,60 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
+void ALevel::Act()
+{
+	Act_Objects((AGraphics_Objects**)&Active_Bricks, Active_Brick_Counter, AsConfig::Max_Active_Brick_Size);
+	Act_Objects((AGraphics_Objects**)&Falling_Letters, Falling_Letters_Counter, AsConfig::Max_Falling_Letters_Size);
+
+	if(Advertisement != 0)
+		Advertisement->Act();
+}
+bool ALevel::Is_Finished()
+{
+	return false;
+}
+void ALevel::Draw(HDC hdc, RECT &paint_area)
+{
+	int i, j;
+	RECT intersection_rect, brick_rect = {};
+
+	
+	if(Advertisement != 0)
+		Advertisement->Draw(hdc, paint_area);
+
+	if(Need_To_Stop_All_Activity)
+		Delete();
+
+	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect) )
+	{
+		for (i = 0; i < AsConfig::Level_Height; i++)
+	    	for (j = 0; j < AsConfig::Level_Width; j++)
+			{
+				brick_rect.left = (AsConfig::Level_X_Offset + j * AsConfig::Cell_Width) * AsConfig::Global_Scale;
+				brick_rect.top = (AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height) * AsConfig::Global_Scale;
+				brick_rect.right = brick_rect.left + AsConfig::Brick_Width * AsConfig::Global_Scale;
+				brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height * AsConfig::Global_Scale;
+
+				if(IntersectRect(&intersection_rect, &paint_area, &brick_rect))
+	    			Draw_Brick(hdc, brick_rect, j, i);
+			}
+
+	
+		Draw_Objects(hdc, paint_area, (AGraphics_Objects**)&Active_Bricks, AsConfig::Max_Active_Brick_Size);
+	}
+
+	Draw_Objects(hdc, paint_area, (AGraphics_Objects**)&Falling_Letters, AsConfig::Max_Falling_Letters_Size);
+
+	
+}
+void ALevel::Clear(HDC hdc, RECT &paint_area)
+{
+	// 1. Очищаем движущиеся объекты
+	Clear_Objects(hdc, paint_area, (AGraphics_Objects**)&Falling_Letters, AsConfig::Max_Falling_Letters_Size);
+	
+	if(Advertisement != 0)
+		Advertisement->Clear(hdc, paint_area);
+}
 
 void ALevel::Init()
 {
@@ -184,7 +238,7 @@ void ALevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Leve
 		if(Teleport_Counter > ALevel::Max_Teleports_In_Level)
 			Teleport_Counter = ALevel::Max_Teleports_In_Level;
 	}
-	if(Teleport_Counter < 2)
+	if(Teleport_Counter < 2 && Teleport_Counter != 0)
 		AsConfig::Throw();
 
 	// 2. Записать телепорты в массив
@@ -211,62 +265,11 @@ void ALevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Leve
 		}
 	}
 
-	Advertisement = new AAdvertisement(9, 5, 2, 3);
+	//Advertisement = new AAdvertisement(9, 5, 2, 3);
 	
 
 }
 //------------------------------------------------------------------------------------------------------------
-void ALevel::Draw(HDC hdc, RECT &paint_area)
-{// Вывод всех кирпичей уровня
-	
-	
-	int i, j;
-	RECT intersection_rect, brick_rect = {};
-
-	// 1. Очищаем движущиеся объекты
-	Clear_Objects(hdc, paint_area, (AGraphics_Objects**)&Falling_Letters, AsConfig::Max_Falling_Letters_Size);
-	
-	if(Advertisement != 0)
-		Advertisement->Clear(hdc, paint_area);
-
-	if(Advertisement != 0)
-		Advertisement->Draw(hdc, paint_area);
-
-	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect) )
-	{
-		for (i = 0; i < AsConfig::Level_Height; i++)
-	    	for (j = 0; j < AsConfig::Level_Width; j++)
-			{
-				brick_rect.left = (AsConfig::Level_X_Offset + j * AsConfig::Cell_Width) * AsConfig::Global_Scale;
-				brick_rect.top = (AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height) * AsConfig::Global_Scale;
-				brick_rect.right = brick_rect.left + AsConfig::Brick_Width * AsConfig::Global_Scale;
-				brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height * AsConfig::Global_Scale;
-
-				if(IntersectRect(&intersection_rect, &paint_area, &brick_rect))
-	    			Draw_Brick(hdc, brick_rect, j, i);
-			}
-
-	
-		Draw_Objects(hdc, paint_area, (AGraphics_Objects**)&Active_Bricks, AsConfig::Max_Active_Brick_Size);
-	}
-
-	Draw_Objects(hdc, paint_area, (AGraphics_Objects**)&Falling_Letters, AsConfig::Max_Falling_Letters_Size);
-
-	
-}
-
-
-//------------------------------------------------------------------------------------------------------------
-void ALevel::Act()
-{
-	Act_Objects((AGraphics_Objects**)&Active_Bricks, Active_Brick_Counter, AsConfig::Max_Active_Brick_Size);
-	Act_Objects((AGraphics_Objects**)&Falling_Letters, Falling_Letters_Counter, AsConfig::Max_Falling_Letters_Size);
-
-	if(Advertisement != 0)
-		Advertisement->Act();
-}
-//------------------------------------------------------------------------------------------------------------
-
 bool ALevel::Get_Next_Falling_Letter(int& index, AFalling_Letter **falling_letter)
 {
 	AFalling_Letter *current_letter;
@@ -295,6 +298,12 @@ bool ALevel::Get_Next_Falling_Letter(int& index, AFalling_Letter **falling_lette
 
 //------------------------------------------------------------------------------------------------------------
 
+
+void ALevel::Stop()
+{
+	Need_To_Stop_All_Activity = true;
+}
+//------------------------------------------------------------------------------------------------------------
 bool ALevel::On_Hit(int brick_x, int brick_y, ABall *ball, bool got_vertical_hit)
 {
 	EBrick_Type brick_type;
@@ -428,7 +437,9 @@ bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 				letter_x = (AsConfig::Level_X_Offset + brick_x * AsConfig::Cell_Width) * AsConfig::Global_Scale;
 				letter_y = (AsConfig::Level_Y_Offset + brick_y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
 
-				letter_type = AFalling_Letter::Get_Random_Letter_Type();
+				//letter_type = AFalling_Letter::Get_Random_Letter_Type();
+
+				letter_type = ELT_P;
 
 				falling_letter = new AFalling_Letter (letter_type, letter_x, letter_y, brick_type);
 				Falling_Letters[i] = falling_letter;
@@ -715,4 +726,28 @@ void ALevel::Draw_Part_Paraschute(HDC hdc, RECT &brick_rect, double offset, int 
 	AsConfig::Paraschute_Color.Select(hdc);
 	AsConfig::Round_Rect(hdc, parashcute_rect);
 }
+//------------------------------------------------------------------------------------------------------------
+void ALevel::Delete()
+{
+	Delete_Objects((AGraphics_Objects**)&Active_Bricks, Active_Brick_Counter, AsConfig::Max_Active_Brick_Size);
+	Delete_Objects((AGraphics_Objects**)&Falling_Letters, Falling_Letters_Counter, AsConfig::Max_Falling_Letters_Size);
+
+	Need_To_Stop_All_Activity = false;
+}
+//------------------------------------------------------------------------------------------------------------
+void ALevel::Delete_Objects(AGraphics_Objects** object_for_drawing, int &object_count, int max_size)
+{
+	int i;
+	for(i = 0; i < max_size; ++i)
+	{
+		if(object_for_drawing[i] != 0)
+		{
+		  	delete object_for_drawing[i];
+		  	object_for_drawing[i] = 0;
+			--object_count;
+		  
+		}
+	} 
+}
+
 //------------------------------------------------------------------------------------------------------------

@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{5EBBC717-66EE-4B70-AA37-A31FADAA3E10}</ProjectGuid>
+    <ProjectGuid>{C4958476-B624-411F-AD91-D6918C7A280E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Popcorn</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
@@ -159,6 +159,7 @@
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Falling_Letter.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Ball_Set.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Platform.h" />
@@ -168,6 +169,7 @@
   <ItemGroup>
     <ClCompile Include="Active_Brick.cpp" />
     <ClCompile Include="Ball.cpp" />
+    <ClCompile Include="Ball_Set.cpp" />
     <ClCompile Include="Border.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Engine.cpp" />

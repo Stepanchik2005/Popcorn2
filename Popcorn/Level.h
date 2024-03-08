@@ -12,7 +12,7 @@ struct SPoint
 //------------------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------------------------------
-class ALevel: public AHit_Checker
+class ALevel: public AHit_Checker, public AGraphics_Objects
 {
 public:
 	~ALevel();
@@ -20,12 +20,15 @@ public:
 
 	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball);
 
+	virtual void Act();
+	virtual bool Is_Finished();
+	virtual void Draw(HDC hdc, RECT &paint_area);
+	virtual void Clear(HDC hdc, RECT &paint_area);
+
 	void Init();
 	void Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Level_Width]);
-	void Draw(HDC hdc, RECT &paint_area);
-	void Act();
    bool Get_Next_Falling_Letter(int& index, AFalling_Letter **falling_letter);
-
+	void Stop();
 	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
 	static char Test_Level[AsConfig::Level_Height][AsConfig::Level_Width];
 
@@ -46,7 +49,8 @@ private:
 	void Draw_Objects(HDC hdc, RECT &paint_area, AGraphics_Objects** object_for_drawing,  int max_size);
 	void Draw_Paraschute_In_Level(HDC hdc, RECT &brick_rect);
 	void Draw_Part_Paraschute(HDC hdc, RECT &brick_rect, double offet, int width);
-
+	void Delete();
+	void Delete_Objects(AGraphics_Objects** object_for_drawing, int &object_count, int max_size);
 	RECT Level_Rect;	
 	
 
@@ -62,5 +66,7 @@ private:
 	AActive_Brick *Active_Bricks[AsConfig::Max_Active_Brick_Size];
 	AFalling_Letter *Falling_Letters[AsConfig::Max_Falling_Letters_Size];
 	AAdvertisement *Advertisement;
+
+	bool Need_To_Stop_All_Activity;
 };
 //------------------------------------------------------------------------------------------------------------

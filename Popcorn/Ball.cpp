@@ -1,4 +1,18 @@
 ﻿#include "Ball.h"
+//AGraphics_Objects
+AGraphics_Objects::~AGraphics_Objects()
+{
+}
+
+
+
+
+// AMover
+AMover::~AMover()
+{
+}
+
+
 
 // ABall
 const double ABall::Start_Ball_Y_Pos = 181.0;
@@ -7,13 +21,11 @@ int ABall::Hit_Checkers_Count = 0;
 AHit_Checker *ABall::Hit_Checkers[] = {};
 //------------------------------------------------------------------------------------------------------------
 ABall::ABall()
-: Ball_State(EBS_Normal),Prev_Ball_State(EBS_Normal), Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Ball_Speed(0.0),
-  Rest_Distance(0.0), Ball_Direction(0), Testing_Is_Active(false), Test_Iteration(0), Ball_Rect{}, Prev_Ball_Rect{}
+: Ball_State(EBS_Disabled),Prev_Ball_State(EBS_Disabled), Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Ball_Speed(0.0),
+  Ball_Direction(0), Testing_Is_Active(false), Test_Iteration(0), Ball_Rect{}, Prev_Ball_Rect{}
 {
 	//Set_State(EBS_Normal, 0);
 }
-//------------------------------------------------------------------------------------------------------------
-
 //------------------------------------------------------------------------------------------------------------
 bool AHit_Checker::Hit_Circle_On_Line(double y, double next_x_pos, double left_x, double right_x, double radius, double &x)
 {// Проверяет пересечение горизонтального отрезка (проходящего от left_x до right_x через y) с окружностью радиусом radius
@@ -37,22 +49,111 @@ bool AHit_Checker::Hit_Circle_On_Line(double y, double next_x_pos, double left_x
 	else
 		return false;
 }
+//------------------------------------------------------------------------------------------------------------
+void ABall::Advance(double max_speed)
+{
+	int i;
+	bool got_hit;
+	double next_x_pos, next_y_pos;
+	double next_step = Ball_Speed / max_speed * AsConfig::Moving_Size_Step;
+	if(Ball_State == EBS_Disabled)
+		return;
+
+	if (Ball_State == EBS_Lost || Ball_State == EBS_On_Platform || Ball_State == EBS_Teleporting)
+		return;
+
+	//Prev_Ball_Rect = Ball_Rect;
+	//Rest_Distance += Ball_Speed;
+
+	/*while (Rest_Distance >= AsConfig::Moving_Size_Step)
+	{*/
+		got_hit = false;
+
+		next_x_pos = Center_X_Pos + next_step * cos(Ball_Direction);
+		next_y_pos = Center_Y_Pos - next_step * sin(Ball_Direction);
+
+		// Корректируем позицию при отражении:
+		for (i = 0; i < Hit_Checkers_Count; i++)
+			got_hit |= Hit_Checkers[i]->Check_Hit(next_x_pos, next_y_pos, this); 
+
+		if (! got_hit)
+		{
+			// Мячик продолжит движение, если не взаимодействовал с другими объектами
+			//Rest_Distance -= AsConfig::Moving_Size_Step;
+
+			Center_X_Pos = next_x_pos;
+			Center_Y_Pos = next_y_pos;
+
+			if (Testing_Is_Active)
+				Rest_Test_Distance -= AsConfig::Moving_Size_Step;
+		}
+	//}
+
+	/*Redraw_Ball();
+
+	if(Ball_State == EBS_On_Paraschute)
+	{
+		Prev_Paraschute_Rect = Paraschute_Rect;
+
+		Paraschute_Rect.bottom = Ball_Rect.bottom;
+		Paraschute_Rect.top = Paraschute_Rect.bottom - Paraschute_Size * AsConfig::Global_Scale;
+		
+	   Redraw_Paraschute();
+	}*/
+}
+//------------------------------------------------------------------------------------------------------------
+double ABall::Get_Speed()
+{
+	return Ball_Speed;
+}
+//------------------------------------------------------------------------------------------------------------
+
+void ABall::Start_Movement()
+{
+	Prev_Ball_Rect = Ball_Rect;
+}
+//------------------------------------------------------------------------------------------------------------
+
+void ABall::End_Movement()
+{
+	if(Ball_State == EBS_Disabled || Ball_State == EBS_Lost)
+		return;
+
+	Redraw_Ball();
+
+	if(Ball_State == EBS_On_Paraschute)
+	{
+		Prev_Paraschute_Rect = Paraschute_Rect;
+
+		Paraschute_Rect.bottom = Ball_Rect.bottom;
+		Paraschute_Rect.top = Paraschute_Rect.bottom - Paraschute_Size * AsConfig::Global_Scale;
+		
+	   Redraw_Paraschute();
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Act()
+{
+
+}
+bool ABall::Is_Finished()
+{
+	return false;
+}
 void ABall::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
+	if(Ball_State == EBS_Disabled)
+		return;
+
 	if( (Ball_State == EBS_Teleporting || Ball_State == EBS_Lost) && Prev_Ball_State == Ball_State)
 		return;
-	// 1. Очищаем фон
-	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect) )
-	{
-      AsConfig::BG_Color.Select(hdc);
 
-		Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
-	}
-   
 	switch (Ball_State)
 	{
+	case EBS_Disabled:
+		return;
 	case EBS_Normal: // сразу переходим к рисованию, т.к. доп. условий для этих состояний не требуется
 	case EBS_On_Platform:
 		break;
@@ -87,55 +188,28 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 		Ellipse(hdc, Ball_Rect.left, Ball_Rect.top, Ball_Rect.right - 1, Ball_Rect.bottom - 1);
 	}
 }
-//------------------------------------------------------------------------------------------------------------
-void ABall::Move()
+void ABall::Clear(HDC hdc, RECT &paint_area)
 {
-	int i;
-	bool got_hit;
-	double next_x_pos, next_y_pos;
-	
+	RECT intersection_rect;
 
-	if (Ball_State == EBS_Lost || Ball_State == EBS_On_Platform || Ball_State == EBS_Teleporting)
+	if(Ball_State == EBS_Disabled)
 		return;
 
-	Prev_Ball_Rect = Ball_Rect;
-	Rest_Distance += Ball_Speed;
+	if( (Ball_State == EBS_Teleporting || Ball_State == EBS_Lost) && Prev_Ball_State == Ball_State)
+		return;
 
-	while (Rest_Distance >= AsConfig::Moving_Size_Step)
+	// 1. Очищаем фон
+	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect) )
 	{
-		got_hit = false;
+      AsConfig::BG_Color.Select(hdc);
 
-		next_x_pos = Center_X_Pos + AsConfig::Moving_Size_Step * cos(Ball_Direction);
-		next_y_pos = Center_Y_Pos - AsConfig::Moving_Size_Step * sin(Ball_Direction);
-
-		// Корректируем позицию при отражении:
-		for (i = 0; i < Hit_Checkers_Count; i++)
-			got_hit |= Hit_Checkers[i]->Check_Hit(next_x_pos, next_y_pos, this); 
-
-		if (! got_hit)
-		{
-			// Мячик продолжит движение, если не взаимодействовал с другими объектами
-			Rest_Distance -= AsConfig::Moving_Size_Step;
-
-			Center_X_Pos = next_x_pos;
-			Center_Y_Pos = next_y_pos;
-
-			if (Testing_Is_Active)
-				Rest_Test_Distance -= AsConfig::Moving_Size_Step;
-		}
+		Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
 	}
-
-	Redraw_Ball();
-
-	if(Ball_State == EBS_On_Paraschute)
-	{
-		Prev_Paraschute_Rect = Paraschute_Rect;
-
-		Paraschute_Rect.bottom = Ball_Rect.bottom;
-		Paraschute_Rect.top = Paraschute_Rect.bottom - Paraschute_Size * AsConfig::Global_Scale;
-		
-	   Redraw_Paraschute();
-	}
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Set_Speed(double ball_speed)
+{
+	Ball_Speed = ball_speed;
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Set_For_Test()
@@ -156,7 +230,7 @@ bool ABall::Is_Test_Finished()
 		if (Rest_Test_Distance <= 0.0)
 		{
 			Testing_Is_Active = false;
-			Set_State(EBS_Lost, 0);
+			Set_State(EBS_Lost);
 			return true;
 		}
 	}
@@ -173,11 +247,14 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 {
 	switch (new_state)
 	{
+	case EBS_Disabled:
+		Ball_Speed = 0.0;
+		break;
+
 	case EBS_Normal:
 		Center_X_Pos = x_pos;
 		Center_Y_Pos = y_pos;
-		Ball_Speed = 5.0;
-		Rest_Distance = 0.0;
+		Ball_Speed = AsConfig::Initial_Ball_Speed;
 		Ball_Direction = M_PI_4;
 		Redraw_Ball();
 		break;
@@ -193,14 +270,12 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 			Redraw_Paraschute();
 
 		Ball_Speed = 0.0;
-		Rest_Distance = 0.0;
 		break;
 
 	case EBS_On_Platform:
 		Center_X_Pos = x_pos;
 		Center_Y_Pos = y_pos;
 		Ball_Speed = 0.0;
-		Rest_Distance = 0.0;
 		Ball_Direction = M_PI_4;
 		Redraw_Ball();
 		break;
@@ -214,7 +289,6 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 		   AsConfig::Throw(); // только из EBS_Off_Paraschute  можно установить EBS_On_Paraschute
 			
 		Ball_Speed = 0.0;
-	   Rest_Distance = 0.0;
 		Redraw_Ball();
 		Redraw_Paraschute();
 		break;
@@ -225,7 +299,6 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 		Center_X_Pos = x_pos;
 		Center_Y_Pos = y_pos;
 		Ball_Speed = 0.0;
-	   Rest_Distance = 0.0;
 		Redraw_Ball();
 
 		if(Ball_State == EBS_On_Paraschute)

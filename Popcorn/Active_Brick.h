@@ -22,15 +22,7 @@ enum EBrick_Type
 	EBT_Invisible
 };
 //------------------------------------------------------------------------------------------------------------
-class AGraphics_Objects
-{
-public:
-	virtual ~AGraphics_Objects();
-	virtual void Act() = 0;
-	virtual bool Is_Finished() = 0;
-	virtual void Draw(HDC hdc, RECT &paint_area) = 0;
-	virtual void Clear(HDC hdc, RECT &paint_area) = 0;
-};
+
 
 
 
