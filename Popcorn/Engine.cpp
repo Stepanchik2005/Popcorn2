@@ -37,7 +37,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	/*Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);*/
 
-	/*Platform.Set_State(EPS_Glay_Init);*/
+	/*Platform.Set_State(EPS_Glue_Init);*/
 
 	Platform.Redraw_Platform();
 
@@ -199,7 +199,7 @@ void AsEngine::Restart_Level()
 		{
 			Game_State = EGS_Play_Level;
 			Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos());
-			/*Platform.Set_State(EPS_Glay_Init);*/
+			/*Platform.Set_State(EPS_Glue_Init);*/
 		}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -236,14 +236,16 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 	switch(falling_letter->Letter_Type)
 	{
 	case ELT_O: 
-		Platform.Set_State(EPS_Glay_Finalize); // только для отмены клея	
+		Platform.Set_State(EPS_Normal); // только для отмены клея	
 		break;
 	case ELT_I:
 		Ball_Set.Inverse_Balls();
+		Platform.Set_State(EPS_Normal);
 		break;
 
 	case ELT_C:  
 		Ball_Set.Reset_Speed();
+		Platform.Set_State(EPS_Normal);
 		break;
 
 	case ELT_M:  
@@ -252,9 +254,11 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 	case ELT_G:  
 		if(Life_Count < AsConfig::Max_Life_Count)
 			++Life_Count; // !!! Добавить метод добавления жизни
+		Platform.Set_State(EPS_Normal);
 		break;
 	case ELT_K: 
-      Platform.Set_State(EPS_Glay_Init);
+      Platform.Set_State(EPS_Glue);
+
 		break;
 	case ELT_Sh:     
 		  
@@ -262,11 +266,13 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 	case ELT_P:  
 		AsConfig::Level_Has_Floor = true;
 		Border.Redraw_Floor();
+		Platform.Set_State(EPS_Normal);
 		break;
 	case ELT_L:   
 
 		break;
 	case ELT_T:   
+		Platform.Set_State(EPS_Normal);
 		Ball_Set.Triple_Balls();
 		break;
 

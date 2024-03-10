@@ -101,15 +101,13 @@ void AsBall_Set::On_Platform_Advance(double direction, double speed, double max_
 		
 		if(curr_ball->Get_State() == EBS_On_Platform)
 			curr_ball->Forced_Advance(direction, speed, max_speed);
-		
 	}
-		
 }
 //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Set_On_Platform(double ball_mid_pos)
 {
 	int i;
-	for(i = 0; i < 4; ++i)
+	for(i = 0; i < 1; ++i)
 	{
 		Balls[i].Set_State(EBS_Normal);
 		Balls[i].Set_State(EBS_On_Platform, ball_mid_pos, ABall::Start_Ball_Y_Pos);

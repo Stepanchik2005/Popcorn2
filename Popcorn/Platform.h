@@ -15,9 +15,7 @@ enum EPlatform_State
 	EPS_Meltdown,
 	EPS_Roll_In,
 	EPS_Expand_Roll_In,
-	EPS_Glay_Init,
-	EPS_Glay,
-	EPS_Glay_Finalize
+	EPS_Glue,
 };
 enum EPlatform_Moving_State
 {
@@ -25,6 +23,14 @@ enum EPlatform_Moving_State
 	EPMS_Stop,
 	EPMS_Left,
 	EPMS_Right
+};
+enum EPlatform_Substate_Glue
+{
+	EPSG_Unknown,
+
+	EPSG_Init,
+	EPSG_Active,
+	EPSG_Finalize
 };
 //------------------------------------------------------------------------------------------------------------
 class AsPlatform: public AHit_Checker, public AMover, public AGraphics_Objects
@@ -64,7 +70,7 @@ private:
 	void Clear_BG(HDC hdc, RECT &paint_area);
 	void Draw_Circle_Highlight(HDC hdc, int x, int y);
 	void Draw_Normal_State(HDC hdc, RECT &paint_area);
-	void Draw_Glay_State(HDC hdc, RECT &paint_area);
+	void Draw_Glue_State(HDC hdc, RECT &paint_area);
 	void Draw_Spot_State(HDC hdc, int x_offset, int width, int height);
 	void Get_Normal_Platform_Image(HDC hdc);
 	void Draw_Meltdown_State(HDC hdc, RECT &paint_area);
@@ -74,6 +80,7 @@ private:
 	bool Get_Platform_Image_Stroke_Color(int x, int y, AColor &color, int &stroke_length);
 
 	EPlatform_State Platform_State;
+	EPlatform_Substate_Glue Platform_Substate_Glue;
 	EPlatform_Moving_State Platform_Moving_State;
 	int Inner_Width;
 	int Rolling_Step;
@@ -82,7 +89,7 @@ private:
 	bool Left_Key_Dowm;
 	bool Right_Key_Down;
 	double Speed;
-	double Platform_Glay_Ratio;
+	double Platform_Glue_Ratio;
 	int *Normal_Platform_Image; 
 
 	static const int Normal_Width = 28;
@@ -102,6 +109,6 @@ private:
 	static const int Roll_In_Platform_End_X_Pos = 99;
 	static const int Rolling_Platform_Speed = 3;
 	static const int X_Step = 6;
-	static const double Max_Glay_Ratio, Min_Glay_Ratio;
+	static const double Max_Glue_Ratio, Min_Glue_Ratio, Glue_Spot_Height_Ratio_Step;
 };
 //------------------------------------------------------------------------------------------------------------

@@ -1,12 +1,13 @@
 ﻿#include "Platform.h"
 
 // AsPlatform
-const double AsPlatform::Max_Glay_Ratio = 1.0;
-const double AsPlatform::Min_Glay_Ratio = 0.0;
+const double AsPlatform::Max_Glue_Ratio = 1.0;
+const double AsPlatform::Min_Glue_Ratio = 0.2;
+const double AsPlatform::Glue_Spot_Height_Ratio_Step = 0.05;
 //------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
-: Width(Normal_Width),X_Pos(AsConfig::Border_X_Offset), Platform_State(EPS_Missing), Platform_Moving_State(EPMS_Stop),Inner_Width(Normal_Platform_Inner_Width),
-  Rolling_Step(0), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0),Left_Key_Dowm(false), Right_Key_Down(false), Speed(0.0), Platform_Glay_Ratio(0.0) ,Normal_Platform_Image(0),Platform_Rect{}, 
+: Width(Normal_Width),X_Pos(AsConfig::Border_X_Offset), Platform_State(EPS_Missing), Platform_Substate_Glue(EPSG_Unknown), Platform_Moving_State(EPMS_Stop),Inner_Width(Normal_Platform_Inner_Width),
+  Rolling_Step(0), Normal_Platform_Image_Width(0), Normal_Platform_Image_Height(0),Left_Key_Dowm(false), Right_Key_Down(false), Speed(0.0), Platform_Glue_Ratio(0.0) ,Normal_Platform_Image(0),Platform_Rect{}, 
   Prev_Platform_Rect{}, Highlight_Pen_Color(255, 255, 255), Platform_Circle_Color(151, 0, 0), Platform_Inner_Color(0, 128, 192)
 {
 	X_Pos = (AsConfig::Max_X_Pos - Width) / 2;
@@ -27,6 +28,7 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	double reflection_pos;
 	double inner_y;
 	double ball_x, ball_y;
+
 	if(next_y_pos + ball->Radius < AsConfig::Platform_Y_Pos)
 		return false;
 
@@ -62,7 +64,7 @@ _on_hit:
 	if(ball->Get_State() == EBS_On_Paraschute)
 		ball->Set_State(EBS_Off_Paraschute);
 
-	if(Platform_State == EPS_Glay)
+	if(Platform_State == EPS_Glue && Platform_Substate_Glue == EPSG_Active)
 	{
 		ball->Get_Center(ball_x, ball_y);
 		ball->Set_State(EBS_On_Platform, ball_x, ball_y);
@@ -79,25 +81,33 @@ void AsPlatform::Act()
 		case EPS_Expand_Roll_In:
 			Redraw_Platform();
 			break;
+		
+		case EPS_Glue:
+			switch(Platform_Substate_Glue)
+			{
+				case EPSG_Init:
+					if(Platform_Glue_Ratio < AsPlatform::Max_Glue_Ratio)
+						Platform_Glue_Ratio += 0.05;
+					else
+						Platform_Substate_Glue = EPSG_Active;
 
-		case EPS_Glay_Init:
-			if(Platform_Glay_Ratio < AsPlatform::Max_Glay_Ratio)
-				Platform_Glay_Ratio += 0.05;
-			else
-				Platform_State = EPS_Glay;
+					Redraw_Platform(false);
 
-			Redraw_Platform(false);
-
-			break;
+					break;
 	
-		case EPS_Glay_Finalize:
-			if(Platform_Glay_Ratio > AsPlatform::Min_Glay_Ratio)
-				Platform_Glay_Ratio -= 0.05;
-			else
-				Platform_State = EPS_Normal;
+				case EPSG_Finalize:
+					if(Platform_Glue_Ratio > AsPlatform::Min_Glue_Ratio)
+						Platform_Glue_Ratio -= 0.05;
+					else
+					{
+						Platform_State = EPS_Normal;
+						Platform_Substate_Glue = EPSG_Unknown;
+					}
 
-			Redraw_Platform(false);
+					Redraw_Platform(false);
 
+					break;
+			}
 			break;
 	}
 }
@@ -138,15 +148,8 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 		Draw_Expanding_Roll_In_State(hdc, paint_area);
 		break;
 
-	case EPS_Glay_Init:
-		Draw_Glay_State(hdc, paint_area);
-		break;
-
-	case EPS_Glay:
-		Draw_Glay_State(hdc, paint_area);
-		break;
-	case EPS_Glay_Finalize:
-		Draw_Glay_State(hdc, paint_area);
+	case EPS_Glue:
+		Draw_Glue_State(hdc, paint_area);
 		break;
 	}
 }
@@ -159,9 +162,7 @@ void AsPlatform::Clear(HDC hdc, RECT &paint_area)
 	case EPS_Pre_Meltdown:
 	case EPS_Roll_In:
 	case EPS_Expand_Roll_In:
-	case EPS_Glay_Init:
-	case EPS_Glay:
-	case EPS_Glay_Finalize:
+	case EPS_Glue:
 		Clear_BG(hdc, paint_area);
 		break;
 	}
@@ -184,7 +185,7 @@ void AsPlatform::On_Space_Key(bool key_down)
 			Set_State(EPS_Normal);
 			break;
 
-		case EPS_Glay:
+		case EPS_Glue:
 			Ball_Set->Release_Next_Ball();
 			break;
 	
@@ -216,7 +217,7 @@ void AsPlatform::Advance(double max_speed)
 	}
 
 	// cмещаем приклеенные мячики
-	if(Platform_State == EPS_Glay || Platform_State == EPS_Ready)
+	if( (Platform_State == EPS_Glue && Platform_Substate_Glue == EPSG_Active) || Platform_State == EPS_Ready)
 	{
 		if(Platform_Moving_State == EPMS_Left)
 			Ball_Set->On_Platform_Advance(M_PI, fabs(Speed), max_speed);
@@ -263,6 +264,18 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 
 	switch (new_state)
 	{
+	case EPS_Normal:
+		if(Platform_State == EPS_Glue)
+		{
+			Platform_Substate_Glue = EPSG_Finalize;
+
+			while (Ball_Set->Release_Next_Ball() )
+			{
+			}
+			return; // EPS_Normal устанавливаем в методе Act() только после проигрывания обратной анимации растекающегося клея
+		}
+		break;
+
 	case EPS_Pre_Meltdown:
 		Speed = 0.0;
 		break;
@@ -280,22 +293,17 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		Rolling_Step = Max_Rolling_Step - 1;
 		break;
 
-	case EPS_Glay_Init:
-		if(Platform_State == EPS_Glay || Platform_State == EPS_Glay_Finalize)
-			return;
-		else
-			Platform_Glay_Ratio = 0.2;
-		break;
-	case EPS_Glay:
-		AsConfig::Throw(); // такое состояние устанавливается в другом методе
-		break;
-	case EPS_Glay_Finalize:
-		if( ! (Platform_State == EPS_Glay || Platform_State == EPS_Glay_Init) )
+
+	case EPS_Glue:
+		if(Platform_Substate_Glue == EPSG_Finalize)
 			return;
 
-		while (Ball_Set->Release_Next_Ball() )
+		else
 		{
+			Platform_Substate_Glue = EPSG_Init;
+			Platform_Glue_Ratio = AsPlatform::Min_Glue_Ratio;
 		}
+
 		break;
 	}
 
@@ -324,14 +332,14 @@ void AsPlatform::Redraw_Platform(bool update_rect)
 			Prev_Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 1) * AsConfig::Global_Scale;
 	}
 
-	InvalidateRect(AsConfig::Hwnd, &Prev_Platform_Rect, FALSE);
-	InvalidateRect(AsConfig::Hwnd, &Platform_Rect, FALSE);
+	AsConfig::Invalidate_Rect(Prev_Platform_Rect);
+	AsConfig::Invalidate_Rect(Platform_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 
  void AsPlatform::Move(bool is_left, bool key_down)
  {
-	 if(! (Platform_State == EPS_Normal || Platform_State == EPS_Glay_Init || Platform_State == EPS_Glay || Platform_State == EPS_Glay_Finalize))
+	 if(! (Platform_State == EPS_Normal || Platform_State == EPS_Glue))
 		 return;
 
 	 if(is_left)
@@ -433,7 +441,7 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
 		Get_Normal_Platform_Image(hdc);
 	
 }
-void AsPlatform::Draw_Glay_State(HDC hdc, RECT &paint_area)
+void AsPlatform::Draw_Glue_State(HDC hdc, RECT &paint_area)
 {
 	Draw_Normal_State(hdc, paint_area);
 
@@ -468,7 +476,7 @@ void AsPlatform::Draw_Spot_State(HDC hdc, int x_offset, int width, int height)
 {
 	RECT rect;
 	int platform_y = (AsConfig::Platform_Y_Pos + 1) * AsConfig::Global_Scale;
-	double spot_height = (double)height * Platform_Glay_Ratio;
+	double spot_height = (double)height * Platform_Glue_Ratio;
 
 	rect.left = (X_Pos + x_offset) * AsConfig::Global_Scale;
 	rect.top = platform_y - spot_height * AsConfig::Global_Scale;

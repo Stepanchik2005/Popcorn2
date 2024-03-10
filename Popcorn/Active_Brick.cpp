@@ -48,7 +48,7 @@ void AActive_Brick_Red_Blue::Act()
 	if (Fade_Step < Max_Fade_Step - 1)
 	{
 		++Fade_Step;
-		InvalidateRect(AsConfig::Hwnd, &Brick_Rect, FALSE);
+		AsConfig::Invalidate_Rect(Brick_Rect);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -169,7 +169,7 @@ void AActive_Brick_Unbreakable::Act()
 	if (Animation_Step < Max_Animation_Step)
 	{
 		++Animation_Step;
-		InvalidateRect(AsConfig::Hwnd, &Brick_Rect, FALSE);
+		AsConfig::Invalidate_Rect(Brick_Rect);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -240,7 +240,7 @@ void AActive_Brick_Multihit::Act()
 	if (Rotation_Step <= Max_Rotation_Step)
 	{
 		++Rotation_Step;
-		InvalidateRect(AsConfig::Hwnd, &Brick_Rect, FALSE);
+		AsConfig::Invalidate_Rect(Brick_Rect);
 	}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -390,7 +390,7 @@ void AActive_Brick_Teleport::Act()
 	if (Animation_Step < Max_Animation_Step)
 	{
 		++Animation_Step;
-		InvalidateRect(AsConfig::Hwnd, &Brick_Rect, FALSE);
+		AsConfig::Invalidate_Rect(Brick_Rect);
 	}
 	else
 	{
@@ -439,7 +439,7 @@ void AActive_Brick_Teleport::Act()
 			   Ball->Set_State(EBS_Normal, ball_x_pos, ball_y_pos);	
 				Ball->Set_Direction(direction);
 				Ball = 0;
-				InvalidateRect(AsConfig::Hwnd, &Brick_Rect, FALSE);
+				AsConfig::Invalidate_Rect(Brick_Rect);
 			}
 			break;
 
@@ -602,8 +602,7 @@ void AAdvertisement::Act()
 				ad_rect.right = ad_rect.left + AsConfig::Cell_Width * AsConfig::Global_Scale;
 				ad_rect.bottom = ad_rect.top + AsConfig::Cell_Height * AsConfig::Global_Scale;
 
-				InvalidateRect(AsConfig::Hwnd, &ad_rect, FALSE);
-		
+				AsConfig::Invalidate_Rect(ad_rect);
 			}
 	Falling_Speed += Acceleration_Step;
 	Ball_Offset = High_Limit_Animation - (int)(Falling_Speed * Falling_Speed);
@@ -786,7 +785,7 @@ AActive_Brick_Ad::AActive_Brick_Ad(int level_x, int level_y, AAdvertisement *adv
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Ad::Act()
 {
-	InvalidateRect(AsConfig::Hwnd, &Brick_Rect, FALSE);
+	AsConfig::Invalidate_Rect(Brick_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Ad::Draw(HDC hdc, RECT &paint_area)

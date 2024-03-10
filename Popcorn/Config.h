@@ -36,6 +36,7 @@ public:
 	static int Rand(int range);
 	static void Round_Rect(HDC hdc, RECT &brick_rect, int corner_radius = 2);
 	static void Throw();
+	static void Invalidate_Rect(RECT &rect);
 
 	static bool Level_Has_Floor;
 	static int Current_Timer_Tick;
@@ -49,6 +50,7 @@ public:
 	static const double D_Global_Scale;
 	static const double Accelerate_Ball_Speed;
 	static const double Initial_Ball_Speed;
+	static const double Min_Ball_Angle;
 
 	static const int Global_Scale = 3;
 	static const int Border_X_Offset = 6;
@@ -68,7 +70,7 @@ public:
 	static const int Max_Active_Brick_Size = 10;
 	static const int Max_Falling_Letters_Size = 10;
 	static const int Max_Random_Number_For_Letter = 1; // вероятность	1 / Max_Random_Number_For_Letter выпадения буквы
-	static const int Max_Balls_Count = 5;
+	static const int Max_Balls_Count = 15;
 	static const int Max_Movers_Count = 10;
 	static const int Max_Life_Count = 12;
 	static const int Floor_Y_Pos = AsConfig::Max_Y_Pos - 1;

@@ -349,7 +349,7 @@ void ALevel::Redraw_Brick(int brick_x, int brick_y)
 	brick_rect.right = brick_rect.left + AsConfig::Brick_Width * scale;
 	brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height * scale;
 
-	InvalidateRect(AsConfig::Hwnd, &brick_rect, FALSE);
+	AsConfig::Invalidate_Rect(brick_rect);
 }
 //------------------------------------------------------------------------------------------------------------
 bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
@@ -437,7 +437,7 @@ bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 				//letter_type = AFalling_Letter::Get_Random_Letter_Type();
 
 				if(AsConfig::Rand(2) == 0)
-					letter_type = ELT_O;
+					letter_type = ELT_T;
 				else
 					letter_type = ELT_K;
 

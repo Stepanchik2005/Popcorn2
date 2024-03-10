@@ -87,7 +87,7 @@ void AsBorder::Clear(HDC hdc, RECT &paint_area)
 }
 void AsBorder::Redraw_Floor()
 {
-	InvalidateRect(AsConfig::Hwnd, &Floor_Rect, FALSE);
+	AsConfig::Invalidate_Rect(Floor_Rect);
 }
 
 //------------------------------------------------------------------------------------------------------------
