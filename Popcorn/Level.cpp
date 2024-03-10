@@ -295,10 +295,7 @@ bool ALevel::Get_Next_Falling_Letter(int& index, AFalling_Letter **falling_lette
 
 	return false;
 }
-
 //------------------------------------------------------------------------------------------------------------
-
-
 void ALevel::Stop()
 {
 	Need_To_Stop_All_Activity = true;
@@ -439,7 +436,10 @@ bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 
 				//letter_type = AFalling_Letter::Get_Random_Letter_Type();
 
-				letter_type = ELT_P;
+				if(AsConfig::Rand(2) == 0)
+					letter_type = ELT_O;
+				else
+					letter_type = ELT_K;
 
 				falling_letter = new AFalling_Letter (letter_type, letter_x, letter_y, brick_type);
 				Falling_Letters[i] = falling_letter;

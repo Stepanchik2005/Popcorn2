@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Ball.h"
+#include "Ball_Set.h"
 #include "Falling_Letter.h"
 //------------------------------------------------------------------------------------------------------------
 
@@ -46,6 +46,8 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual void Clear(HDC hdc, RECT &paint_area);
 
+	void Init(AsBall_Set *ball_set);
+	void On_Space_Key(bool key_down);
 	EPlatform_State Get_State();
 	void Set_State(EPlatform_State new_state);
 	void Redraw_Platform(bool update_rect = true);
@@ -90,7 +92,7 @@ private:
 	RECT Platform_Rect, Prev_Platform_Rect;
 
    AColor Highlight_Pen_Color, Platform_Circle_Color, Platform_Inner_Color;
-
+	AsBall_Set *Ball_Set;
 	
 	static const int Height = 7;
 	static const int Circle_Size = 7; // диаметр
@@ -100,6 +102,6 @@ private:
 	static const int Roll_In_Platform_End_X_Pos = 99;
 	static const int Rolling_Platform_Speed = 3;
 	static const int X_Step = 6;
-	static const double Max_Glay_Ratio;
+	static const double Max_Glay_Ratio, Min_Glay_Ratio;
 };
 //------------------------------------------------------------------------------------------------------------

@@ -26,7 +26,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 	AActive_Brick_Red_Blue::Setup_Colors();
 
 	Level.Init();
-
+	Platform.Init(&Ball_Set);
 	AFalling_Letter::Init();
 
 	ABall::Add_Hit_Checker(&Border);
@@ -86,13 +86,8 @@ int AsEngine::On_Key(EKey_Type key_type, bool key_down)
 		break;
 
 	case EKT_Space:
-		if(key_down)
-		  if (Platform.Get_State() == EPS_Ready)
-		  {
-		  	  Ball_Set.Release_From_Platform(Platform.Get_Middle_Pos());
-		  	  Platform.Set_State(EPS_Normal);
-		  }
-		  break;
+		Platform.On_Space_Key(key_down);
+	 break;
 	}
 
 	return 0;
@@ -204,7 +199,7 @@ void AsEngine::Restart_Level()
 		{
 			Game_State = EGS_Play_Level;
 			Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos());
-			Platform.Set_State(EPS_Glay_Init);
+			/*Platform.Set_State(EPS_Glay_Init);*/
 		}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -216,6 +211,12 @@ void AsEngine::Act()
 	
 	AFalling_Letter *falling_letter;
 
+	Level.Act();
+	Platform.Act();
+
+	if(Platform.Get_State() != EPS_Ready)
+		Ball_Set.Act();
+
 	while(Level.Get_Next_Falling_Letter(index, &falling_letter))
 	{
 		if(Platform.HitBy(falling_letter))
@@ -223,9 +224,9 @@ void AsEngine::Act()
 	}
 
 	// Анимация для всех граф объектов по таймеру
-	for(i = 0; i < AsConfig::Max_Graphics_Objects_Count;++i)
+	/*for(i = 0; i < AsConfig::Max_Graphics_Objects_Count;++i)
 		if(Graphics_Objects[i] != 0)
-			Graphics_Objects[i]->Act();
+			Graphics_Objects[i]->Act();*/
 }
 void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 {
@@ -235,7 +236,7 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 	switch(falling_letter->Letter_Type)
 	{
 	case ELT_O: 
-			
+		Platform.Set_State(EPS_Glay_Finalize); // только для отмены клея	
 		break;
 	case ELT_I:
 		Ball_Set.Inverse_Balls();
@@ -253,7 +254,7 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 			++Life_Count; // !!! Добавить метод добавления жизни
 		break;
 	case ELT_K: 
-     
+      Platform.Set_State(EPS_Glay_Init);
 		break;
 	case ELT_Sh:     
 		  

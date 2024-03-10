@@ -1,11 +1,8 @@
 ﻿#include "Platform.h"
 
-
-
-
-
 // AsPlatform
 const double AsPlatform::Max_Glay_Ratio = 1.0;
+const double AsPlatform::Min_Glay_Ratio = 0.0;
 //------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
 : Width(Normal_Width),X_Pos(AsConfig::Border_X_Offset), Platform_State(EPS_Missing), Platform_Moving_State(EPMS_Stop),Inner_Width(Normal_Platform_Inner_Width),
@@ -29,7 +26,7 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
    double inner_left_x, inner_right_x;
 	double reflection_pos;
 	double inner_y;
-	
+	double ball_x, ball_y;
 	if(next_y_pos + ball->Radius < AsConfig::Platform_Y_Pos)
 		return false;
 
@@ -64,6 +61,12 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 _on_hit:
 	if(ball->Get_State() == EBS_On_Paraschute)
 		ball->Set_State(EBS_Off_Paraschute);
+
+	if(Platform_State == EPS_Glay)
+	{
+		ball->Get_Center(ball_x, ball_y);
+		ball->Set_State(EBS_On_Platform, ball_x, ball_y);
+	}
 	return true;
 }
 //------------------------------------------------------------------------------------------------------------
@@ -71,22 +74,31 @@ void AsPlatform::Act()
 {
 	switch (Platform_State)
 	{
-	case EPS_Meltdown:
-	case EPS_Roll_In:
-	case EPS_Expand_Roll_In:
-		Redraw_Platform();
-		break;
+		case EPS_Meltdown:
+		case EPS_Roll_In:
+		case EPS_Expand_Roll_In:
+			Redraw_Platform();
+			break;
 
-	case EPS_Glay_Init:
-		if(Platform_Glay_Ratio < AsPlatform::Max_Glay_Ratio)
-		{
-			Platform_Glay_Ratio += 0.05;
+		case EPS_Glay_Init:
+			if(Platform_Glay_Ratio < AsPlatform::Max_Glay_Ratio)
+				Platform_Glay_Ratio += 0.05;
+			else
+				Platform_State = EPS_Glay;
+
 			Redraw_Platform(false);
-		}
-		else
-			Platform_State = EPS_Glay;
-		
-		break;
+
+			break;
+	
+		case EPS_Glay_Finalize:
+			if(Platform_Glay_Ratio > AsPlatform::Min_Glay_Ratio)
+				Platform_Glay_Ratio -= 0.05;
+			else
+				Platform_State = EPS_Normal;
+
+			Redraw_Platform(false);
+
+			break;
 	}
 }
 bool AsPlatform::Is_Finished()
@@ -133,6 +145,9 @@ void AsPlatform::Draw(HDC hdc, RECT &paint_area)
 	case EPS_Glay:
 		Draw_Glay_State(hdc, paint_area);
 		break;
+	case EPS_Glay_Finalize:
+		Draw_Glay_State(hdc, paint_area);
+		break;
 	}
 }
 void AsPlatform::Clear(HDC hdc, RECT &paint_area)
@@ -149,6 +164,30 @@ void AsPlatform::Clear(HDC hdc, RECT &paint_area)
 	case EPS_Glay_Finalize:
 		Clear_BG(hdc, paint_area);
 		break;
+	}
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::Init(AsBall_Set *ball_set)
+{
+	Ball_Set = ball_set;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsPlatform::On_Space_Key(bool key_down)
+{
+	if(! key_down)
+		return;
+	
+	switch(Platform_State)
+	{
+		case  EPS_Ready:
+			Ball_Set->Release_From_Platform(Get_Middle_Pos());
+			Set_State(EPS_Normal);
+			break;
+
+		case EPS_Glay:
+			Ball_Set->Release_Next_Ball();
+			break;
+	
 	}
 }
 //------------------------------------------------------------------------------------------------------------
@@ -174,6 +213,16 @@ void AsPlatform::Advance(double max_speed)
 		Speed = 0.0;
 		Platform_Moving_State = EPMS_Stopping;
 	
+	}
+
+	// cмещаем приклеенные мячики
+	if(Platform_State == EPS_Glay || Platform_State == EPS_Ready)
+	{
+		if(Platform_Moving_State == EPMS_Left)
+			Ball_Set->On_Platform_Advance(M_PI, fabs(Speed), max_speed);
+		else
+			if(Platform_Moving_State == EPMS_Right)
+				Ball_Set->On_Platform_Advance(0, fabs(Speed), max_speed);
 	}
 }
 
@@ -232,7 +281,21 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		break;
 
 	case EPS_Glay_Init:
-		Platform_Glay_Ratio = 0.2;
+		if(Platform_State == EPS_Glay || Platform_State == EPS_Glay_Finalize)
+			return;
+		else
+			Platform_Glay_Ratio = 0.2;
+		break;
+	case EPS_Glay:
+		AsConfig::Throw(); // такое состояние устанавливается в другом методе
+		break;
+	case EPS_Glay_Finalize:
+		if( ! (Platform_State == EPS_Glay || Platform_State == EPS_Glay_Init) )
+			return;
+
+		while (Ball_Set->Release_Next_Ball() )
+		{
+		}
 		break;
 	}
 

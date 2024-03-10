@@ -36,6 +36,16 @@ void AsBall_Set::End_Movement()
  //------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Act()
 {
+	int i;
+	ABall *curr_ball;
+	for(i = 0; i < AsConfig::Max_Balls_Count; ++i)
+	{
+		curr_ball = &Balls[i];
+
+		if(curr_ball->Get_State() == EBS_On_Platform)
+			if(curr_ball->Release_Timer_Tick != 0 && AsConfig::Current_Timer_Tick >= curr_ball->Release_Timer_Tick)
+				curr_ball->Release();
+	}
 }
 bool AsBall_Set::Is_Finished()
 {
@@ -62,11 +72,48 @@ void AsBall_Set::Release_From_Platform(double ball_mid_pos)
 			Balls[i].Set_State(EBS_Normal, ball_mid_pos , ABall::Start_Ball_Y_Pos);
 }
 //------------------------------------------------------------------------------------------------------------
+bool AsBall_Set::Release_Next_Ball()
+{
+	int i;
+	double ball_x, ball_y;
+	ABall *curr_ball;
+	for(i = 0; i < AsConfig::Max_Balls_Count; ++i)
+	{
+		curr_ball = &Balls[i];
+
+		if(curr_ball->Get_State() == EBS_On_Platform)
+		{  
+			curr_ball->Release();
+			return true;
+		}
+	}
+
+	return false;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsBall_Set::On_Platform_Advance(double direction, double speed, double max_speed)
+{
+	int i;
+	ABall *curr_ball;
+	for(i = 0; i < AsConfig::Max_Balls_Count; ++i)
+	{
+		curr_ball = &Balls[i];
+		
+		if(curr_ball->Get_State() == EBS_On_Platform)
+			curr_ball->Forced_Advance(direction, speed, max_speed);
+		
+	}
+		
+}
+//------------------------------------------------------------------------------------------------------------
 void AsBall_Set::Set_On_Platform(double ball_mid_pos)
 {
 	int i;
-	for(i = 0; i < 1; ++i)
-		Balls[0].Set_State(EBS_On_Platform, ball_mid_pos, ABall::Start_Ball_Y_Pos);
+	for(i = 0; i < 4; ++i)
+	{
+		Balls[i].Set_State(EBS_Normal);
+		Balls[i].Set_State(EBS_On_Platform, ball_mid_pos, ABall::Start_Ball_Y_Pos);
+	}
 
    for(; i < AsConfig::Max_Balls_Count; ++i)
 		Balls[i].Set_State(EBS_Disabled);

@@ -37,6 +37,7 @@ public:
 	int On_Timer();
 
 private:
+	
 	void Advance_Mover();
 	void Play_Level();
 	void Restart_Level();

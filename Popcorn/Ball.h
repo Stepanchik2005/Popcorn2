@@ -71,6 +71,8 @@ public:
 	double Get_Direction();
 	void Get_Center(double &x_pos, double &y_pos);
 	void Set_Direction(double new_direction);
+	void Forced_Advance(double direction, double speed, double max_speed);
+	void Release();
 	void Reflect(bool from_horizontal);
 	bool Is_Moving_Up();
 	bool Is_Moving_Left();
@@ -79,6 +81,7 @@ public:
 
 	static void Add_Hit_Checker(AHit_Checker *hit_checker);
 	
+	int Release_Timer_Tick;
 
 	static const double Radius;
 	static const double Start_Ball_Y_Pos;
@@ -90,9 +93,10 @@ private:
 
 	
 	EBall_State Ball_State, Prev_Ball_State;
-
+	double Prev_Ball_Speed;
 	double Ball_Speed;
-	
+
+	double Prev_Ball_Direction;
 	double Ball_Direction;
 
 	bool Testing_Is_Active;
@@ -104,8 +108,10 @@ private:
 	RECT Ball_Rect, Prev_Ball_Rect;
    RECT Paraschute_Rect, Prev_Paraschute_Rect;
 
+
 	
 	static const int Paraschute_Size = 15;
+	static const int On_Platform_Timeout = 3 * AsConfig::FPS;
 	static int Hit_Checkers_Count;
 	static AHit_Checker *Hit_Checkers[3];
 };

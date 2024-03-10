@@ -21,8 +21,8 @@ int ABall::Hit_Checkers_Count = 0;
 AHit_Checker *ABall::Hit_Checkers[] = {};
 //------------------------------------------------------------------------------------------------------------
 ABall::ABall()
-: Ball_State(EBS_Disabled),Prev_Ball_State(EBS_Disabled), Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Ball_Speed(0.0),
-  Ball_Direction(0), Testing_Is_Active(false), Test_Iteration(0), Ball_Rect{}, Prev_Ball_Rect{}
+: Ball_State(EBS_Disabled),Prev_Ball_State(EBS_Disabled), Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Prev_Ball_Speed(0.0), 
+  Ball_Speed(0.0), Prev_Ball_Direction(0),  Ball_Direction(0), Testing_Is_Active(false), Test_Iteration(0), Ball_Rect{}, Prev_Ball_Rect{}, Release_Timer_Tick(0)
 {
 	//Set_State(EBS_Normal, 0);
 }
@@ -53,6 +53,8 @@ bool AHit_Checker::Hit_Circle_On_Line(double y, double next_x_pos, double left_x
 void ABall::Advance(double max_speed)
 {
 	int i;
+	int prev_hits_count = 0;
+	const int max_hits_count = 8;
 	bool got_hit;
 	double next_x_pos, next_y_pos;
 	double next_step = Ball_Speed / max_speed * AsConfig::Moving_Size_Step;
@@ -62,11 +64,6 @@ void ABall::Advance(double max_speed)
 	if (Ball_State == EBS_Lost || Ball_State == EBS_On_Platform || Ball_State == EBS_Teleporting)
 		return;
 
-	//Prev_Ball_Rect = Ball_Rect;
-	//Rest_Distance += Ball_Speed;
-
-	/*while (Rest_Distance >= AsConfig::Moving_Size_Step)
-	{*/
 		got_hit = false;
 
 		next_x_pos = Center_X_Pos + next_step * cos(Ball_Direction);
@@ -76,7 +73,19 @@ void ABall::Advance(double max_speed)
 		for (i = 0; i < Hit_Checkers_Count; i++)
 			got_hit |= Hit_Checkers[i]->Check_Hit(next_x_pos, next_y_pos, this); 
 
-		if (! got_hit)
+		if (got_hit)
+		{
+			++prev_hits_count;
+
+			if(prev_hits_count >= max_hits_count)
+			{
+				Ball_Direction += M_PI / 8.0;
+				prev_hits_count = 0;
+			}
+
+		}
+		else
+
 		{
 			// Мячик продолжит движение, если не взаимодействовал с другими объектами
 			//Rest_Distance -= AsConfig::Moving_Size_Step;
@@ -87,19 +96,6 @@ void ABall::Advance(double max_speed)
 			if (Testing_Is_Active)
 				Rest_Test_Distance -= AsConfig::Moving_Size_Step;
 		}
-	//}
-
-	/*Redraw_Ball();
-
-	if(Ball_State == EBS_On_Paraschute)
-	{
-		Prev_Paraschute_Rect = Paraschute_Rect;
-
-		Paraschute_Rect.bottom = Ball_Rect.bottom;
-		Paraschute_Rect.top = Paraschute_Rect.bottom - Paraschute_Size * AsConfig::Global_Scale;
-		
-	   Redraw_Paraschute();
-	}*/
 }
 //------------------------------------------------------------------------------------------------------------
 double ABall::Get_Speed()
@@ -275,8 +271,11 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 	case EBS_On_Platform:
 		Center_X_Pos = x_pos;
 		Center_Y_Pos = y_pos;
+		Prev_Ball_Speed = Ball_Speed;
 		Ball_Speed = 0.0;
-		Ball_Direction = M_PI_4;
+		Prev_Ball_Direction = Ball_Direction;
+		//Ball_Direction = M_PI_4;
+		Release_Timer_Tick = AsConfig::Current_Timer_Tick + On_Platform_Timeout;
 		Redraw_Ball();
 		break;
 
@@ -335,6 +334,36 @@ void ABall::Set_Direction(double new_direction)
 		new_direction += pi_2;
 
 	Ball_Direction = new_direction;
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Forced_Advance(double direction, double speed, double max_speed)
+{
+	EBall_State prev_ball_state;
+	double prev_direction, prev_speed;
+	
+	prev_ball_state = Ball_State;
+	prev_direction = Ball_Direction;
+	prev_speed = Ball_Speed;
+	
+	Ball_State = EBS_Normal;
+	Ball_Speed = speed;
+	Ball_Direction = direction;
+
+	Advance(max_speed);
+
+	Ball_Speed = prev_speed;
+	Ball_Direction = prev_direction;
+	Ball_State = prev_ball_state;
+}
+void ABall::Release()
+{// продолжить прерванное движение мячика
+	Set_State(EBS_Normal, Center_X_Pos, Center_Y_Pos);
+	Ball_Speed = Prev_Ball_Speed;
+
+	if(Ball_Speed < AsConfig::Initial_Ball_Speed)
+		Ball_Speed = AsConfig::Initial_Ball_Speed;
+
+	Ball_Direction = Prev_Ball_Direction;
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Reflect(bool from_horizontal)
