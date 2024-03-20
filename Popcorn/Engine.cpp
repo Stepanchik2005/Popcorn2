@@ -38,6 +38,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 	/*Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);*/
 
 	/*Platform.Set_State(EPS_Glue_Init);*/
+	//Platform.Set_State(EPlatform_State::Laser);
 
 	Platform.Redraw_Platform();
 
@@ -87,6 +88,7 @@ int AsEngine::On_Key(EKey_Type key_type, bool key_down)
 
 	case EKT_Space:
 		Platform.On_Space_Key(key_down);
+		/*Platform.Set_State(EPlatform_State::Laser);*/
 	 break;
 	}
 
@@ -113,10 +115,10 @@ int AsEngine::On_Timer()
 
 
 	case EGS_Lost_Ball:
-		if (Platform.Get_State() == EPS_Missing)
+		if (Platform.Has_Substate_Regular(EPlatform_Substate_Regular::Missing) )
 		{
 			Game_State = EGS_Restart_Level;
-			Platform.Set_State(EPS_Roll_In);
+			Platform.Set_State(EPlatform_State::Rolling);
 		}
 		break;
 
@@ -173,9 +175,7 @@ void AsEngine::Advance_Mover()
 void AsEngine::Play_Level()
 {
 	int lost_ball_count = 0;
-	
-	Advance_Mover();
-	
+	// проверка надо ли остановить уровень
 	lost_ball_count = Ball_Set.Count_Lost_Ball();
 			
 	if(lost_ball_count == AsConfig::Max_Balls_Count)
@@ -184,29 +184,31 @@ void AsEngine::Play_Level()
 
 		Level.Stop();
 
-		Platform.Set_State(EPS_Pre_Meltdown);
+		Platform.Set_State(EPlatform_State::Meltdown);
 	}
 	else
 		Ball_Set.Accelerate();
 	
+	Advance_Mover();
+
 	if (Ball_Set.Is_Test_Finished() )
 		Game_State = EGS_Test_Ball;
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Restart_Level()
 {
-	if (Platform.Get_State() == EPS_Ready)
+	if (Platform.Has_Substate_Regular(EPlatform_Substate_Regular::Ready))
 		{
 			Game_State = EGS_Play_Level;
 			Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos());
-			/*Platform.Set_State(EPS_Glue_Init);*/
+			////Platform.Set_State(EPS_Glue_Init);
 		}
 }
 //------------------------------------------------------------------------------------------------------------
 
 void AsEngine::Act()
 {
-	int i;
+	//int i;
 	int index = 0;
 	
 	AFalling_Letter *falling_letter;
@@ -214,7 +216,7 @@ void AsEngine::Act()
 	Level.Act();
 	Platform.Act();
 
-	if(Platform.Get_State() != EPS_Ready)
+	if( !(Platform.Has_Substate_Regular(EPlatform_Substate_Regular::Ready)) )
 		Ball_Set.Act();
 
 	while(Level.Get_Next_Falling_Letter(index, &falling_letter))
@@ -236,16 +238,16 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 	switch(falling_letter->Letter_Type)
 	{
 	case ELT_O: 
-		Platform.Set_State(EPS_Normal); // только для отмены клея	
+		Platform.Set_State(EPlatform_Substate_Regular::Normal); // только для отмены клея	
 		break;
 	case ELT_I:
 		Ball_Set.Inverse_Balls();
-		Platform.Set_State(EPS_Normal);
+		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 
 	case ELT_C:  
 		Ball_Set.Reset_Speed();
-		Platform.Set_State(EPS_Normal);
+		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 
 	case ELT_M:  
@@ -254,25 +256,25 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 	case ELT_G:  
 		if(Life_Count < AsConfig::Max_Life_Count)
 			++Life_Count; // !!! Добавить метод добавления жизни
-		Platform.Set_State(EPS_Normal);
+		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 	case ELT_K: 
-      Platform.Set_State(EPS_Glue);
+      Platform.Set_State(EPlatform_State::Glue);
 
 		break;
 	case ELT_Sh:     
-		  
+		 Platform.Set_State(EPlatform_State::Expanding);
 		break;
 	case ELT_P:  
 		AsConfig::Level_Has_Floor = true;
 		Border.Redraw_Floor();
-		Platform.Set_State(EPS_Normal);
+		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 	case ELT_L:   
-
+		Platform.Set_State(EPlatform_State::Laser);
 		break;
 	case ELT_T:   
-		Platform.Set_State(EPS_Normal);
+		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		Ball_Set.Triple_Balls();
 		break;
 
