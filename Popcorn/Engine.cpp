@@ -258,32 +258,36 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 			++Life_Count; // !!! Добавить метод добавления жизни
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
+
 	case ELT_K: 
       Platform.Set_State(EPlatform_State::Glue);
-
 		break;
+
 	case ELT_Sh:     
 		 Platform.Set_State(EPlatform_State::Expanding);
 		break;
+
 	case ELT_P:  
 		AsConfig::Level_Has_Floor = true;
 		Border.Redraw_Floor();
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
+
 	case ELT_L:   
-		Platform.Set_State(EPlatform_State::Laser);
+ 		Platform.Set_State(EPlatform_State::Laser);
 		break;
+
 	case ELT_T:   
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		Ball_Set.Triple_Balls();
 		break;
 
-	/*case ELT_Plus:
+	case ELT_Plus:
 		
 		break;
 	
 	default:
-		AsConfig::Throw();*/
+		AsConfig::Throw();
 	}
 
 		falling_letter->Finalize();

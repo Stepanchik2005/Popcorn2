@@ -434,14 +434,26 @@ bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 				letter_x = (AsConfig::Level_X_Offset + brick_x * AsConfig::Cell_Width) * AsConfig::Global_Scale;
 				letter_y = (AsConfig::Level_Y_Offset + brick_y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
 
-				letter_type = AFalling_Letter::Get_Random_Letter_Type();
+				//letter_type = AFalling_Letter::Get_Random_Letter_Type();
 
-			///*	if(AsConfig::Rand(2) == 0)
-			//		letter_type = ELT_Sh;
-			//	else
-			//		letter_type = ELT_K;*/
+				switch(AsConfig::Rand(3))
+				{
+				case 0:
+					letter_type = ELT_K;
+					break;
+				case 1:
+					letter_type = ELT_Sh;
+					break;
+				case 2:
+					letter_type = ELT_L;
+					break;
+				}
+				/*if(AsConfig::Rand(2) == 0)
+					letter_type = ELT_Sh;
+				else
+					letter_type = ELT_L;*/
 
-				letter_type = ELT_L;
+				/*letter_type = ELT_L;*/
 
 				falling_letter = new AFalling_Letter (letter_type, letter_x, letter_y, brick_type);
 				Falling_Letters[i] = falling_letter;
