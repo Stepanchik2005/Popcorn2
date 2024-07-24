@@ -26,12 +26,15 @@ void AsEngine::Init_Engine(HWND hwnd)
 	AActive_Brick_Red_Blue::Setup_Colors();
 
 	Level.Init();
-	Platform.Init(&Ball_Set);
+	Platform.Init(&Ball_Set, &Laser_Beam_Set); 
 	AFalling_Letter::Init();
+	//Laser_Beam_Set.Init();
 
 	ABall::Add_Hit_Checker(&Border);
 	ABall::Add_Hit_Checker(&Level);
 	ABall::Add_Hit_Checker(&Platform);
+
+   ALaser_Beam::Add_Hit_Checker(&Level);
 
 	Level.Set_Current_Level(ALevel::Level_01);
 
@@ -46,6 +49,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	Movers[0] = &Platform;
 	Movers[1] = &Ball_Set;
+	Movers[2] = &Laser_Beam_Set;
 
 	memset(Graphics_Objects, 0, AsConfig::Max_Graphics_Objects_Count);
 
@@ -53,6 +57,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Graphics_Objects[1] = (AGraphics_Objects*)&Border;
 	Graphics_Objects[2] = (AGraphics_Objects*)&Platform;
 	Graphics_Objects[3] = (AGraphics_Objects*)&Ball_Set;
+	Graphics_Objects[4] = (AGraphics_Objects*)&Laser_Beam_Set;
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
 }
@@ -63,12 +68,13 @@ void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
 
 	SetGraphicsMode(hdc, GM_ADVANCED);
 
+	// очистка экрана за кадр
 	for(i = 0; i < AsConfig::Max_Graphics_Objects_Count;++i)
 		if(Graphics_Objects[i] != 0)
 			Graphics_Objects[i]->Clear(hdc, paint_area);
 		
 		
-
+	// отрисовка экрана за кадр
 	for(i = 0; i < AsConfig::Max_Graphics_Objects_Count;++i)
 		if(Graphics_Objects[i] != 0)
 			Graphics_Objects[i]->Draw(hdc, paint_area);
@@ -87,8 +93,8 @@ int AsEngine::On_Key(EKey_Type key_type, bool key_down)
 		break;
 
 	case EKT_Space:
-		Platform.On_Space_Key(key_down);
-		/*Platform.Set_State(EPlatform_State::Laser);*/
+		if(Ball_Set.Balls[0].Get_State() != EBall_State::EBS_Disabled)
+			Platform.On_Space_Key(key_down);
 	 break;
 	}
 
@@ -168,8 +174,6 @@ void AsEngine::Advance_Mover()
 	for(i = 0; i < AsConfig::Max_Movers_Count;++i)
 		if(Movers[i] != 0)
 			Movers[i]->End_Movement();
-
-	
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Play_Level()

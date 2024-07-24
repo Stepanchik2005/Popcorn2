@@ -53,7 +53,7 @@ ALevel::ALevel()
 }
 //------------------------------------------------------------------------------------------------------------
 bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
-{// Корректируем позицию при отражении от кирпичей
+{// Корректируем позицию мячика при отражении от кирпичей
 
 	int i, j;
 	double direction;
@@ -148,6 +148,51 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 
 	return false;
 }
+//------------------------------------------------------------------------------------------------------------
+bool ALevel::Check_Hit(double next_x_pos, double next_y_pos)
+{
+	int i, j;
+	
+	
+	int level_x, level_y;
+	double current_brick_top_y, current_brick_low_y, current_brick_left_x, current_brick_right_x;
+	// сделать проверку на активность кирпича
+
+	if (next_y_pos > AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)
+		return false;
+
+
+	level_x = (int)( (next_x_pos - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width);
+
+	if(level_x > AsConfig::Level_Width - 1)
+		level_x = AsConfig::Level_Width - 1;
+
+	level_y = (int)( (next_y_pos - AsConfig::Level_Y_Offset) / (double)AsConfig::Cell_Height);
+
+	if(level_y > AsConfig::Level_Height - 1)
+		level_y = AsConfig::Level_Height - 1;
+
+	
+	if (Current_Level[level_y][level_x] == 0)
+		return false;
+	
+	current_brick_top_y = AsConfig::Level_Y_Offset + level_y * AsConfig::Cell_Height;
+	current_brick_low_y = current_brick_top_y + AsConfig::Brick_Height;
+
+	current_brick_left_x = AsConfig::Level_X_Offset + level_x * AsConfig::Cell_Width;
+	current_brick_right_x = current_brick_left_x + AsConfig::Brick_Width;
+
+	if(next_x_pos >= current_brick_left_x && next_x_pos <= current_brick_right_x)
+		if(next_y_pos <= current_brick_low_y)
+		{
+			On_Hit(level_x, level_y, 0, true);
+			return true;
+		}
+	
+	return false;
+}
+
+
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Act()
 {
@@ -308,11 +353,21 @@ bool ALevel::On_Hit(int brick_x, int brick_y, ABall *ball, bool got_vertical_hit
 
 	brick_type = (EBrick_Type)Current_Level[brick_y][brick_x];
 
+	
 	if(brick_type == EBT_Paraschute)
-	{
-		ball->Set_On_Paraschute(brick_x, brick_y);
-		Current_Level[brick_y][brick_x] = EBT_None;
+	{ 
+		if(ball != 0)
+		{
+			ball->Set_On_Paraschute(brick_x, brick_y);
+			Current_Level[brick_y][brick_x] = EBT_None;
+		}
+		else
+		{
+			brick_type = EBT_Red;
+			Current_Level[brick_y][brick_x] = EBT_Red; // превращаем кирпич с парашютом в красный при попадании луча
+		}
 	}
+
 
 	else if(Add_Falling_Letter(brick_type, brick_x,  brick_y))
 		Current_Level[brick_y][brick_x] = EBT_None;
@@ -434,7 +489,7 @@ bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 				letter_x = (AsConfig::Level_X_Offset + brick_x * AsConfig::Cell_Width) * AsConfig::Global_Scale;
 				letter_y = (AsConfig::Level_Y_Offset + brick_y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
 
-				//letter_type = AFalling_Letter::Get_Random_Letter_Type();
+				letter_type = AFalling_Letter::Get_Random_Letter_Type();
 
 				switch(AsConfig::Rand(3))
 				{
@@ -453,7 +508,7 @@ bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 				else
 					letter_type = ELT_L;*/
 
-				/*letter_type = ELT_L;*/
+				//letter_type = ELT_L;
 
 				falling_letter = new AFalling_Letter (letter_type, letter_x, letter_y, brick_type);
 				Falling_Letters[i] = falling_letter;
@@ -466,7 +521,7 @@ bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 }
 //------------------------------------------------------------------------------------------------------------
 bool ALevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall *ball, bool got_vertical_hit)
-{ // brick_x, brick_x - номер позиции в двухмерном массиве конкретного кирпича 
+{ // brick_x, brick_у - номер позиции в двухмерном массиве конкретного кирпича 
 	bool is_teleport = false;
 	//double ball_x, ball_y;
 	AActive_Brick *active_brick = 0;

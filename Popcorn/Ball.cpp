@@ -49,6 +49,12 @@ bool AHit_Checker::Hit_Circle_On_Line(double y, double next_x_pos, double left_x
 	else
 		return false;
 }
+
+bool AHit_Checker::Check_Hit(double next_x_pos, double next_y_pos)
+{
+	// реализация при перегрузке в классе ALevel
+	return true;
+}
 //------------------------------------------------------------------------------------------------------------
 void ABall::Advance(double max_speed)
 {
@@ -57,7 +63,8 @@ void ABall::Advance(double max_speed)
 	const int max_hits_count = 8;
 	bool got_hit;
 	double next_x_pos, next_y_pos;
-	double next_step = Ball_Speed / max_speed * AsConfig::Moving_Size_Step;
+	double next_step;
+
 	if(Ball_State == EBS_Disabled)
 		return;
 
@@ -65,6 +72,8 @@ void ABall::Advance(double max_speed)
 		return;
 
 		got_hit = false;
+
+		next_step = Ball_Speed / max_speed * AsConfig::Moving_Size_Step;
 
 		next_x_pos = Center_X_Pos + next_step * cos(Ball_Direction);
 		next_y_pos = Center_Y_Pos - next_step * sin(Ball_Direction);
@@ -130,7 +139,7 @@ void ABall::End_Movement()
 //------------------------------------------------------------------------------------------------------------
 void ABall::Act()
 {
-
+	// заглушка, не использется т.к. мячик сам не анимируется
 }
 bool ABall::Is_Finished()
 {
@@ -446,10 +455,10 @@ void ABall::Draw_Teleporting(HDC hdc, int step)
 //------------------------------------------------------------------------------------------------------------
 void ABall::Add_Hit_Checker(AHit_Checker *hit_checker)
 {
-	if (Hit_Checkers_Count >= sizeof(Hit_Checkers) / sizeof(Hit_Checkers[0]) )
-		return;
+		if (Hit_Checkers_Count >= sizeof(Hit_Checkers) / sizeof(Hit_Checkers[0]) )
+			return;
 
-	Hit_Checkers[Hit_Checkers_Count++] = hit_checker;
+		Hit_Checkers[Hit_Checkers_Count++] = hit_checker;
 }
 //------------------------------------------------------------------------------------------------------------
 

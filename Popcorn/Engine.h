@@ -48,11 +48,12 @@ private:
 	int Life_Count;
 	EGame_State Game_State;
 	AsBall_Set Ball_Set;
+	AsLaser_Beam_Set Laser_Beam_Set;
 	ALevel Level;
 	AsPlatform Platform;
 	AsBorder Border;
 
 	AMover *Movers[AsConfig::Max_Movers_Count];
-	AGraphics_Objects * Graphics_Objects[AsConfig::Max_Graphics_Objects_Count];
+	AGraphics_Objects *Graphics_Objects[AsConfig::Max_Graphics_Objects_Count];
 };
 //------------------------------------------------------------------------------------------------------------

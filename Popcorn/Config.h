@@ -41,7 +41,7 @@ public:
 	static bool Level_Has_Floor;
 	static int Current_Timer_Tick;
 
-	static const AColor BG_Color, Red_Color, Blue_Color, White_Color, Letter_Color, Paraschute_Color;
+	static const AColor BG_Color, Red_Color, Blue_Color, White_Color, Letter_Color, Laser_Color,Paraschute_Color;
 	static const AColor Teleport_Color, Advertisement_Blue_Table_Color, Unbreakable_Blue_Hightlight_Color, Unbreakable_Red_Hightlight_Color;;
 
 	static HWND Hwnd;

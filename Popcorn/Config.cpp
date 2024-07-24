@@ -84,6 +84,7 @@ const AColor AsConfig::Red_Color(255, 85, 85);
 const AColor AsConfig::Blue_Color(85, 255, 255);
 const AColor AsConfig::White_Color(255, 255, 255);
 const AColor AsConfig::Letter_Color(AsConfig::White_Color, AsConfig::Global_Scale);
+const AColor AsConfig::Laser_Color(AsConfig::White_Color, AsConfig::Global_Scale);
 const AColor AsConfig::Paraschute_Color(AsConfig::Blue_Color, 3, AsConfig::Red_Color);
 const AColor AsConfig::Teleport_Color(AsConfig::Blue_Color, 3, AsConfig::BG_Color);
 const AColor AsConfig::Advertisement_Blue_Table_Color(0, 159, 159, AsConfig::Global_Scale);
