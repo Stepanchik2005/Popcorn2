@@ -1,5 +1,5 @@
 ﻿#include "Engine.h"
-// AsBall_Set
+
 
 
 
@@ -30,12 +30,11 @@ void AsEngine::Init_Engine(HWND hwnd)
 	AFalling_Letter::Init();
 	//Laser_Beam_Set.Init();
 
-	ABall::Add_Hit_Checker(&Border);
-	ABall::Add_Hit_Checker(&Level);
-	ABall::Add_Hit_Checker(&Platform);
+	ABall::Hit_Checker_List.Add_Hit_Checker(&Border);
+	ABall::Hit_Checker_List.Add_Hit_Checker(&Level);
+	ABall::Hit_Checker_List.Add_Hit_Checker(&Platform);
 
-   ALaser_Beam::Add_Hit_Checker(&Level);
-
+	ALaser_Beam::Hit_Checker_List.Add_Hit_Checker(&Level);
 	Level.Set_Current_Level(ALevel::Level_01);
 
 	/*Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);*/
@@ -212,7 +211,6 @@ void AsEngine::Restart_Level()
 
 void AsEngine::Act()
 {
-	//int i;
 	int index = 0;
 	
 	AFalling_Letter *falling_letter;

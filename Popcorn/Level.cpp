@@ -150,10 +150,7 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 }
 //------------------------------------------------------------------------------------------------------------
 bool ALevel::Check_Hit(double next_x_pos, double next_y_pos)
-{
-	int i, j;
-	
-	
+{	
 	int level_x, level_y;
 	double current_brick_top_y, current_brick_low_y, current_brick_left_x, current_brick_right_x;
 	// сделать проверку на активность кирпича

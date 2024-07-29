@@ -75,7 +75,6 @@ void AsBall_Set::Release_From_Platform(double ball_mid_pos)
 bool AsBall_Set::Release_Next_Ball()
 {
 	int i;
-	double ball_x, ball_y;
 	ABall *curr_ball;
 	for(i = 0; i < AsConfig::Max_Balls_Count; ++i)
 	{

@@ -43,6 +43,30 @@
     <Filter Include="Ball_Set">
       <UniqueIdentifier>{4a382587-03cc-498e-a90b-0a2a7ec12af7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Laser_Beam">
+      <UniqueIdentifier>{8b0ea54e-223a-49c7-9092-dc570e08468c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{a0578842-7c5e-4e12-b084-1535a2213333}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hit_Checker_List">
+      <UniqueIdentifier>{bc037dec-4209-43a5-8204-e9a945365c80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Laser_Beam_Set">
+      <UniqueIdentifier>{624f7fe0-74c7-42c5-b592-ae0f476d2806}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform_State">
+      <UniqueIdentifier>{8fdb0c07-803e-47bd-8832-89be72506717}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform_Laser">
+      <UniqueIdentifier>{02193b39-e34d-403f-996e-7fba73b96cc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform_Expanding">
+      <UniqueIdentifier>{4d370280-4641-49ee-9d2f-40001922aa2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform_Glue">
+      <UniqueIdentifier>{6130919a-5bb0-46ac-a9aa-55a390222b66}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -83,6 +107,30 @@
     </ClInclude>
     <ClInclude Include="Ball_Set.h">
       <Filter>Ball_Set</Filter>
+    </ClInclude>
+    <ClInclude Include="Laser_Beam.h">
+      <Filter>Laser_Beam</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Hit_Checker_List.h">
+      <Filter>Hit_Checker_List</Filter>
+    </ClInclude>
+    <ClInclude Include="Laser_Beam_Set.h">
+      <Filter>Laser_Beam_Set</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform_State.h">
+      <Filter>Platform_State</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform_Laser.h">
+      <Filter>Platform_Laser</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform_Expanding.h">
+      <Filter>Platform_Expanding</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform_Glue.h">
+      <Filter>Platform_Glue</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +176,30 @@
     </ClCompile>
     <ClCompile Include="Ball_Set.cpp">
       <Filter>Ball_Set</Filter>
+    </ClCompile>
+    <ClCompile Include="Laser_Beam.cpp">
+      <Filter>Laser_Beam</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Hit_Checker_List.cpp">
+      <Filter>Hit_Checker_List</Filter>
+    </ClCompile>
+    <ClCompile Include="Laser_Beam_Set.cpp">
+      <Filter>Laser_Beam_Set</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform_State.cpp">
+      <Filter>Platform_State</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform_Laser.cpp">
+      <Filter>Platform_Laser</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform_Expanding.cpp">
+      <Filter>Platform_Expanding</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform_Glue.cpp">
+      <Filter>Platform_Glue</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

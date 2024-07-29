@@ -1,40 +1,15 @@
 ﻿#pragma once
 
-#include <Windows.h>
+#include "Tools.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-//------------------------------------------------------------------------------------------------------------
-class AColor
-{
-public:
-	AColor();
-	AColor(unsigned char r, unsigned char g, unsigned char b);
-	AColor(const AColor &color,int pen_size);
-	AColor(const AColor &pen_color, int pen_size, const AColor &brush_color);
-	AColor(unsigned char r, unsigned char g, unsigned char b,int pen_size);
-
-	int Get_RGB() const;
-	void Select(HDC hdc) const;
-	HBRUSH Get_Brush() const;
-	HPEN Get_Pen() const;
-	void Set_Brush(HBRUSH brush);
-	void Set_Pen(HPEN pen);
-	void Select_Pen(HDC hdc) const;
-	
-	unsigned char R, G, B;
-private:
-	HPEN Pen;
-	HBRUSH Brush;
-	
-};
 //------------------------------------------------------------------------------------------------------------
 class AsConfig
 {
 public:
 	static int Rand(int range);
 	static void Round_Rect(HDC hdc, RECT &brick_rect, int corner_radius = 2);
+	static void Rect(HDC hdc, int x, int y, int width, int height, AColor color);
+	static void Rect(HDC hdc, RECT &rect, AColor color);
 	static void Throw();
 	static void Invalidate_Rect(RECT &rect);
 
@@ -75,5 +50,14 @@ public:
 	static const int Max_Life_Count = 12;
 	static const int Floor_Y_Pos = AsConfig::Max_Y_Pos - 1;
 	static const int Max_Graphics_Objects_Count = 10;
+
+	// константы платформы
+	static const int Platform_Height = 7;
+	static const int Platform_Normal_Width = 28;
+	static const int Platform_Circle_Size = 7; // диаметр
+	static const int Platform_Normal_Inner_Width = Platform_Normal_Width - Platform_Circle_Size;
+
+	static const int Gate_Width = 6;
+	static const int Gates_Count = 8;
 };
 //------------------------------------------------------------------------------------------------------------

@@ -310,6 +310,8 @@ void AActive_Brick_Multihit::Draw_In_Level(HDC hdc, RECT &brick_rect, EBrick_Typ
 
 	//2. Рисуем красный прямоугольник поверх фона
 	AsConfig::Red_Color.Select(hdc);
+
+
 	Rectangle(hdc, brick_rect.left + scale, brick_rect.top + scale, brick_rect.right - scale - 1, brick_rect.bottom - scale - 1);
 	
 	//3. Рисуем "жизни" кирпича
@@ -349,21 +351,24 @@ void AActive_Brick_Multihit::Draw_Stage(HDC hdc, RECT &brick_rect, int x, int wi
 	const int scale = AsConfig::Global_Scale;
 	RECT stage_rect = {};
 	
-	AsConfig::BG_Color.Select(hdc);
+	//AsConfig::BG_Color.Select(hdc);
 	stage_rect.left = brick_rect.left + (x + 1) * scale;
 	stage_rect.top = brick_rect.top + 3 * scale;
 	stage_rect.right = stage_rect.left + width * scale + 1;
 	stage_rect.bottom = stage_rect.top + 3 * scale - 1;
 
-	Rectangle(hdc, stage_rect.left, stage_rect.top, stage_rect.right, stage_rect.bottom);
+	AsConfig::Rect(hdc, stage_rect, AsConfig::BG_Color);
 
-	AsConfig::Blue_Color.Select(hdc);
+	//Rectangle(hdc, stage_rect.left, stage_rect.top, stage_rect.right, stage_rect.bottom);
+
+	//AsConfig::Blue_Color.Select(hdc);
 	stage_rect.left = brick_rect.left + x * scale;
 	stage_rect.top = brick_rect.top + 2 * scale;
 	stage_rect.right = stage_rect.left + width * scale + 1;
 	stage_rect.bottom = stage_rect.top + 3 * scale - 1;
 
-	Rectangle(hdc, stage_rect.left, stage_rect.top, stage_rect.right, stage_rect.bottom);
+	AsConfig::Rect(hdc, stage_rect, AsConfig::Blue_Color);
+	//Rectangle(hdc, stage_rect.left, stage_rect.top, stage_rect.right, stage_rect.bottom);
 }
 
 

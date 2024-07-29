@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Config.h"
+#include "Hit_Checker_List.h"
 
 //------------------------------------------------------------------------------------------------------------
 enum EBall_State
@@ -13,41 +14,13 @@ enum EBall_State
 	EBS_Off_Paraschute,
 	EBS_Teleporting
 };
-//------------------------------------------------------------------------------------------------------------
-class ABall;
-class AGraphics_Objects
-{
-public:
-	virtual ~AGraphics_Objects();
-	virtual void Act() = 0;
-	virtual bool Is_Finished() = 0;
-	virtual void Draw(HDC hdc, RECT &paint_area) = 0;
-	virtual void Clear(HDC hdc, RECT &paint_area) = 0;
-};
+
 
 
 
 //------------------------------------------------------------------------------------------------------------
-class AHit_Checker
-{
-public:
-	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball) = 0;
-	virtual bool Check_Hit(double next_x_pos, double next_y_pos);
-	bool Hit_Circle_On_Line(double y, double next_x_pos, double left_x, double right_x, double radius, double &x);
-};
 
-//------------------------------------------------------------------------------------------------------------
 
-class AMover
-{
-public:
-	virtual ~AMover();
-	virtual void Advance(double max_speed) = 0;
-	virtual double Get_Speed() = 0;
-	virtual void Start_Movement() = 0;
-	virtual void End_Movement() = 0;
-	
-};
 //------------------------------------------------------------------------------------------------------------
 class ABall : public AMover, public AGraphics_Objects
 {
@@ -80,8 +53,8 @@ public:
 	void Set_On_Paraschute(int brick_x, int brick_y);
    void Draw_Teleporting(HDC hdc, int step);
 
-	static void Add_Hit_Checker(AHit_Checker *hit_checker);
-	
+	//static void Add_Hit_Checker(AHit_Checker *hit_checker);
+	static AHit_Checker_List Hit_Checker_List;
 	int Release_Timer_Tick;
 
 	static const double Radius;
@@ -113,7 +86,7 @@ private:
 	
 	static const int Paraschute_Size = 15;
 	static const int On_Platform_Timeout = 3 * AsConfig::FPS;
-	static int Hit_Checkers_Count;
-	static AHit_Checker *Hit_Checkers[3];
+	/*static int Hit_Checkers_Count;
+	static AHit_Checker *Hit_Checkers[3];*/
 };
 //------------------------------------------------------------------------------------------------------------

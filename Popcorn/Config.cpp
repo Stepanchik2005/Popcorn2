@@ -1,77 +1,5 @@
 ﻿#include "Config.h"
 
-// AColor
-//------------------------------------------------------------------------------------------------------------
-AColor::AColor()
-: R(0), G(0), B(0), Pen(0), Brush(0)
-{
-}
-//------------------------------------------------------------------------------------------------------------
-AColor::AColor(unsigned char r, unsigned char g, unsigned char b)
-: R(r), G(g), B(b), Pen(0), Brush(0)
-{
-	Pen = CreatePen(PS_SOLID, 0, RGB(r,g,b));
-	Brush = CreateSolidBrush(RGB (r,g,b));
-}
-//------------------------------------------------------------------------------------------------------------
-AColor::AColor(const AColor &color, int pen_size)
-: R(color.R), G(color.G), B(color.B), Pen(0), Brush(0)
-{
-	Pen = CreatePen(PS_SOLID, pen_size, color.Get_RGB());
-}
-//------------------------------------------------------------------------------------------------------------
-AColor::AColor(const AColor &pen_color, int pen_size, const AColor &brush_color)
-: R(0), G(0), B(0), Pen(0), Brush(0)
-{
-	Pen = CreatePen(PS_SOLID, pen_size, pen_color.Get_RGB());
-	Brush = CreateSolidBrush(brush_color.Get_RGB());
-}
-//------------------------------------------------------------------------------------------------------------
-AColor::AColor(unsigned char r, unsigned char g, unsigned char b,int pen_size)
-: R(r), G(g), B(b), Pen(0), Brush(0)
-{
-	Pen = CreatePen(PS_SOLID, pen_size, RGB(r, g, b));
-}
-void AColor::Select(HDC hdc) const
-{
-	SelectObject(hdc, Pen);
-	SelectObject(hdc, Brush); 
-}
-//------------------------------------------------------------------------------------------------------------
-HBRUSH AColor::Get_Brush() const
-{
-	return Brush;
-}
-//------------------------------------------------------------------------------------------------------------
-HPEN AColor::Get_Pen() const
-{
-	return Pen;
-}
-//------------------------------------------------------------------------------------------------------------
-int AColor::Get_RGB() const
-{
-	return RGB(R, G, B);
-}
-//------------------------------------------------------------------------------------------------------------
-
-void AColor::Set_Brush(HBRUSH brush)
-{
-	Brush = brush;
-}
-//------------------------------------------------------------------------------------------------------------
-
-void AColor::Set_Pen(HPEN pen)
-{
-	Pen = pen;
-}
-void AColor::Select_Pen(HDC hdc) const
-{
-	SelectObject(hdc, Pen);
-}
-//------------------------------------------------------------------------------------------------------------
-
-
-
 
 // AsConfig
 
@@ -111,6 +39,27 @@ void AsConfig::Round_Rect(HDC hdc, RECT &brick_rect, int corner_radius)
 	int radius = corner_radius * AsConfig::Global_Scale;
 
 	RoundRect(hdc, brick_rect.left, brick_rect.top, brick_rect.right - 1, brick_rect.bottom - 1, radius, radius);
+}
+void AsConfig::Rect(HDC hdc, int x, int y, int width, int height, AColor color)
+{
+	RECT rect = {};
+	const int scale = AsConfig::Global_Scale;
+	color.Select(hdc);
+
+	rect.left = x * scale;
+	rect.top = y * scale;
+	rect.right = rect.left + width * scale;
+	rect.bottom = rect.top + height * scale;
+
+
+	Rectangle(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
+}
+void AsConfig::Rect(HDC hdc, RECT &rect, AColor color)
+{
+	const int scale = AsConfig::Global_Scale;
+	color.Select(hdc);
+
+	Rectangle(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsConfig::Throw()
