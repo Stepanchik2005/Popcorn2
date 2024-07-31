@@ -3,16 +3,16 @@
 #include "Hit_Checker_List.h"
 
 //------------------------------------------------------------------------------------------------------------
-enum EBall_State
+enum class EBall_State: unsigned char
 {
-	EBS_Disabled,
+	Disabled,
 
-	EBS_Normal,
-	EBS_Lost,
-	EBS_On_Platform,
-	EBS_On_Paraschute, 
-	EBS_Off_Paraschute,
-	EBS_Teleporting
+	Normal,
+	Lost,
+	On_Platform,
+	On_Paraschute, 
+	Off_Paraschute,
+	Teleporting
 };
 
 
@@ -22,7 +22,7 @@ enum EBall_State
 
 
 //------------------------------------------------------------------------------------------------------------
-class ABall : public AMover, public AGraphics_Objects
+class ABall : public AGame_Object
 {
 public:
 	ABall();

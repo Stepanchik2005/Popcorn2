@@ -6,7 +6,7 @@
 
 
 //------------------------------------------------------------------------------------------------------------
-class AsPlatform: public AHit_Checker, public AMover, public AGraphics_Objects
+class AsPlatform: public AHit_Checker, public AGame_Object
 {
 public:
 	~AsPlatform();

@@ -1,29 +1,29 @@
 #pragma once
 #include "Active_Brick.h"
 
-enum EFalling_Letter_State
+enum class EFalling_Letter_State: unsigned char
 {
-	EFLS_Normal,
-	EFLS_Finilazing, // Начинаем удалять объект
-	EFLS_Finished // Когда объект можно удалять
+	Normal,
+	Finilazing, // Начинаем удалять объект
+	Finished // Когда объект можно удалять
 };
-enum ELetter_Type
+enum class ELetter_Type: unsigned char
 {
 	
-	ELT_O, //О ("Отмена") — отмена действия символов К, Ш, П, Л и М. V
-	ELT_I, // И ("Инверсия") V
-	ELT_C, // С ("Скорость") V
-	ELT_M, //  М ("Монстры")
-	ELT_G, // Ж ("Жизнь") V
-	ELT_K, // К ("Клей")
-	ELT_Sh, // Ш ("Шире")	
+	O, //О ("Отмена") — отмена действия символов К, Ш, П, Л и М. V
+	I, // И ("Инверсия") V
+	C, // С ("Скорость") V
+	M, //  М ("Монстры")
+	G, // Ж ("Жизнь") V
+	K, // К ("Клей")
+	Sh, // Ш ("Шире")	
 	
-	ELT_P, //  П ("Пол")
-	ELT_L, //  Л ("Лазер")
-	ELT_T, // Т ("Три")	
+	P, //  П ("Пол")
+	L, //  Л ("Лазер")
+	T, // Т ("Три")	
 
-	ELT_Plus, // + (Переход на следующий уровень)
-	ELT_Max
+	Plus, // + (Переход на следующий уровень)
+	Max
 };
 		
 class AFalling_Letter : public AGraphics_Objects
@@ -64,5 +64,5 @@ private:
 	static const int Brick_Half_Height = AsConfig::Brick_Height * AsConfig::Global_Scale / 2;
 	static int All_Letter_Popularity;
 
-	static int Letters_Popularity[ELT_Max];
+	static int Letters_Popularity[(int)ELetter_Type::Max];
 };

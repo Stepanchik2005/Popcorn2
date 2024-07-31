@@ -1,9 +1,6 @@
 ﻿#include "Config.h"
 
-
 // AsConfig
-
-
 bool AsConfig::Level_Has_Floor = true;
 int AsConfig::Current_Timer_Tick = 0;
 
@@ -27,20 +24,29 @@ const double AsConfig::D_Global_Scale = 3.0;
 const double AsConfig::Accelerate_Ball_Speed = 1.001;
 const double AsConfig::Initial_Ball_Speed = 3.0;
 const double AsConfig::Min_Ball_Angle = M_PI / 8.0;
+
 //------------------------------------------------------------------------------------------------------------
-int AsConfig::Rand(int range)
+void AsConfig::Throw()
+{
+	throw 13;
+}
+
+
+
+// AsCommon --------
+int AsCommon::Rand(int range)
 {// Вычисляет псевдослучайное число в диапазоне [0, .. range - 1]
 
 	return rand() * range / RAND_MAX;
 }
 //------------------------------------------------------------------------------------------------------------
-void AsConfig::Round_Rect(HDC hdc, RECT &brick_rect, int corner_radius)
+void AsCommon::Round_Rect(HDC hdc, RECT &brick_rect, int corner_radius)
 {
 	int radius = corner_radius * AsConfig::Global_Scale;
 
 	RoundRect(hdc, brick_rect.left, brick_rect.top, brick_rect.right - 1, brick_rect.bottom - 1, radius, radius);
 }
-void AsConfig::Rect(HDC hdc, int x, int y, int width, int height, AColor color)
+void AsCommon::Rect(HDC hdc, int x, int y, int width, int height, AColor color)
 {
 	RECT rect = {};
 	const int scale = AsConfig::Global_Scale;
@@ -51,22 +57,21 @@ void AsConfig::Rect(HDC hdc, int x, int y, int width, int height, AColor color)
 	rect.right = rect.left + width * scale;
 	rect.bottom = rect.top + height * scale;
 
-
 	Rectangle(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 }
-void AsConfig::Rect(HDC hdc, RECT &rect, AColor color)
+void AsCommon::Rect(HDC hdc, RECT &rect, AColor color)
 {
-	const int scale = AsConfig::Global_Scale;
 	color.Select(hdc);
 
 	Rectangle(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 }
-//------------------------------------------------------------------------------------------------------------
-void AsConfig::Throw()
+void AsCommon::Ellipse(HDC hdc, RECT &rect, AColor color)
 {
-	throw 13;
+	color.Select(hdc);
+
+	::Ellipse(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 }
-void AsConfig::Invalidate_Rect(RECT &rect)
+void AsCommon::Invalidate_Rect(RECT &rect)
 {
 	InvalidateRect(AsConfig::Hwnd, &rect, FALSE);
 }

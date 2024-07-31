@@ -3,22 +3,22 @@
 #include "Ball.h"
 
 //------------------------------------------------------------------------------------------------------------
-enum EBrick_Type
+enum class EBrick_Type: unsigned char
 {
-	EBT_None,
+	None,
 
 
-	EBT_Red,
-	EBT_Blue,
-	EBT_Unbreakable,
-	EBT_Multihit_1,
-	EBT_Multihit_2,
-	EBT_Multihit_3,
-	EBT_Multihit_4,
-	EBT_Paraschute,
-	EBT_Teleport,
-	EBT_Ad, 
-	EBT_Invisible
+	Red,
+	Blue,
+	Unbreakable,
+	Multihit_1,
+	Multihit_2,
+	Multihit_3,
+	Multihit_4,
+	Paraschute,
+	Teleport,
+	Ad, 
+	Invisible
 };
 //------------------------------------------------------------------------------------------------------------
 
@@ -117,20 +117,19 @@ private:
 
 
 //------------------------------------------------------------------------------------------------------------
-enum ETeleport_State 
+enum class ETeleport_State: unsigned char
 {
 	
-
-	ETS_Starting,
-	ETS_Finishing,
-	ETS_Done
+	Starting,
+	Finishing,
+	Done
 };
-enum EDirection_State
+enum class EDirection_State: unsigned char
 {
-	EDS_Left,
-	EDS_Up,
-	EDS_Right,
-	EDS_Down
+	Left,
+	Up,
+	Right,
+	Down
 };
 class AActive_Brick_Teleport : public AActive_Brick
 {
@@ -178,7 +177,6 @@ public:
 	void Show_Under_Brick(int level_x, int level_y);
 	bool Has_Brick_At(int level_x, int level_y);
 	RECT Ad_Rect;
-	//static void Draw_In_Level(HDC hdc, RECT &brick_rect);
 	HRGN *Brick_Regions;
    int Max_Brick_Mask_Size;
 private:

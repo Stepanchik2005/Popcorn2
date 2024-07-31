@@ -11,7 +11,7 @@ struct SPoint
 //------------------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------------------------------
-class ALevel: public AHit_Checker, public AGraphics_Objects
+class ALevel: public AHit_Checker, public AGame_Object
 {
 public:
 	~ALevel();
@@ -24,6 +24,11 @@ public:
 	virtual bool Is_Finished();
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual void Clear(HDC hdc, RECT &paint_area);
+
+	virtual void Advance(double max_speed);
+	virtual double Get_Speed();
+	virtual void Start_Movement();
+	virtual void End_Movement();
 
 	void Init();
 	void Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Level_Width]);

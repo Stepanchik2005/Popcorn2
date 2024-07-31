@@ -1,9 +1,6 @@
-﻿  Active_Brick.cpp
-D:\Visual Studio\Popcorn_Git_2\Popcorn\Active_Brick.cpp(267,38): warning C4244: '=': conversion from 'double' to 'FLOAT', possible loss of data
-D:\Visual Studio\Popcorn_Git_2\Popcorn\Active_Brick.cpp(539,41): warning C4244: '=': conversion from 'double' to 'LONG', possible loss of data
-D:\Visual Studio\Popcorn_Git_2\Popcorn\Active_Brick.cpp(541,82): warning C4244: '=': conversion from 'double' to 'LONG', possible loss of data
-D:\Visual Studio\Popcorn_Git_2\Popcorn\Active_Brick.cpp(685,55): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-D:\Visual Studio\Popcorn_Git_2\Popcorn\Active_Brick.cpp(713,35): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+﻿  Engine.cpp
+  Main.cpp
+  Generating Code...
   Popcorn.vcxproj -> D:\Visual Studio\Popcorn_Git_2\x64\Debug\Popcorn.exe
   'pwsh.exe' is not recognized as an internal or external command,
   operable program or batch file.

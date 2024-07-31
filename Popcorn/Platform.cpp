@@ -29,7 +29,7 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
    double reflection_pos;
    double inner_y;
    double ball_x, ball_y;
-   int width;
+   double width;
    if(next_y_pos + ball->Radius < AsConfig::Platform_Y_Pos)
       return false;
    
@@ -44,7 +44,7 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
    if(Reflect_On_Circle( next_x_pos, next_y_pos, 0, ball))
        goto _on_hit;// от левого
    
-   if(Reflect_On_Circle( next_x_pos, next_y_pos, width - AsConfig::Platform_Circle_Size, ball))
+   if(Reflect_On_Circle( next_x_pos, next_y_pos, width - (double)AsConfig::Platform_Circle_Size, ball))
        goto _on_hit; // от правого
 
 
@@ -63,13 +63,13 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
    return false;
 
 _on_hit:
-   if(ball->Get_State() == EBS_On_Paraschute)
-      ball->Set_State(EBS_Off_Paraschute);
+   if(ball->Get_State() == EBall_State::On_Paraschute)
+      ball->Set_State(EBall_State::Off_Paraschute);
 
    if(Platform_State == EPlatform_State::Glue && Platform_State.Glue == EPlatform_Transformation::Active)
    {
       ball->Get_Center(ball_x, ball_y);
-      ball->Set_State(EBS_On_Platform, ball_x, ball_y);
+      ball->Set_State(EBall_State::On_Platform, ball_x, ball_y);
    }
    return true;
 }
@@ -402,8 +402,8 @@ void AsPlatform::Redraw_Platform()
       Prev_Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 1) * AsConfig::Global_Scale;
    
 
-   AsConfig::Invalidate_Rect(Prev_Platform_Rect);
-   AsConfig::Invalidate_Rect(Platform_Rect);
+   AsCommon::Invalidate_Rect(Prev_Platform_Rect);
+   AsCommon::Invalidate_Rect(Platform_Rect);
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -540,8 +540,7 @@ void AsPlatform::Clear_BG(HDC hdc, RECT &paint_area)
    if ( !(IntersectRect(&intersection_rect, &paint_area, &Prev_Platform_Rect)) )
       return;
 
-   AsConfig::BG_Color.Select(hdc);
-   Rectangle(hdc, Prev_Platform_Rect.left, Prev_Platform_Rect.top, Prev_Platform_Rect.right, Prev_Platform_Rect.bottom);
+   AsCommon::Rect(hdc, Prev_Platform_Rect, AsConfig::BG_Color);
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -566,17 +565,17 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
    Ellipse(hdc,(int)( (x + (double)Inner_Width) * d_scale), y * scale, (int)((x + (double)AsConfig::Platform_Circle_Size + (double)Inner_Width) * d_scale - 1), (y + AsConfig::Platform_Circle_Size) * scale - 1);
 
    // 2. Рисуем блик
-   Platform_Expanding.Draw_Circle_Highlight(hdc, x * d_scale, y * scale);
+   Platform_Expanding.Draw_Circle_Highlight(hdc, (int)(x * d_scale), y * scale);
 
    // 3. Рисуем среднюю часть
    AsPlatform::Platform_Inner_Color.Select(hdc);
 
-   inner_rect.left = (x + 4) * d_scale;
+   inner_rect.left = (int)( (x + 4.0) * d_scale);
    inner_rect.top = (y + 1) * scale;
-   inner_rect.right = (x + 4 + Inner_Width - 1) * d_scale;
+   inner_rect.right = (int) ( (x + 4.0 + Inner_Width - 1) * d_scale);
    inner_rect.bottom = (y + 1 + 5) * scale;
 
-   AsConfig::Round_Rect(hdc, inner_rect, 3);
+   AsCommon::Round_Rect(hdc, inner_rect, 3);
 
    
    if(Normal_Platform_Image == 0 && Has_Substate_Regular(EPlatform_Substate_Regular::Ready) )
@@ -602,7 +601,7 @@ void AsPlatform::Get_Normal_Platform_Image(HDC hdc)
 
    for(i = 0; i < Normal_Platform_Image_Height; ++i)
       for(j = 0; j < Normal_Platform_Image_Width; ++j)
-         Normal_Platform_Image[offset++] = GetPixel(hdc, x + j, y + i );
+         Normal_Platform_Image[offset++] = GetPixel(hdc, x + j, y + i);
    
 }
 //------------------------------------------------------------------------------------------------------------
@@ -626,7 +625,7 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
 
       ++moved_columns_count;
 
-      y_offset = AsConfig::Rand(Meltdown_Speed) + 1;
+      y_offset = AsCommon::Rand(Meltdown_Speed) + 1;
       x = Platform_Rect.left + i;
 
       j = 0;
@@ -671,8 +670,6 @@ void AsPlatform::Draw_Roll_In_State(HDC hdc, RECT &paint_area)
    int roller_size = AsConfig::Platform_Circle_Size * AsConfig::Global_Scale;
    double alpha;
    XFORM xform = {}, old_xform = {};
-
-   //Clear_BG(hdc);
 
    // 1. Шарик
    AsPlatform::Platform_Circle_Color.Select(hdc);

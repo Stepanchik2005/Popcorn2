@@ -13,7 +13,7 @@ char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -245,6 +245,21 @@ void ALevel::Clear(HDC hdc, RECT &paint_area)
 	if(Advertisement != 0)
 		Advertisement->Clear(hdc, paint_area);
 }
+	
+// нету реализации для методов AMover т.к. уровень не двигается
+void ALevel::Advance(double max_speed)
+{
+}
+double ALevel::Get_Speed()
+{
+	return 0.0;
+}
+void ALevel::Start_Movement()
+{
+}
+void ALevel::End_Movement()
+{
+}
 
 void ALevel::Init()
 {
@@ -268,13 +283,13 @@ void ALevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Leve
 
 	memcpy(Current_Level, level, sizeof(Current_Level) );
 
-	// 1. Считаем телепорты (только для того, чтобы задать размер массива
+	// 1. Считаем телепорты (только для того, чтобы задать размер массива)
 	for(i = 0; i < AsConfig::Level_Height; ++i)
 	{
 		for(j = 0; j < AsConfig::Level_Width; ++j)
 		{
 			brick_type = (EBrick_Type)ALevel::Current_Level[i][j];
-			if(brick_type == EBT_Teleport)
+			if(brick_type == EBrick_Type::Teleport)
 				Teleport_Counter++;
 		}
 		if(Teleport_Counter > ALevel::Max_Teleports_In_Level)
@@ -297,7 +312,7 @@ void ALevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Leve
 			for(j = 0; j < AsConfig::Level_Width; ++j)
 			{
 				brick_type = (EBrick_Type)ALevel::Current_Level[i][j];
-				if(brick_type == EBT_Teleport)
+				if(brick_type == EBrick_Type::Teleport)
 				{
 					Teleport_Pos[index].X = j;
 					Teleport_Pos[index].Y = i;
@@ -351,23 +366,23 @@ bool ALevel::On_Hit(int brick_x, int brick_y, ABall *ball, bool got_vertical_hit
 	brick_type = (EBrick_Type)Current_Level[brick_y][brick_x];
 
 	
-	if(brick_type == EBT_Paraschute)
+	if(brick_type == EBrick_Type::Paraschute)
 	{ 
 		if(ball != 0)
 		{
 			ball->Set_On_Paraschute(brick_x, brick_y);
-			Current_Level[brick_y][brick_x] = EBT_None;
+			Current_Level[brick_y][brick_x] = (char)EBrick_Type::None;
 		}
 		else
 		{
-			brick_type = EBT_Red;
-			Current_Level[brick_y][brick_x] = EBT_Red; // превращаем кирпич с парашютом в красный при попадании луча
+			brick_type = EBrick_Type::Red;
+			Current_Level[brick_y][brick_x] = (char)EBrick_Type::Red; // превращаем кирпич с парашютом в красный при попадании луча
 		}
 	}
 
 
 	else if(Add_Falling_Letter(brick_type, brick_x,  brick_y))
-		Current_Level[brick_y][brick_x] = EBT_None;
+		Current_Level[brick_y][brick_x] = (char)EBrick_Type::None;
 	
 	else
 		if(Create_Active_Brick(brick_x, brick_y, brick_type, ball, got_vertical_hit))
@@ -401,7 +416,7 @@ void ALevel::Redraw_Brick(int brick_x, int brick_y)
 	brick_rect.right = brick_rect.left + AsConfig::Brick_Width * scale;
 	brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height * scale;
 
-	AsConfig::Invalidate_Rect(brick_rect);
+	AsCommon::Invalidate_Rect(brick_rect);
 }
 //------------------------------------------------------------------------------------------------------------
 bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
@@ -470,10 +485,10 @@ bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 	ELetter_Type letter_type;
 	AFalling_Letter *falling_letter;
 	int letter_x, letter_y;
-	if( !(brick_type == EBT_Blue || brick_type == EBT_Red) )
+	if( !(brick_type == EBrick_Type::Blue || brick_type == EBrick_Type::Red) )
 		return false;
 	
-	if(AsConfig::Rand(AsConfig::Max_Random_Number_For_Letter) != 0) // рандом: или буква или нет
+	if(AsCommon::Rand(AsConfig::Max_Random_Number_For_Letter) != 0) // рандом: или буква или нет
 		return false;
 		
 	if(Falling_Letters_Counter >= AsConfig::Max_Falling_Letters_Size - 1) // падающих букв слишком много
@@ -488,24 +503,24 @@ bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 
 				letter_type = AFalling_Letter::Get_Random_Letter_Type();
 
-				switch(AsConfig::Rand(3))
+				switch(AsCommon::Rand(3))
 				{
 				case 0:
-					letter_type = ELT_K;
+					letter_type = ELetter_Type::K;
 					break;
 				case 1:
-					letter_type = ELT_Sh;
+					letter_type = ELetter_Type::Sh;
 					break;
 				case 2:
-					letter_type = ELT_L;
+					letter_type = ELetter_Type::L;
 					break;
 				}
-				/*if(AsConfig::Rand(2) == 0)
-					letter_type = ELT_Sh;
+				/*if(AsCommon::Rand(2) == 0)
+					letter_type = ELetter_Type::Sh;
 				else
-					letter_type = ELT_L;*/
+					letter_type = ELetter_Type::L;*/
 
-				//letter_type = ELT_L;
+				//letter_type = ELetter_Type::L;
 
 				falling_letter = new AFalling_Letter (letter_type, letter_x, letter_y, brick_type);
 				Falling_Letters[i] = falling_letter;
@@ -529,41 +544,41 @@ bool ALevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_typ
 
 	switch(brick_type)
 	{
-	case EBT_None:
+	case EBrick_Type::None:
 		break;
 
-	case EBT_Blue:
-	case EBT_Red:
+	case EBrick_Type::Blue:
+	case EBrick_Type::Red:
 		active_brick = new AActive_Brick_Red_Blue(brick_x,brick_y,brick_type);
-		Current_Level[brick_y][brick_x] = EBT_None;
+		Current_Level[brick_y][brick_x] = (char)EBrick_Type::None;
 		break;
 
-	case EBT_Unbreakable:
+	case EBrick_Type::Unbreakable:
 		active_brick = new AActive_Brick_Unbreakable(brick_x,brick_y);
 		break;
 
-	case EBT_Multihit_1:
+	case EBrick_Type::Multihit_1:
 		active_brick = new AActive_Brick_Multihit(brick_x,brick_y);
-		Current_Level[brick_y][brick_x] = EBT_None;
+		Current_Level[brick_y][brick_x] = (char)EBrick_Type::None;
 		break;
 
-	case EBT_Multihit_2:
-	case EBT_Multihit_3:
-	case EBT_Multihit_4:
-		Current_Level[brick_y][brick_x] = brick_type - 1;
+	case EBrick_Type::Multihit_2:
+	case EBrick_Type::Multihit_3:
+	case EBrick_Type::Multihit_4:
+		Current_Level[brick_y][brick_x] = (int)brick_type - 1;
 	   break;
 
-	case EBT_Teleport:
+	case EBrick_Type::Teleport:
 		Add_Active_Brick_Teleport(brick_x, brick_y, ball, got_vertical_hit);
 		is_teleport = true;
 		break;
 
-	case EBT_Ad:
+	case EBrick_Type::Ad:
 		active_brick = new AActive_Brick_Ad(brick_x,brick_y, Advertisement);
-		Current_Level[brick_y][brick_x] = EBT_Invisible;
+		Current_Level[brick_y][brick_x] = (char)EBrick_Type::Invisible;
 		break;
 
-	case EBT_Invisible:
+	case EBrick_Type::Invisible:
 		break;
 
 	default:
@@ -613,16 +628,16 @@ void ALevel::Add_Active_Brick_Teleport(int brick_x, int brick_y, ABall *ball, bo
 	if(got_vertical_hit)
 	{
 		if(pre_y_pos > curr_y_pos)
-			direction = EDS_Up;
+			direction = EDirection_State::Up;
 		else
-			direction = EDS_Down;
+			direction = EDirection_State::Down;
 	}
 	else
 	{
 		if(pre_x_pos < curr_x_pos)
-			direction = EDS_Right;
+			direction = EDirection_State::Right;
 		else
-			direction = EDS_Left;
+			direction = EDirection_State::Left;
 	}
 
 	// 2. Перебираем все направления в поисках свободного
@@ -631,23 +646,23 @@ void ALevel::Add_Active_Brick_Teleport(int brick_x, int brick_y, ABall *ball, bo
 	{
 	   switch(direction)
 	   {
-	   	case EDS_Left: 
-			   if(destination_teleport_x_pos > 0 && Current_Level[destination_teleport_y_pos][destination_teleport_x_pos - 1] == EBT_None)
+	   	case EDirection_State::Left: 
+			   if(destination_teleport_x_pos > 0 && Current_Level[destination_teleport_y_pos][destination_teleport_x_pos - 1] == (char)EBrick_Type::None)
 					got_direction = true;
 				break;
 
-			case EDS_Up:
-				if(destination_teleport_y_pos > 0 && Current_Level[destination_teleport_y_pos - 1][destination_teleport_x_pos] == EBT_None)
+			case EDirection_State::Up:
+				if(destination_teleport_y_pos > 0 && Current_Level[destination_teleport_y_pos - 1][destination_teleport_x_pos] == (char)EBrick_Type::None)
 					got_direction = true;
 				break;
 
-			case EDS_Right:
-				if(destination_teleport_x_pos < AsConfig::Level_Width - 1 && Current_Level[destination_teleport_y_pos][destination_teleport_x_pos + 1] == EBT_None)
+			case EDirection_State::Right:
+				if(destination_teleport_x_pos < AsConfig::Level_Width - 1 && Current_Level[destination_teleport_y_pos][destination_teleport_x_pos + 1] == (char)EBrick_Type::None)
 					got_direction = true;
 				break;
 
-			case EDS_Down:
-				if(destination_teleport_y_pos < AsConfig::Level_Height - 1 && Current_Level[destination_teleport_y_pos + 1][destination_teleport_x_pos] == EBT_None)
+			case EDirection_State::Down:
+				if(destination_teleport_y_pos < AsConfig::Level_Height - 1 && Current_Level[destination_teleport_y_pos + 1][destination_teleport_x_pos] == (char)EBrick_Type::None)
 					got_direction = true;
 				break;
 
@@ -657,12 +672,12 @@ void ALevel::Add_Active_Brick_Teleport(int brick_x, int brick_y, ABall *ball, bo
 		if(got_direction == true)
 			break;
 
-		direction = (EDirection_State)(direction - 1);
+		direction = (EDirection_State)((int)direction - 1);
 
 		ball->Set_Direction(ball->Get_Direction() + M_PI_2);
 
-		if(direction < 0)
-			direction = EDS_Down; // максимальное значение
+		if((int)direction < 0)
+			direction = EDirection_State::Down; // максимальное значение
 	}
 
 	destination_teleport->Release_Direction_State = direction;
@@ -678,7 +693,7 @@ AActive_Brick_Teleport* ALevel::Select_Destination_Teleport(int brick_x, int bri
 	int rand_index;
 	while(1) // рандомный выбор телепорта
 	{
-		rand_index = AsConfig::Rand(ALevel::Teleport_Counter);
+		rand_index = AsCommon::Rand(ALevel::Teleport_Counter);
 
 		if( !(Teleport_Pos[rand_index].X == brick_x && Teleport_Pos[rand_index].Y == brick_y))
 	        break;
@@ -718,39 +733,39 @@ void ALevel::Draw_Brick(HDC hdc, RECT brick_rect, int level_x, int level_y)
 
 	switch (brick_type)
 	{
-	case EBT_None:
+	case EBrick_Type::None:
 		if(Advertisement != 0 && Advertisement->Has_Brick_At(level_x, level_y))
 			break;
 		// else - No break;
-	case EBT_Red:
-	case EBT_Blue:
+	case EBrick_Type::Red:
+	case EBrick_Type::Blue:
 		AActive_Brick_Red_Blue::Draw_In_Level(hdc, brick_rect, brick_type);
 		break;
 
-	case EBT_Unbreakable:
+	case EBrick_Type::Unbreakable:
 		AActive_Brick_Unbreakable::Draw_In_Level(hdc, brick_rect);
 		break;
 	
-	case EBT_Multihit_1:
-	case EBT_Multihit_2:
-	case EBT_Multihit_3:
-	case EBT_Multihit_4:
+	case EBrick_Type::Multihit_1:
+	case EBrick_Type::Multihit_2:
+	case EBrick_Type::Multihit_3:
+	case EBrick_Type::Multihit_4:
 	AActive_Brick_Multihit::Draw_In_Level(hdc, brick_rect, brick_type);
 		break;
 
-	case EBT_Paraschute:
+	case EBrick_Type::Paraschute:
 		Draw_Paraschute_In_Level(hdc, brick_rect);
 		break;
 
-	case EBT_Teleport:
+	case EBrick_Type::Teleport:
 		AActive_Brick_Teleport::Draw_In_Level(hdc, brick_rect);
 		break;
 
-	case EBT_Ad:
+	case EBrick_Type::Ad:
 		AActive_Brick_Ad::Draw_In_Level(hdc, brick_rect);
 		break;
 
-	case EBT_Invisible:
+	case EBrick_Type::Invisible:
 		break;
 	default:
 		AsConfig::Throw();
@@ -778,19 +793,19 @@ void ALevel::Draw_Part_Paraschute(HDC hdc, RECT &brick_rect, double offset, int 
 	const int scale = AsConfig::Global_Scale;
 	RECT parashcute_rect = {};
 
-	parashcute_rect.left = brick_rect.left + offset * scale + 1;
+	parashcute_rect.left = (int)( (double)brick_rect.left + offset * AsConfig::D_Global_Scale + 1.0);
 	parashcute_rect.top = brick_rect.top + 1;
 	parashcute_rect.right = parashcute_rect.left + width * scale + 1;
 	parashcute_rect.bottom = parashcute_rect.top + 3 * scale;
 
 	AsConfig::Paraschute_Color.Select(hdc);
-	AsConfig::Round_Rect(hdc, parashcute_rect);
+	AsCommon::Round_Rect(hdc, parashcute_rect);
 
 	parashcute_rect.top += 3 * scale + 1 ;
 	parashcute_rect.bottom += 3 * scale + 1;
 
 	AsConfig::Paraschute_Color.Select(hdc);
-	AsConfig::Round_Rect(hdc, parashcute_rect);
+	AsCommon::Round_Rect(hdc, parashcute_rect);
 }
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Delete()

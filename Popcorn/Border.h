@@ -1,30 +1,9 @@
 ﻿#pragma once
 
 #include "Ball.h"
-
-class AGate: public AGraphics_Objects
-{
-public:
-	AGate(int x_pos, int y_pos);
-
-	virtual void Act();
-	virtual bool Is_Finished();
-	virtual void Draw(HDC hdc, RECT &paint_area);
-	virtual void Clear(HDC hdc, RECT &paint_area);
-
-
-	static const int Gates_Jumper_Count = 9;
-	
-private:
-	int X_Pos, Y_Pos;
-	int Height;
-
-	void Draw_Cup(HDC hdc, RECT &paint_area, bool is_top_cup);
-	void Draw_Edges(HDC hdc, RECT &paint_area);
-	void Draw_Edge(HDC hdc, RECT &paint_area, int x, int y, bool is_blue);
-};
+#include "Gate.h"
 //------------------------------------------------------------------------------------------------------------
-class AsBorder: public AHit_Checker, public AGraphics_Objects
+class AsBorder: public AHit_Checker, public AGame_Object
 {
 public:
 	~AsBorder();
@@ -37,7 +16,14 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual void Clear(HDC hdc, RECT &paint_area);
 
+	virtual void Advance(double max_speed);
+	virtual double Get_Speed();
+	virtual void Start_Movement();
+	virtual void End_Movement();
+
+	void Open_Gate(int gate_index, bool is_open_short);
    void Redraw_Floor();
+	bool Is_Gate_Opened(int gate_index); 
 private:
 	void Draw_Element(HDC hdc, RECT &paint_area, int x, int y, bool top_border);
 	void Draw_Floor(HDC hdc, RECT &paint_area);

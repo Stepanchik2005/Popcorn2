@@ -5,20 +5,20 @@
 #include "Platform.h"
 #include "Ball_Set.h"
 //------------------------------------------------------------------------------------------------------------
-enum EKey_Type
+enum class EKey_Type: unsigned char
 {
-	EKT_Left,
-	EKT_Right,
-	EKT_Space
+	Left,
+	Right,
+	Space
 };
 //------------------------------------------------------------------------------------------------------------
-enum EGame_State
+enum class EGame_State: unsigned char
 {
-	EGS_Test_Ball,
+	Test_Ball,
 
-	EGS_Play_Level,
-	EGS_Lost_Ball,
-	EGS_Restart_Level
+	Play_Level,
+	Lost_Ball,
+	Restart_Level
 };
 //------------------------------------------------------------------------------------------------------------
 const int Timer_ID = WM_USER + 1;
@@ -41,7 +41,8 @@ private:
 	void Restart_Level();
 	void Act();
 	void On_Falling_Letter(AFalling_Letter *falling_letter);
-	
+	void Add_New_Module(int &index, AGame_Object *obj);
+
 	double Rest_Distance;
 	int Life_Count;
 	EGame_State Game_State;
@@ -51,7 +52,6 @@ private:
 	AsPlatform Platform;
 	AsBorder Border;
 
-	AMover *Movers[AsConfig::Max_Movers_Count];
-	AGraphics_Objects *Graphics_Objects[AsConfig::Max_Graphics_Objects_Count];
+	AGame_Object *Modules[AsConfig::Max_Modules_Count];
 };
 //------------------------------------------------------------------------------------------------------------

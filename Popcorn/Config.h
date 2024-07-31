@@ -6,12 +6,7 @@
 class AsConfig
 {
 public:
-	static int Rand(int range);
-	static void Round_Rect(HDC hdc, RECT &brick_rect, int corner_radius = 2);
-	static void Rect(HDC hdc, int x, int y, int width, int height, AColor color);
-	static void Rect(HDC hdc, RECT &rect, AColor color);
 	static void Throw();
-	static void Invalidate_Rect(RECT &rect);
 
 	static bool Level_Has_Floor;
 	static int Current_Timer_Tick;
@@ -49,7 +44,7 @@ public:
 	static const int Max_Movers_Count = 10;
 	static const int Max_Life_Count = 12;
 	static const int Floor_Y_Pos = AsConfig::Max_Y_Pos - 1;
-	static const int Max_Graphics_Objects_Count = 10;
+	static const int Max_Modules_Count = 10;
 
 	// константы платформы
 	static const int Platform_Height = 7;
@@ -61,3 +56,14 @@ public:
 	static const int Gates_Count = 8;
 };
 //------------------------------------------------------------------------------------------------------------
+class AsCommon
+{
+public:
+	static int  Rand(int range);
+	static void Round_Rect(HDC hdc, RECT &brick_rect, int corner_radius = 2);
+	static void Rect(HDC hdc, int x, int y, int width, int height, AColor color);
+	static void Rect(HDC hdc, RECT &rect, AColor color);
+	static void Ellipse(HDC hdc, RECT &rect, AColor color);
+
+	static void Invalidate_Rect(RECT &rect);
+};
