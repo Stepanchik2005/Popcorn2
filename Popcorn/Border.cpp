@@ -130,7 +130,13 @@ void AsBorder::Start_Movement()
 void AsBorder::End_Movement()
 {
 }
+void AsBorder::Get_Gate_Pos(int index, int &x_gate_pos, int &y_gate_pos)
+{
+	if(index < 0 || index > AsConfig::Gates_Count)
+		AsConfig::Throw();
 
+	Gate[index]->Get_Pos(x_gate_pos, y_gate_pos);
+}
 void AsBorder::Open_Gate(int gate_index, bool is_open_short)
 {
 	if(gate_index >= 0 && gate_index < AsConfig::Gates_Count)

@@ -85,6 +85,15 @@
     <Filter Include="#Platform\Platform_State">
       <UniqueIdentifier>{8fdb0c07-803e-47bd-8832-89be72506717}</UniqueIdentifier>
     </Filter>
+    <Filter Include="#Monster">
+      <UniqueIdentifier>{61cc3378-95d8-40ab-9b30-d9e0a9600158}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Monster\Monster_Set">
+      <UniqueIdentifier>{8eb182e4-8082-4599-9fed-9b982b4c0f51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Monster\Monster">
+      <UniqueIdentifier>{7611ed56-be58-4bca-b5cd-0dcea77a2622}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -152,6 +161,12 @@
     </ClInclude>
     <ClInclude Include="Gate.h">
       <Filter>#Border\Gate</Filter>
+    </ClInclude>
+    <ClInclude Include="Monster_Set.h">
+      <Filter>#Monster\Monster_Set</Filter>
+    </ClInclude>
+    <ClInclude Include="Monster.h">
+      <Filter>#Monster\Monster</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -224,6 +239,12 @@
     </ClCompile>
     <ClCompile Include="Gate.cpp">
       <Filter>#Border\Gate</Filter>
+    </ClCompile>
+    <ClCompile Include="Monster_Set.cpp">
+      <Filter>#Monster\Monster_Set</Filter>
+    </ClCompile>
+    <ClCompile Include="Monster.cpp">
+      <Filter>#Monster\Monster</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

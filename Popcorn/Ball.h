@@ -16,13 +16,7 @@ enum class EBall_State: unsigned char
 };
 
 
-
-
-//------------------------------------------------------------------------------------------------------------
-
-
-//------------------------------------------------------------------------------------------------------------
-class ABall : public AGame_Object
+class ABall: public AGame_Object
 {
 public:
 	ABall();
@@ -53,7 +47,6 @@ public:
 	void Set_On_Paraschute(int brick_x, int brick_y);
    void Draw_Teleporting(HDC hdc, int step);
 
-	//static void Add_Hit_Checker(AHit_Checker *hit_checker);
 	static AHit_Checker_List Hit_Checker_List;
 	int Release_Timer_Tick;
 
@@ -65,7 +58,6 @@ private:
 	void Redraw_Paraschute();
 	void Clean_Up_Paraschute(HDC hdc);
 
-	
 	EBall_State Ball_State, Prev_Ball_State;
 	double Prev_Ball_Speed;
 	double Ball_Speed;
@@ -82,11 +74,7 @@ private:
 	RECT Ball_Rect, Prev_Ball_Rect;
    RECT Paraschute_Rect, Prev_Paraschute_Rect;
 
-
-	
 	static const int Paraschute_Size = 15;
 	static const int On_Platform_Timeout = 3 * AsConfig::FPS;
-	/*static int Hit_Checkers_Count;
-	static AHit_Checker *Hit_Checkers[3];*/
 };
 //------------------------------------------------------------------------------------------------------------

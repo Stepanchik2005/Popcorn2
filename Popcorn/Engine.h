@@ -4,6 +4,7 @@
 #include "Level.h"
 #include "Platform.h"
 #include "Ball_Set.h"
+#include "Monster_Set.h"
 //------------------------------------------------------------------------------------------------------------
 enum class EKey_Type: unsigned char
 {
@@ -45,12 +46,14 @@ private:
 
 	double Rest_Distance;
 	int Life_Count;
+
 	EGame_State Game_State;
 	AsBall_Set Ball_Set;
 	AsLaser_Beam_Set Laser_Beam_Set;
 	ALevel Level;
 	AsPlatform Platform;
 	AsBorder Border;
+	AsMonster_Set Monster_Set;
 
 	AGame_Object *Modules[AsConfig::Max_Modules_Count];
 };

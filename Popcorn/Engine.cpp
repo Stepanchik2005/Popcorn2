@@ -4,7 +4,7 @@
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
-: Game_State(EGame_State::Lost_Ball),Rest_Distance(0.0), Life_Count(5)
+	: Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Life_Count(5)
 {
 }
 //------------------------------------------------------------------------------------------------------------
@@ -26,7 +26,8 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Level.Init();
 	Platform.Init(&Ball_Set, &Laser_Beam_Set); 
 	AFalling_Letter::Init();
-	
+	Monster_Set.Init(&Border);
+
 	//Laser_Beam_Set.Init();
 
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Border);
@@ -45,19 +46,16 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	memset(Modules, 0, AsConfig::Max_Modules_Count);
 
-	/*Modules[0] = &Level;
-	Modules[1] = &Border;
-	Modules[2] = &Platform;
-	Modules[3] = &Ball_Set;
-	Modules[4] = &Laser_Beam_Set;*/
-
 	Add_New_Module(index, &Level);
 	Add_New_Module(index, &Border);
 	Add_New_Module(index, &Platform);
 	Add_New_Module(index, &Ball_Set);
 	Add_New_Module(index, &Laser_Beam_Set);
-	
-	Border.Open_Gate(AsConfig::Gates_Count - 3, false);
+	Add_New_Module(index, &Monster_Set);
+
+	//Border.Open_Gate(AsConfig::Gates_Count - 4, false);
+
+	Monster_Set.Emit_At_Gate(4);
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
 }

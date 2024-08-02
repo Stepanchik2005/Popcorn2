@@ -8,6 +8,8 @@ const AColor AsConfig::BG_Color(15, 63, 31);
 const AColor AsConfig::Red_Color(255, 85, 85);
 const AColor AsConfig::Blue_Color(85, 255, 255);
 const AColor AsConfig::White_Color(255, 255, 255);
+const AColor AsConfig::Monster_Dark_Red_Color(200, 0, 32);
+
 const AColor AsConfig::Letter_Color(AsConfig::White_Color, AsConfig::Global_Scale);
 const AColor AsConfig::Laser_Color(AsConfig::White_Color, AsConfig::Global_Scale);
 const AColor AsConfig::Paraschute_Color(AsConfig::Blue_Color, 3, AsConfig::Red_Color);
@@ -15,6 +17,9 @@ const AColor AsConfig::Teleport_Color(AsConfig::Blue_Color, 3, AsConfig::BG_Colo
 const AColor AsConfig::Advertisement_Blue_Table_Color(0, 159, 159, AsConfig::Global_Scale);
 const AColor AsConfig::Unbreakable_Blue_Hightlight_Color(AsConfig::Blue_Color, AsConfig::Global_Scale); 
 const AColor AsConfig::Unbreakable_Red_Hightlight_Color(AsConfig::Red_Color, 2 * AsConfig::Global_Scale);
+const AColor AsConfig::Cornea_Color(AsConfig::BG_Color, AsConfig::Global_Scale - 1, AsConfig::White_Color);
+const AColor AsConfig::Iris_Color(AsConfig::BG_Color, AsConfig::Global_Scale * 2 / 3, AsConfig::Blue_Color);
+const AColor AsConfig::Cornea_Arc_Color(AsConfig::BG_Color, AsConfig::Global_Scale * 2 / 3);
 
 
 HWND AsConfig::Hwnd;

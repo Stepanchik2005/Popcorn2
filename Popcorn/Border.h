@@ -21,6 +21,7 @@ public:
 	virtual void Start_Movement();
 	virtual void End_Movement();
 
+	void Get_Gate_Pos(int index, int &x_gate_pos, int &y_gate_pos);
 	void Open_Gate(int gate_index, bool is_open_short);
    void Redraw_Floor();
 	bool Is_Gate_Opened(int gate_index); 
@@ -29,7 +30,6 @@ private:
 	void Draw_Floor(HDC hdc, RECT &paint_area);
 
 
-	
 	RECT Floor_Rect;
 	AGate *Gate[8];
 };
