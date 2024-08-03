@@ -52,14 +52,14 @@ public:
 	virtual bool Is_Finished();
 
 	static void Setup_Colors();
+
 	static void Draw_In_Level(HDC hdc, RECT &brick_rect, EBrick_Type brick_type);
 	
 private:
 	int Fade_Step;
 
 
-	static unsigned char Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step);
-	static void Get_Fading_Color(const AColor &color, int step, AColor &result_color);
+	
 
 	static const int Max_Fade_Step = AsConfig::FPS;
 

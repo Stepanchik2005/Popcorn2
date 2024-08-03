@@ -157,6 +157,7 @@
     <ClInclude Include="Border.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="Engine.h" />
+    <ClInclude Include="Explodive_Balls.h" />
     <ClInclude Include="Falling_Letter.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Ball_Set.h" />
@@ -184,6 +185,7 @@
     <ClCompile Include="Border.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Explodive_Ball.cpp" />
     <ClCompile Include="Falling_Letter.cpp" />
     <ClCompile Include="Gate.cpp" />
     <ClCompile Include="Hit_Checker_List.cpp" />

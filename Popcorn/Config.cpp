@@ -20,7 +20,8 @@ const AColor AsConfig::Unbreakable_Red_Hightlight_Color(AsConfig::Red_Color, 2 *
 const AColor AsConfig::Cornea_Color(AsConfig::BG_Color, AsConfig::Global_Scale - 1, AsConfig::White_Color);
 const AColor AsConfig::Iris_Color(AsConfig::BG_Color, AsConfig::Global_Scale * 2 / 3, AsConfig::Blue_Color);
 const AColor AsConfig::Cornea_Arc_Color(AsConfig::BG_Color, AsConfig::Global_Scale * 2 / 3);
-
+const AColor AsConfig::Explodive_Red_Color(AsConfig::White_Color, 0, AsConfig::Red_Color);
+const AColor AsConfig::Explodive_Blue_Color(AsConfig::White_Color, 0, AsConfig::Blue_Color);
 
 HWND AsConfig::Hwnd;
 
@@ -80,3 +81,20 @@ void AsCommon::Invalidate_Rect(RECT &rect)
 {
 	InvalidateRect(AsConfig::Hwnd, &rect, FALSE);
 }
+//------------------------------------------------------------------------------------------------------------
+unsigned char AsCommon::Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step, int max_fade_step)
+{
+	return color - step * (color - bg_color) / (max_fade_step - 1);
+}
+//------------------------------------------------------------------------------------------------------------
+void AsCommon::Get_Fading_Color(const AColor &origin_color, int step, int max_fade_step, AColor &result_color)
+{
+	unsigned char r, g, b;
+
+	r = Get_Fading_Channel(origin_color.R, AsConfig::BG_Color.R, step, max_fade_step);
+	g = Get_Fading_Channel(origin_color.G, AsConfig::BG_Color.G, step, max_fade_step);
+	b = Get_Fading_Channel(origin_color.B, AsConfig::BG_Color.B, step, max_fade_step);
+
+	result_color = AColor(r,g,b);
+}
+//------------------------------------------------------------------------------------------------------------

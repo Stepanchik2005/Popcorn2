@@ -13,7 +13,7 @@ public:
 
 	static const AColor BG_Color, Red_Color, Blue_Color, White_Color, Monster_Dark_Red_Color,  Letter_Color, Laser_Color,Paraschute_Color;
 	static const AColor Teleport_Color, Advertisement_Blue_Table_Color, Unbreakable_Blue_Hightlight_Color, Unbreakable_Red_Hightlight_Color;;
-	static const AColor Cornea_Color, Iris_Color, Cornea_Arc_Color;
+	static const AColor Cornea_Color, Iris_Color, Cornea_Arc_Color, Explodive_Red_Color, Explodive_Blue_Color;
 
 	static HWND Hwnd;
 
@@ -67,4 +67,7 @@ public:
 	static void Ellipse(HDC hdc, RECT &rect, AColor color);
 
 	static void Invalidate_Rect(RECT &rect);
+
+	static unsigned char Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step, int max_fade_step);
+	static void Get_Fading_Color(const AColor &color, int step, int max_fade_step, AColor &result_color);
 };
