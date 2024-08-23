@@ -4,11 +4,11 @@
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
-	: Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Life_Count(5)
+	: Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Life_Count(5), Modules{}
 {
 }
 //------------------------------------------------------------------------------------------------------------
-void AsEngine::Init_Engine(HWND hwnd)
+void AsEngine::Init_Engine(HWND hwnd) 
 {// Настройка игры при старте
 	int index = 0;
 	SYSTEMTIME sys_time;
@@ -34,8 +34,13 @@ void AsEngine::Init_Engine(HWND hwnd)
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Border);
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Level);
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Platform);
+	ABall::Hit_Checker_List.Add_Hit_Checker(&Monster_Set);
 
 	ALaser_Beam::Hit_Checker_List.Add_Hit_Checker(&Level);
+	ALaser_Beam::Hit_Checker_List.Add_Hit_Checker(&Monster_Set);
+
+	AsPlatform::Hit_Checker_List.Add_Hit_Checker(&Monster_Set);
+
 	Level.Set_Current_Level(ALevel::Level_01);
 
  	/*Ball.Set_State(EBall_State::Normal, Platform.X_Pos + Platform.Width / 2);*/
@@ -56,7 +61,9 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	//Border.Open_Gate(AsConfig::Gates_Count - 4, false);
 
-	Monster_Set.Emit_At_Gate(4);
+	//Monster_Set.Emit_At_Gate(5);
+
+	
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
 }
@@ -121,13 +128,23 @@ int AsEngine::On_Timer()
 
 	case EGame_State::Lost_Ball:
 		if (Platform.Has_Substate_Regular(EPlatform_Substate_Regular::Missing) )
+		{
 			Game_State = EGame_State::Restart_Level;
+			Restart_Level();
+		}
 		
 		break;
 
 
 	case EGame_State::Restart_Level:
-		Restart_Level();
+		if(Platform.Has_Substate_Regular(EPlatform_Substate_Regular::Ready))
+		{
+		  Game_State = EGame_State::Play_Level;
+		  Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos());
+		  Monster_Set.Activate();
+		}
+		if (Border.Is_Gate_Opened(AsConfig::Gates_Count - 1) )
+			Platform.Set_State(EPlatform_State::Rolling);
 		break;
 	}
 	
@@ -182,9 +199,9 @@ void AsEngine::Play_Level()
 	if(lost_ball_count == AsConfig::Max_Balls_Count)
 	{
 		Game_State = EGame_State::Lost_Ball;
-
 		Level.Stop();
-
+		Monster_Set.Destroy_All();
+		Laser_Beam_Set.Disable_All();
 		Platform.Set_State(EPlatform_State::Meltdown);
 	}
 	else
@@ -198,16 +215,11 @@ void AsEngine::Play_Level()
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Restart_Level()
 {
-	Border.Open_Gate(AsConfig::Gates_Count - 1, true);
+	
+	if(Border.Is_Gate_Closed(AsConfig::Gates_Count - 1))
+ 		Border.Open_Gate(AsConfig::Gates_Count - 1, true);
 
-	if (Border.Is_Gate_Opened(AsConfig::Gates_Count - 1) )
-			Platform.Set_State(EPlatform_State::Rolling);
-		
-	if(Platform.Has_Substate_Regular(EPlatform_Substate_Regular::Ready))
-	{
-			Game_State = EGame_State::Play_Level;
-			Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos());
-	}
+	
 }
 //------------------------------------------------------------------------------------------------------------
 

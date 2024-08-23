@@ -2,7 +2,7 @@
 
 // ABall
 const double ABall::Start_Ball_Y_Pos = 181.0;
-const double ABall::Radius = 2.0 - 0.5 / AsConfig::Global_Scale;
+
 AHit_Checker_List ABall::Hit_Checker_List = {};
 
 //------------------------------------------------------------------------------------------------------------
@@ -165,35 +165,47 @@ void ABall::Clear(HDC hdc, RECT &paint_area)
 	
 }
 //------------------------------------------------------------------------------------------------------------
-void ABall::Set_Speed(double ball_speed)
+double ABall::Get_Direction()
 {
-	Ball_Speed = ball_speed;
+	return Ball_Direction;
+}
+void ABall::Set_Direction(double new_direction)
+{
+	const double pi_2 = 2.0 * M_PI;
+
+	while (new_direction > pi_2) // устанавливаем мячик в диапозон [0..pi_2]
+		new_direction -= pi_2;
+
+	while (new_direction < 0.0)
+		new_direction += pi_2;
+
+	// 1. Справа
+	// 1.1 Сверху
+	if(new_direction < AsConfig::Min_Ball_Angle)
+		new_direction = AsConfig::Min_Ball_Angle;
+
+	//1.2 Снизу
+	if(new_direction > pi_2 - AsConfig::Min_Ball_Angle)
+		new_direction = pi_2 - AsConfig::Min_Ball_Angle;
+	
+	// 2. Слева
+	// 2.1 Сверху
+	if(new_direction < M_PI && new_direction > M_PI - AsConfig::Min_Ball_Angle)
+		new_direction = M_PI - AsConfig::Min_Ball_Angle;
+
+	// 2.2 Снизу
+	if(new_direction > M_PI && new_direction < M_PI + AsConfig::Min_Ball_Angle)
+		new_direction = M_PI + AsConfig::Min_Ball_Angle;
+
+	Ball_Direction = new_direction;
 }
 //------------------------------------------------------------------------------------------------------------
-void ABall::Set_For_Test()
+bool ABall::Is_Moving_Up()
 {
-	Testing_Is_Active = true;
-	Rest_Test_Distance = 30.0;
-
-	Set_State(EBall_State::Normal, 80, 189 - Test_Iteration);
-	Ball_Direction = M_PI_4 / 4.0;
-
-	++Test_Iteration;
-}
-//------------------------------------------------------------------------------------------------------------
-bool ABall::Is_Test_Finished()
-{
-	if (Testing_Is_Active)
-	{
-		if (Rest_Test_Distance <= 0.0)
-		{
-			Testing_Is_Active = false;
-			Set_State(EBall_State::Lost);
-			return true;
-		}
-	}
-
-	return false;
+	if (Ball_Direction >= 0.0 && Ball_Direction < M_PI)
+		return true;
+	else
+		return false;
 }
 //------------------------------------------------------------------------------------------------------------
 EBall_State ABall::Get_State()
@@ -274,9 +286,12 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 	Ball_State = new_state;
 }
 //------------------------------------------------------------------------------------------------------------
-double ABall::Get_Direction()
+void ABall::Reflect(bool from_horizontal)
 {
-	return Ball_Direction;
+	if (from_horizontal)
+		Set_Direction(-Ball_Direction);
+	else
+		Set_Direction(M_PI - Ball_Direction);
 }
 //------------------------------------------------------------------------------------------------------------
 void ABall::Get_Center(double &x_pos, double &y_pos)
@@ -285,36 +300,84 @@ void ABall::Get_Center(double &x_pos, double &y_pos)
 	y_pos = Center_Y_Pos;
 }
 //------------------------------------------------------------------------------------------------------------
-void ABall::Set_Direction(double new_direction)
+bool ABall::Is_Moving_Left()
 {
-	const double pi_2 = 2.0 * M_PI;
-
-	while (new_direction > pi_2) // устанавливаем мячик в диапозон [0..pi_2]
-		new_direction -= pi_2;
-
-	while (new_direction < 0.0)
-		new_direction += pi_2;
-
-	// 1. Справа
-	// 1.1 Сверху
-	if(new_direction < AsConfig::Min_Ball_Angle)
-		new_direction = AsConfig::Min_Ball_Angle;
-
-	//1.2 Снизу
-	if(new_direction > pi_2 - AsConfig::Min_Ball_Angle)
-		new_direction = pi_2 - AsConfig::Min_Ball_Angle;
-	
-	// 2. Слева
-	// 2.1 Сверху
-	if(new_direction < M_PI && new_direction > M_PI - AsConfig::Min_Ball_Angle)
-		new_direction = M_PI - AsConfig::Min_Ball_Angle;
-
-	// 2.2 Снизу
-	if(new_direction > M_PI && new_direction < M_PI + AsConfig::Min_Ball_Angle)
-		new_direction = M_PI + AsConfig::Min_Ball_Angle;
-
-	Ball_Direction = new_direction;
+	if(Ball_Direction > M_PI_2 && Ball_Direction < M_PI + M_PI_2)
+		return true;
+	else
+		return false;
 }
+//------------------------------------------------------------------------------------------------------------
+void ABall::Set_On_Paraschute(int brick_x, int brick_y)
+{
+	const int scale = AsConfig::Global_Scale;
+	int cell_x = AsConfig::Level_X_Offset + brick_x * AsConfig::Cell_Width;
+	int cell_y = AsConfig::Level_Y_Offset + brick_y * AsConfig::Cell_Height;
+	Ball_State = EBall_State::On_Paraschute;
+	Ball_Direction = M_PI + M_PI_2;
+	Ball_Speed = 1.0;
+
+	Paraschute_Rect.left = cell_x * scale;
+	Paraschute_Rect.top = cell_y * scale;
+	Paraschute_Rect.right = Paraschute_Rect.left + Paraschute_Size * scale;
+	Paraschute_Rect.bottom = Paraschute_Rect.top + Paraschute_Size * scale;
+
+	Prev_Paraschute_Rect = Paraschute_Rect;
+
+	Center_X_Pos =  (double)cell_x + ((double)AsConfig::Cell_Width / 2);
+   Center_Y_Pos = (double) (cell_y + Paraschute_Size) - AsConfig::Ball_Radius * 2.0;
+
+   Redraw_Paraschute();
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Draw_Teleporting(HDC hdc, int step)
+{
+	const int scale = AsConfig::Global_Scale;
+
+	int top_y = (int)(Ball_Rect.top + step * 1.7);
+	int low_y = (int)(Ball_Rect.bottom - step * 1.7);
+
+	if(top_y > low_y)
+		return;
+
+	AsConfig::White_Color.Select(hdc);
+	Ellipse(hdc, Ball_Rect.left, top_y, Ball_Rect.right, low_y);
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Set_Speed(double ball_speed)
+{
+	Ball_Speed = ball_speed;
+}
+//------------------------------------------------------------------------------------------------------------
+void ABall::Set_For_Test()
+{
+	Testing_Is_Active = true;
+	Rest_Test_Distance = 30.0;
+
+	Set_State(EBall_State::Normal, 80, 189 - Test_Iteration);
+	Ball_Direction = M_PI_4 / 4.0;
+
+	++Test_Iteration;
+}
+//------------------------------------------------------------------------------------------------------------
+bool ABall::Is_Test_Finished()
+{
+	if (Testing_Is_Active)
+	{
+		if (Rest_Test_Distance <= 0.0)
+		{
+			Testing_Is_Active = false;
+			Set_State(EBall_State::Lost);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+//------------------------------------------------------------------------------------------------------------
+
 //------------------------------------------------------------------------------------------------------------
 void ABall::Forced_Advance(double direction, double speed, double max_speed)
 {
@@ -345,75 +408,19 @@ void ABall::Release()
 
 	Ball_Direction = Prev_Ball_Direction;
 }
-//------------------------------------------------------------------------------------------------------------
-void ABall::Reflect(bool from_horizontal)
-{
-	if (from_horizontal)
-		Set_Direction(-Ball_Direction);
-	else
-		Set_Direction(M_PI - Ball_Direction);
-}
-//------------------------------------------------------------------------------------------------------------
-bool ABall::Is_Moving_Up()
-{
-	if (Ball_Direction >= 0.0 && Ball_Direction < M_PI)
-		return true;
-	else
-		return false;
-}
-//------------------------------------------------------------------------------------------------------------
-bool ABall::Is_Moving_Left()
-{
-	if(Ball_Direction > M_PI_2 && Ball_Direction < M_PI + M_PI_2)
-		return true;
-	else
-		return false;
-}
-//------------------------------------------------------------------------------------------------------------
-void ABall::Set_On_Paraschute(int brick_x, int brick_y)
-{
-	const int scale = AsConfig::Global_Scale;
-	int cell_x = AsConfig::Level_X_Offset + brick_x * AsConfig::Cell_Width;
-	int cell_y = AsConfig::Level_Y_Offset + brick_y * AsConfig::Cell_Height;
-	Ball_State = EBall_State::On_Paraschute;
-	Ball_Direction = M_PI + M_PI_2;
-	Ball_Speed = 1.0;
 
-	Paraschute_Rect.left = cell_x * scale;
-	Paraschute_Rect.top = cell_y * scale;
-	Paraschute_Rect.right = Paraschute_Rect.left + Paraschute_Size * scale;
-	Paraschute_Rect.bottom = Paraschute_Rect.top + Paraschute_Size * scale;
 
-	Prev_Paraschute_Rect = Paraschute_Rect;
 
-	Center_X_Pos =  (double)cell_x + ((double)AsConfig::Cell_Width / 2);
-   Center_Y_Pos = (double) (cell_y + Paraschute_Size) - Radius * 2.0;
 
-   Redraw_Paraschute();
-}
-//------------------------------------------------------------------------------------------------------------
-void ABall::Draw_Teleporting(HDC hdc, int step)
-{
-	const int scale = AsConfig::Global_Scale;
-
-	int top_y = (int)(Ball_Rect.top + step * 1.7);
-	int low_y = (int)(Ball_Rect.bottom - step * 1.7);
-
-	if(top_y > low_y)
-		return;
-
-	AsConfig::White_Color.Select(hdc);
-	Ellipse(hdc, Ball_Rect.left, top_y, Ball_Rect.right, low_y);
-}
 
 //------------------------------------------------------------------------------------------------------------
 
 void ABall::Redraw_Ball()
 {
-	Ball_Rect.left = (int)((Center_X_Pos - Radius) * AsConfig::Global_Scale);
-	Ball_Rect.top = (int)((Center_Y_Pos - Radius) * AsConfig::Global_Scale);
-	Ball_Rect.right = (int)((Center_X_Pos + Radius) * AsConfig::Global_Scale);
-	Ball_Rect.bottom = (int)((Center_Y_Pos + Radius) * AsConfig::Global_Scale);
+	Ball_Rect.left = (int)((Center_X_Pos - AsConfig::Ball_Radius) * AsConfig::Global_Scale);
+	Ball_Rect.top = (int)((Center_Y_Pos - AsConfig::Ball_Radius) * AsConfig::Global_Scale);
+	Ball_Rect.right = (int)((Center_X_Pos + AsConfig::Ball_Radius) * AsConfig::Global_Scale);
+	Ball_Rect.bottom = (int)((Center_Y_Pos + AsConfig::Ball_Radius) * AsConfig::Global_Scale);
 
 	AsCommon::Invalidate_Rect(Prev_Ball_Rect);
 	AsCommon::Invalidate_Rect(Ball_Rect);

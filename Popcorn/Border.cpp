@@ -19,11 +19,11 @@ AsBorder::AsBorder()
 	  Floor_Rect.right = AsConfig::Max_X_Pos * AsConfig::Global_Scale;
 	  Floor_Rect.bottom = AsConfig::Max_Y_Pos * AsConfig::Global_Scale;
 
-	  Gate[0] = new AGate(1, 29);
-	  Gate[1] = new AGate(AsConfig::Max_X_Pos, 29);
+	  Gate[0] = new AGate(1, 29, 0, 3);
+	  Gate[1] = new AGate(AsConfig::Max_X_Pos, 29, AsConfig::Level_Width - 1, 3);
 
-	  Gate[2] = new AGate(1, 77);
-	  Gate[3] = new AGate(AsConfig::Max_X_Pos, 77);
+	  Gate[2] = new AGate(1, 77, 0, 9);
+	  Gate[3] = new AGate(AsConfig::Max_X_Pos, 77, AsConfig::Level_Width - 1, 9);
 
 	  Gate[4] = new AGate(1, 129);
 	  Gate[5] = new AGate(AsConfig::Max_X_Pos, 129);
@@ -33,41 +33,41 @@ AsBorder::AsBorder()
 
 }
 //------------------------------------------------------------------------------------------------------------
-bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
+bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
 {	// Корректируем позицию при отражении от рамки
 
 	bool got_hit = false;
 
 	// Левый край
-	if (next_x_pos - ball->Radius < AsConfig::Border_X_Offset)
+	if (next_x_pos - AsConfig::Ball_Radius < AsConfig::Border_X_Offset)
 	{
 		got_hit = true;
 		ball->Reflect(false);
 	}
 	
 	// Верхний край
-	if (next_y_pos - ball->Radius < AsConfig::Border_Y_Offset)
+	if (next_y_pos - AsConfig::Ball_Radius < AsConfig::Border_Y_Offset)
 	{
 		got_hit = true;
 		ball->Reflect(true);
 	}
 
 	// Нижний край
-	if (next_x_pos + ball->Radius > AsConfig::Max_X_Pos)
+	if (next_x_pos + AsConfig::Ball_Radius > AsConfig::Max_X_Pos)
 	{
 		got_hit = true;
 		ball->Reflect(false);
 	}
 
 	// Правый край
-	if (next_y_pos + ball->Radius > AsConfig::Floor_Y_Pos && AsConfig::Level_Has_Floor)
+	if (next_y_pos + AsConfig::Ball_Radius > AsConfig::Floor_Y_Pos && AsConfig::Level_Has_Floor)
 	{
 		got_hit = true;
 		ball->Reflect(true);
 	}
 	else
 	{
-		if (next_y_pos + ball->Radius > (double)AsConfig::Max_Y_Pos + ball->Radius * 4.0)  // Чтобы шарик смог улететь ниже пола, проверяем его max_y_pos ниже видимой границы
+		if (next_y_pos + AsConfig::Ball_Radius > (double)AsConfig::Max_Y_Pos + AsConfig::Ball_Radius * 4.0)  // Чтобы шарик смог улететь ниже пола, проверяем его max_y_pos ниже видимой границы
 			ball->Set_State(EBall_State::Lost, next_x_pos);
 	}
 	
@@ -130,12 +130,39 @@ void AsBorder::Start_Movement()
 void AsBorder::End_Movement()
 {
 }
-void AsBorder::Get_Gate_Pos(int index, int &x_gate_pos, int &y_gate_pos)
+int AsBorder::Open_Long_Gate()
+{
+	int current_gate_index;
+	AGate *gate = 0;
+	while(true)
+	{
+
+		current_gate_index = AsCommon::Rand(AsConfig::Gates_Count - 1); // чтобы всегда выбирался только большой (не последний) гейт отнимаем единицу
+		gate = Gate[current_gate_index];
+
+		if(gate->Is_Closed() )
+		{
+			if(Gate[current_gate_index]->Level_X == -1 )
+				break;
+
+			if(!ALevel::Has_Brick_At(gate->Level_X, gate->Level_Y) && !ALevel::Has_Brick_At(gate->Level_X, gate->Level_Y + 1))
+				break;
+		}
+
+		
+	}
+
+   Open_Gate(current_gate_index, false);
+
+   return current_gate_index;
+}
+
+void AsBorder::Get_Gate_Pos(int index, double &x_pos, double &y_pos)
 {
 	if(index < 0 || index > AsConfig::Gates_Count)
 		AsConfig::Throw();
 
-	Gate[index]->Get_Pos(x_gate_pos, y_gate_pos);
+	Gate[index]->Get_Pos(x_pos, y_pos);
 }
 void AsBorder::Open_Gate(int gate_index, bool is_open_short)
 {
@@ -155,6 +182,15 @@ bool AsBorder::Is_Gate_Opened(int gate_index)
 {
 	if(gate_index >= 0 && gate_index < AsConfig::Gates_Count)
 		return Gate[gate_index]->Is_Opened();
+	else
+		AsConfig::Throw();
+
+	return false;
+}
+bool AsBorder::Is_Gate_Closed(int gate_index)
+{
+	if(gate_index >= 0 && gate_index < AsConfig::Gates_Count)
+		return Gate[gate_index]->Is_Closed();
 	else
 		AsConfig::Throw();
 

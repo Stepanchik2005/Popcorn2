@@ -136,13 +136,15 @@ class AActive_Brick_Teleport : public AActive_Brick
 public:
 	~AActive_Brick_Teleport();
 
-	AActive_Brick_Teleport(int level_x, int level_y, ABall *ball, AActive_Brick_Teleport *destination_teleport);
+	AActive_Brick_Teleport(int level_x, int level_y, ABall_Object *ball, AActive_Brick_Teleport *destination_teleport);
 
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual void Act();
 	virtual bool Is_Finished();
 
-	void Set_Ball(ABall *ball);
+	
+
+	void Set_Ball(ABall_Object *ball);
 	double Get_X_Teleport_Pos(bool is_center);
 	double Get_Y_Teleport_Pos(bool is_center);
 	static void Draw_In_Level(HDC hdc, RECT &brick_rect, int step = 0);
@@ -151,7 +153,7 @@ public:
 private:
 	
 	ETeleport_State Teleport_State;
-	ABall *Ball;
+	ABall_Object *Ball;
 	AActive_Brick_Teleport *Destination_Teleport;
 	int Animation_Step;
  

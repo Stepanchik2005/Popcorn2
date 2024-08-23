@@ -358,7 +358,7 @@ AActive_Brick_Teleport::~AActive_Brick_Teleport()
 	
 }
 //------------------------------------------------------------------------------------------------------------
-AActive_Brick_Teleport::AActive_Brick_Teleport(int level_x, int level_y, ABall *ball, AActive_Brick_Teleport *destination_teleport)
+AActive_Brick_Teleport::AActive_Brick_Teleport(int level_x, int level_y, ABall_Object *ball, AActive_Brick_Teleport *destination_teleport)
 :  AActive_Brick(EBrick_Type::Teleport,level_x, level_y), Animation_Step(0), Ball(0), Destination_Teleport(destination_teleport), Teleport_State(ETeleport_State::Starting),Release_Direction_State(EDirection_State::Left)
 {
 	Set_Ball(ball);
@@ -399,23 +399,23 @@ void AActive_Brick_Teleport::Act()
 			   switch(Release_Direction_State)
 				{
 				case EDirection_State::Left:
-					ball_x_pos = Get_X_Teleport_Pos(false) - ABall::Radius;
+					ball_x_pos = Get_X_Teleport_Pos(false) - AsConfig::Ball_Radius;
 					ball_y_pos = Get_Y_Teleport_Pos(true);
 					break;
 
 				case EDirection_State::Up:
 					ball_x_pos = Get_X_Teleport_Pos(true);
-					ball_y_pos = Get_Y_Teleport_Pos(false) -  ABall::Radius;
+					ball_y_pos = Get_Y_Teleport_Pos(false) -  AsConfig::Ball_Radius;
 					break;
 
 				case EDirection_State::Right:
-					ball_x_pos = Get_X_Teleport_Pos(false)  + (double)AsConfig::Brick_Width + ABall::Radius;
+					ball_x_pos = Get_X_Teleport_Pos(false)  + (double)AsConfig::Brick_Width + AsConfig::Ball_Radius;
 					ball_y_pos = Get_Y_Teleport_Pos(true);
 					break;
 
 				case EDirection_State::Down:
 					ball_x_pos = Get_X_Teleport_Pos(true);
-					ball_y_pos = Get_Y_Teleport_Pos(false) + (double)AsConfig::Brick_Height +  ABall::Radius;
+					ball_y_pos = Get_Y_Teleport_Pos(false) + (double)AsConfig::Brick_Height +  AsConfig::Ball_Radius;
 					break;
 					
 				}
@@ -465,7 +465,7 @@ bool AActive_Brick_Teleport::Is_Finished()
 		return false;
 }
 //------------------------------------------------------------------------------------------------------------
-void AActive_Brick_Teleport::Set_Ball(ABall *ball)
+void AActive_Brick_Teleport::Set_Ball(ABall_Object *ball)
 {
 	double ball_x, ball_y;
 

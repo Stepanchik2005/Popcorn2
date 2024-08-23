@@ -2,6 +2,8 @@
 
 #include "Ball.h"
 #include "Gate.h"
+#include "Level.h"
+
 //------------------------------------------------------------------------------------------------------------
 class AsBorder: public AHit_Checker, public AGame_Object
 {
@@ -9,7 +11,7 @@ public:
 	~AsBorder();
 	AsBorder();
 
-	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball);
+	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball);
 
 	virtual void Act();
 	virtual bool Is_Finished();
@@ -21,10 +23,15 @@ public:
 	virtual void Start_Movement();
 	virtual void End_Movement();
 
-	void Get_Gate_Pos(int index, int &x_gate_pos, int &y_gate_pos);
+	int Open_Long_Gate();
+
+
+	void Get_Gate_Pos(int index, double &x_gate_pos, double &y_gate_pos);
 	void Open_Gate(int gate_index, bool is_open_short);
    void Redraw_Floor();
 	bool Is_Gate_Opened(int gate_index); 
+	bool Is_Gate_Closed(int gate_index);
+
 private:
 	void Draw_Element(HDC hdc, RECT &paint_area, int x, int y, bool top_border);
 	void Draw_Floor(HDC hdc, RECT &paint_area);

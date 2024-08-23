@@ -47,6 +47,8 @@ public:
 	static const int Floor_Y_Pos = AsConfig::Max_Y_Pos - 1;
 	static const int Max_Modules_Count = 10;
 
+	static const double Ball_Radius;
+
 	// константы платформы
 	static const int Platform_Height = 7;
 	static const int Platform_Normal_Width = 28;
@@ -54,6 +56,7 @@ public:
 	static const int Platform_Normal_Inner_Width = Platform_Normal_Width - Platform_Circle_Size;
 
 	static const int Gate_Width = 6;
+	static const int Gate_Height = 19;
 	static const int Gates_Count = 8;
 };
 //------------------------------------------------------------------------------------------------------------
@@ -70,4 +73,7 @@ public:
 
 	static unsigned char Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step, int max_fade_step);
 	static void Get_Fading_Color(const AColor &color, int step, int max_fade_step, AColor &result_color);
+
+
+	static bool Reflect_On_Circle(double next_x_pos, double next_y_pos, double x_pos, double y_pos, double width, ABall_Object *ball);
 };

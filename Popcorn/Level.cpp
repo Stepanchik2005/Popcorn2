@@ -39,6 +39,8 @@ char ALevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
+ALevel *ALevel::Level = 0;
+
 // ALevel
 //------------------------------------------------------------------------------------------------------------
 ALevel::~ALevel()
@@ -49,10 +51,12 @@ ALevel::~ALevel()
 
 ALevel::ALevel()
 : Level_Rect{}, Active_Brick_Counter(0), Falling_Letters_Counter(0), Teleport_Counter(0), Teleport_Pos(0), Advertisement(0), Need_To_Stop_All_Activity(false)
+  
 {
+	Level = this;
 }
 //------------------------------------------------------------------------------------------------------------
-bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
+bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
 {// Корректируем позицию мячика при отражении от кирпичей
 
 	int i, j;
@@ -64,15 +68,15 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	bool got_horizontal_hit, got_vertical_hit;
 	double horizontal_reflection_pos, vertical_reflection_pos;
 
-	if (next_y_pos + ball->Radius > AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)
+	if (next_y_pos + AsConfig::Ball_Radius > AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)
 		return false;
 
 	direction = ball->Get_Direction();
 
-	min_ball_x = next_x_pos - ball->Radius;
-	max_ball_x = next_x_pos + ball->Radius;
-	min_ball_y = next_y_pos - ball->Radius;
-	max_ball_y = next_y_pos + ball->Radius;
+	min_ball_x = next_x_pos - AsConfig::Ball_Radius;
+	max_ball_x = next_x_pos + AsConfig::Ball_Radius;
+	min_ball_y = next_y_pos - AsConfig::Ball_Radius;
+	max_ball_y = next_y_pos + AsConfig::Ball_Radius;
 
 	min_level_x = (int)( (min_ball_x - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width);
 
@@ -357,8 +361,47 @@ void ALevel::Stop()
 {
 	Need_To_Stop_All_Activity = true;
 }
+bool ALevel::Has_Brick_At(int brick_x, int brick_y)
+{
+	EBrick_Type brick_type;
+	
+	if(brick_x > AsConfig::Level_Width - 1 || brick_y > AsConfig::Level_Height - 1)
+		return false;
+
+	brick_type = (EBrick_Type)Level->Current_Level[brick_y][brick_x];
+	
+	if(brick_type != EBrick_Type::None)
+		return true;
+	else
+		return false;
+
+}
+bool ALevel::Has_Brick_At(RECT &monster_rect)
+{
+	const int scale = AsConfig::Global_Scale;
+	int i, j;
+	int min_x_index, min_y_index;
+	int max_x_index, max_y_index;
+	int width = AsConfig::Cell_Width * scale;
+	int height = AsConfig::Cell_Height * scale;
+	int x_offset = AsConfig::Level_X_Offset * scale;
+	int y_offset = AsConfig::Level_Y_Offset * scale;
+
+	min_x_index = (monster_rect.left - x_offset) / width;
+	min_y_index = (monster_rect.top - y_offset) / height;
+	max_x_index = (monster_rect.right - x_offset) / width;
+	max_y_index = (monster_rect.bottom - y_offset) / height;
+
+	for(i = min_y_index; i <= max_y_index; ++i)
+		for(j = min_x_index; j <= max_x_index; ++j)
+			if(Has_Brick_At(j, i))
+				return true;
+
+	return false;
+
+}
 //------------------------------------------------------------------------------------------------------------
-bool ALevel::On_Hit(int brick_x, int brick_y, ABall *ball, bool got_vertical_hit)
+bool ALevel::On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool got_vertical_hit)
 {
 	EBrick_Type brick_type;
 	bool can_reflect = true;
@@ -419,14 +462,14 @@ void ALevel::Redraw_Brick(int brick_x, int brick_y)
 	AsCommon::Invalidate_Rect(brick_rect);
 }
 //------------------------------------------------------------------------------------------------------------
-bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
+bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall_Object *ball, double &reflection_pos)
 {
 	double direction = ball->Get_Direction();
 
 	// Проверяем попадание в нижнюю грань
 	if(ball->Is_Moving_Up())
 	{
-		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Low_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, ball->Radius, reflection_pos) )
+		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Low_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока вниз
 			if (level_y < AsConfig::Level_Height - 1 && Current_Level[level_y + 1][level_x] == 0)
@@ -437,7 +480,7 @@ bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_
 	}
 	else
 	{// Проверяем попадание в верхнюю грань
-	   if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Top_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, ball->Radius, reflection_pos) )
+	   if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Top_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока вверх
 			if (level_y > 0 && Current_Level[level_y - 1][level_x] == 0)
@@ -449,14 +492,14 @@ bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflection_pos)
+bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall_Object *ball, double &reflection_pos)
 {
 	double direction = ball->Get_Direction();
 
 	// Проверяем попадание в левую грань
 	if (! ball->Is_Moving_Left())
 	{
-		if (Hit_Circle_On_Line(Current_Brick_Left_X - next_x_pos, next_y_pos, Current_Brick_Top_Y, Current_Brick_Low_Y, ball->Radius, reflection_pos) )
+		if (Hit_Circle_On_Line(Current_Brick_Left_X - next_x_pos, next_y_pos, Current_Brick_Top_Y, Current_Brick_Low_Y, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока влево
 			if (level_x > 0 && Current_Level[level_y][level_x - 1] == 0)
@@ -467,7 +510,7 @@ bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int leve
 	}
 	else
 	{// Проверяем попадание в правую грань
-		if (Hit_Circle_On_Line(Current_Brick_Right_X - next_x_pos, next_y_pos, Current_Brick_Top_Y, Current_Brick_Low_Y, ball->Radius, reflection_pos) )
+		if (Hit_Circle_On_Line(Current_Brick_Right_X - next_x_pos, next_y_pos, Current_Brick_Top_Y, Current_Brick_Low_Y, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока вправо
 			if (level_x < AsConfig::Level_Width - 1 && Current_Level[level_y][level_x + 1] == 0)
@@ -501,7 +544,7 @@ bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 				letter_x = (AsConfig::Level_X_Offset + brick_x * AsConfig::Cell_Width) * AsConfig::Global_Scale;
 				letter_y = (AsConfig::Level_Y_Offset + brick_y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
 
-				letter_type = AFalling_Letter::Get_Random_Letter_Type();
+				/*letter_type = AFalling_Letter::Get_Random_Letter_Type();
 
 				switch(AsCommon::Rand(3))
 				{
@@ -514,13 +557,13 @@ bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 				case 2:
 					letter_type = ELetter_Type::L;
 					break;
-				}
+				}*/
 				/*if(AsCommon::Rand(2) == 0)
 					letter_type = ELetter_Type::Sh;
 				else
 					letter_type = ELetter_Type::L;*/
 
-				//letter_type = ELetter_Type::L;
+			letter_type = ELetter_Type::K;
 
 				falling_letter = new AFalling_Letter (letter_type, letter_x, letter_y, brick_type);
 				Falling_Letters[i] = falling_letter;
@@ -532,10 +575,10 @@ bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 	return false;
 }
 //------------------------------------------------------------------------------------------------------------
-bool ALevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall *ball, bool got_vertical_hit)
+bool ALevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall_Object *ball, bool got_vertical_hit)
 { // brick_x, brick_у - номер позиции в двухмерном массиве конкретного кирпича 
 	bool is_teleport = false;
-	//double ball_x, ball_y;
+
 	AActive_Brick *active_brick = 0;
 	AActive_Brick_Teleport *destination_teleport = 0;
 
@@ -606,7 +649,7 @@ void ALevel::Add_Active_Brick(AActive_Brick *active_brick)
 	}
 }
 //------------------------------------------------------------------------------------------------------------
-void ALevel::Add_Active_Brick_Teleport(int brick_x, int brick_y, ABall *ball, bool got_vertical_hit)
+void ALevel::Add_Active_Brick_Teleport(int brick_x, int brick_y, ABall_Object *ball, bool got_vertical_hit)
 {
 	double pre_x_pos, pre_y_pos;
 	double curr_x_pos, curr_y_pos;

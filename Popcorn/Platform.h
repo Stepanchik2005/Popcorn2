@@ -13,7 +13,7 @@ public:
 
 	AsPlatform();
 
-	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball);
+	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball);
 
 	virtual void Advance(double max_speed);
 	virtual double Get_Speed();
@@ -37,23 +37,20 @@ public:
 	double Get_Middle_Pos();
 	
 
-	double X_Pos;
 	
+	static AHit_Checker_List Hit_Checker_List;
 private:
 	bool Set_Transformation_State(EPlatform_State new_state, EPlatform_Transformation &transformation_state);
 	void Act_For_Rolling_State();
 	void Act_For_Meltdown_State();
 	bool Correct_Platform_Pos();
 	void Clear_BG(HDC hdc, RECT &paint_area);
-	void Draw_Expanding_Figure(HDC hdc, EFigure_Type figure_type, double start_x, double start_y, double start_width, double start_height, double ratio, double end_x, double end_y, double end_width, double end_height);
-	double Get_Expanding_Value(HDC hdc, double start_pos, double end_pos, double ratio);
-
 
 	void Draw_Normal_State(HDC hdc, RECT &paint_area);
 	void Get_Normal_Platform_Image(HDC hdc);
 	void Draw_Meltdown_State(HDC hdc, RECT &paint_area);
 	void Draw_Roll_In_State(HDC hdc, RECT &paint_area);
-	bool Reflect_On_Circle(double next_x_pos, double next_y_pos, double platform_ball_x_offset, ABall *ball);
+	
 	bool Get_Platform_Image_Stroke_Color(int x, int y, AColor &color, int &stroke_length);
 	double Get_Platform_Width();
 	
@@ -62,6 +59,7 @@ private:
 	AsPlatform_Expanding Platform_Expanding;
 	AsPlatform_Laser Platform_Laser;
 
+	double X_Pos;
 	int Inner_Width;
 	int Rolling_Step;
 	int Normal_Platform_Image_Width;
@@ -80,6 +78,7 @@ private:
 	AsBall_Set *Ball_Set; // UNO
 	AsLaser_Beam_Set *Laser_Beam_Set; // UNO
 	
+
 	static const int Meltdown_Speed = 3;
 	static const int Max_Rolling_Step = 16;
 	static const int Roll_In_Platform_End_X_Pos = 99;

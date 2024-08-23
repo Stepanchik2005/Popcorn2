@@ -2,6 +2,7 @@
 
 
 // AsPlatform
+AHit_Checker_List AsPlatform::Hit_Checker_List;
 //------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
 : X_Pos(AsConfig::Border_X_Offset), Platform_State(), Platform_Glue(Platform_State), Platform_Expanding(Platform_State), Platform_Laser(Platform_State, Laser_Beam_Set) ,Inner_Width(AsConfig::Platform_Normal_Inner_Width), 
@@ -20,7 +21,7 @@ AsPlatform::~AsPlatform()
 }
 
 //------------------------------------------------------------------------------------------------------------
-bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
+bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
 {
    
    double inner_top_y; 
@@ -30,7 +31,7 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
    double inner_y;
    double ball_x, ball_y;
    double width;
-   if(next_y_pos + ball->Radius < AsConfig::Platform_Y_Pos)
+   if(next_y_pos + AsConfig::Ball_Radius < AsConfig::Platform_Y_Pos)
       return false;
    
    width = Get_Platform_Width();
@@ -41,10 +42,10 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
    inner_low_y = (double) (AsConfig::Platform_Y_Pos + (AsConfig::Platform_Height - 1));
 
    //1. Проверка отражения от мячика
-   if(Reflect_On_Circle( next_x_pos, next_y_pos, 0, ball))
+   if(AsCommon::Reflect_On_Circle(next_x_pos, next_y_pos, X_Pos, AsConfig::Platform_Y_Pos, (double)AsConfig::Platform_Circle_Size, ball))
        goto _on_hit;// от левого
    
-   if(Reflect_On_Circle( next_x_pos, next_y_pos, width - (double)AsConfig::Platform_Circle_Size, ball))
+   if(AsCommon::Reflect_On_Circle( next_x_pos, next_y_pos, X_Pos + width - (double)AsConfig::Platform_Circle_Size, AsConfig::Platform_Y_Pos, (double)AsConfig::Platform_Circle_Size, ball))
        goto _on_hit; // от правого
 
 
@@ -54,7 +55,7 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
       inner_y = inner_top_y;
    
    
-   if (Hit_Circle_On_Line(next_y_pos - inner_y, next_x_pos, inner_left_x, inner_right_x, ball->Radius, reflection_pos) ) // отрадежение от внутренней части платформы
+   if (Hit_Circle_On_Line(next_y_pos - inner_y, next_x_pos, inner_left_x, inner_right_x, AsConfig::Ball_Radius, reflection_pos) ) // отрадежение от внутренней части платформы
    {
       ball->Reflect(true);
       goto _on_hit;
@@ -179,6 +180,7 @@ void AsPlatform::Clear(HDC hdc, RECT &paint_area)
       if(! ( Has_Substate_Regular(EPlatform_Substate_Regular::Ready) || Has_Substate_Regular(EPlatform_Substate_Regular::Normal) ))
          break;
       // else - no break
+   case EPlatform_State::Meltdown:
    case EPlatform_State::Rolling:
    case EPlatform_State::Glue:
    case EPlatform_State::Expanding:
@@ -244,6 +246,9 @@ void AsPlatform::Advance(double max_speed)
          if(Platform_State.Moving == EPlatform_Moving_State::Right)
             Ball_Set->On_Platform_Advance(0, fabs(Speed), max_speed);
    }
+
+   Hit_Checker_List.Check_Hit(Platform_Rect); // в самом хитчекере происходит действие (например, уничтожение монстра)
+         
 }
 
 //------------------------------------------------------------------------------------------------------------
@@ -377,7 +382,7 @@ bool AsPlatform::Has_Substate_Regular(EPlatform_Substate_Regular new_state)
       return true;
    else 
       return false;
-}
+   }
 //------------------------------------------------------------------------------------------------------------
 void AsPlatform::Redraw_Platform()
 {
@@ -505,9 +510,9 @@ void AsPlatform::Act_For_Meltdown_State()
          break;
 
       case EPlatform_Substate_Meltdown::Active:
-         Redraw_Platform();
          break;
    }
+   Redraw_Platform();
 }
 
 
@@ -556,7 +561,6 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT &paint_area)
    const double d_scale = AsConfig::D_Global_Scale;
    const int scale = AsConfig::Global_Scale;
    RECT inner_rect = {};
-   //Clear_BG(hdc);
 
    // 1. Рисуем боковые шарики
    AsPlatform::Platform_Circle_Color.Select(hdc);
@@ -701,53 +705,7 @@ void AsPlatform::Draw_Roll_In_State(HDC hdc, RECT &paint_area)
 
    
 }
-//------------------------------------------------------------------------------------------------------------
-bool AsPlatform::Reflect_On_Circle(double next_x_pos, double next_y_pos, double platform_ball_x_offset, ABall *ball)
-{
-   double dx, dy;
-   double distance;
-   double two_radiuses;
-   double platform_ball_radius,platform_ball_x,platform_ball_y;
-   double beta, alpha, gamma;
-   double related_ball_direction;
-   double const pi_2 = 2.0 * M_PI;
 
-   platform_ball_radius = (double)AsConfig::Platform_Circle_Size / 2.0;
-   platform_ball_x =  X_Pos + platform_ball_radius + platform_ball_x_offset;
-   platform_ball_y = (double)(AsConfig::Platform_Y_Pos + platform_ball_radius);
-   
-   dx = next_x_pos - platform_ball_x;
-   dy = next_y_pos - platform_ball_y;
-
-   distance = sqrt(dx * dx + dy * dy);
-   two_radiuses = ball->Radius + platform_ball_radius;
-
-   if(fabs(distance - two_radiuses < AsConfig::Moving_Size_Step))
-   {// Мячик коснулся шарика
-      beta = atan2(-dy, dx);
-
-      related_ball_direction = ball->Get_Direction();
-      related_ball_direction -= beta;
-
-      if(related_ball_direction > pi_2)
-         related_ball_direction -= pi_2;
-
-      if(related_ball_direction < 0)
-         related_ball_direction += pi_2;
-
-      
-      if(related_ball_direction > M_PI_2 && related_ball_direction < M_PI + M_PI_2)
-      {
-         alpha = M_PI + beta - ball->Get_Direction();
-         gamma = beta + alpha;
-         
-         ball->Set_Direction(gamma);
-
-         return true;
-      }
-   }
-   return false;
-}
 //------------------------------------------------------------------------------------------------------------
 
 bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, AColor &color, int &stroke_length)

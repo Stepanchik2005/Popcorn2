@@ -2,21 +2,9 @@
 #include "Config.h"
 #include "Hit_Checker_List.h"
 
-//------------------------------------------------------------------------------------------------------------
-enum class EBall_State: unsigned char
-{
-	Disabled,
-
-	Normal,
-	Lost,
-	On_Platform,
-	On_Paraschute, 
-	Off_Paraschute,
-	Teleporting
-};
 
 
-class ABall: public AGame_Object
+class ABall: public AGame_Object, public ABall_Object
 {
 public:
 	ABall();
@@ -31,26 +19,37 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual void Clear(HDC hdc, RECT &paint_area);
 
+	virtual double Get_Direction();
+	virtual void Set_Direction(double new_direction);
+	virtual bool Is_Moving_Up();
+	virtual EBall_State Get_State();
+	virtual void Set_State(EBall_State new_state, double x_pos = 0, double y_pos = 0);
+	virtual void Reflect(bool from_horizontal);
+	virtual void Get_Center(double &x_pos, double &y_pos);
+	virtual bool Is_Moving_Left();
+	virtual void Set_On_Paraschute(int brick_x, int brick_y);
+	virtual void Draw_Teleporting(HDC hdc, int step);
+
+
+
 	void Set_Speed(double ball_speed);
 	void Set_For_Test();
 	bool Is_Test_Finished();
-	EBall_State Get_State();
-	void Set_State(EBall_State new_state, double x_pos = 0, double y_pos = 0);
-	double Get_Direction();
-	void Get_Center(double &x_pos, double &y_pos);
-	void Set_Direction(double new_direction);
+	
+	
+	
+	
 	void Forced_Advance(double direction, double speed, double max_speed);
 	void Release();
-	void Reflect(bool from_horizontal);
-	bool Is_Moving_Up();
-	bool Is_Moving_Left();
-	void Set_On_Paraschute(int brick_x, int brick_y);
-   void Draw_Teleporting(HDC hdc, int step);
+	
+	
+
+	
+   
 
 	static AHit_Checker_List Hit_Checker_List;
 	int Release_Timer_Tick;
 
-	static const double Radius;
 	static const double Start_Ball_Y_Pos;
 private:
 	void Redraw_Ball();

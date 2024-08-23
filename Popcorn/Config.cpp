@@ -3,6 +3,7 @@
 // AsConfig
 bool AsConfig::Level_Has_Floor = true;
 int AsConfig::Current_Timer_Tick = 0;
+const double AsConfig::Ball_Radius = 2.0 - 0.5 / AsConfig::Global_Scale;
 
 const AColor AsConfig::BG_Color(15, 63, 31);
 const AColor AsConfig::Red_Color(255, 85, 85);
@@ -96,5 +97,52 @@ void AsCommon::Get_Fading_Color(const AColor &origin_color, int step, int max_fa
 	b = Get_Fading_Channel(origin_color.B, AsConfig::BG_Color.B, step, max_fade_step);
 
 	result_color = AColor(r,g,b);
+}
+//------------------------------------------------------------------------------------------------------------
+bool AsCommon::Reflect_On_Circle(double next_x_pos, double next_y_pos, double x_pos, double y_pos, double width, ABall_Object *ball)
+{
+   double dx, dy;
+   double distance;
+   double two_radiuses;
+   double radius,ball_x, ball_y;
+   double beta, alpha, gamma;
+   double related_ball_direction;
+   double const pi_2 = 2.0 * M_PI;
+
+   radius = width / 2.0;
+   ball_x =  x_pos + radius /*+ platform_ball_x_offset*/; // координат центра шарика платформы
+   ball_y = (double)(y_pos + radius);
+   
+   dx = next_x_pos - ball_x;
+   dy = next_y_pos - ball_y;
+
+   distance = sqrt(dx * dx + dy * dy);
+   two_radiuses = AsConfig::Ball_Radius + radius;
+
+   if(fabs(distance - two_radiuses < AsConfig::Moving_Size_Step))
+   {// Мячик коснулся шарика
+      beta = atan2(-dy, dx);
+
+      related_ball_direction = ball->Get_Direction();
+      related_ball_direction -= beta;
+
+      if(related_ball_direction > pi_2)
+         related_ball_direction -= pi_2;
+
+      if(related_ball_direction < 0)
+         related_ball_direction += pi_2;
+
+      
+      if(related_ball_direction > M_PI_2 && related_ball_direction < M_PI + M_PI_2)
+      {
+         alpha = M_PI + beta - ball->Get_Direction();
+         gamma = beta + alpha;
+         
+         ball->Set_Direction(gamma);   
+
+         return true;
+      }
+   }
+   return false;
 }
 //------------------------------------------------------------------------------------------------------------
