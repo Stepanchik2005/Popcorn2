@@ -29,8 +29,6 @@ void AsEngine::Init_Engine(HWND hwnd)
 	AFalling_Letter::Init();
 	Monster_Set.Init(&Border);
 
-	//Laser_Beam_Set.Init();
-
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Border);
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Level);
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Platform);

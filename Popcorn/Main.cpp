@@ -238,7 +238,6 @@ LRESULT CALLBACK AsMain_Window::Window_Proc(HWND hwnd, UINT message, WPARAM w_pa
 // Message handler for about box.
 INT_PTR CALLBACK AsMain_Window::About(HWND dlg, UINT message, WPARAM w_param, LPARAM l_param)
 {
-	//UNREFERENCED_PARAMETER(l_param);
 	switch (message)
 	{
 	case WM_INITDIALOG:

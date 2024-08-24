@@ -1,7 +1,7 @@
 ﻿#include "Config.h"
 
 // AsConfig
-bool AsConfig::Level_Has_Floor = true;
+bool AsConfig::Level_Has_Floor = false;
 int AsConfig::Current_Timer_Tick = 0;
 const double AsConfig::Ball_Radius = 2.0 - 0.5 / AsConfig::Global_Scale;
 
@@ -11,18 +11,19 @@ const AColor AsConfig::Blue_Color(85, 255, 255);
 const AColor AsConfig::White_Color(255, 255, 255);
 const AColor AsConfig::Monster_Dark_Red_Color(200, 0, 32);
 
-const AColor AsConfig::Letter_Color(AsConfig::White_Color, AsConfig::Global_Scale);
-const AColor AsConfig::Laser_Color(AsConfig::White_Color, AsConfig::Global_Scale);
-const AColor AsConfig::Paraschute_Color(AsConfig::Blue_Color, 3, AsConfig::Red_Color);
-const AColor AsConfig::Teleport_Color(AsConfig::Blue_Color, 3, AsConfig::BG_Color);
-const AColor AsConfig::Advertisement_Blue_Table_Color(0, 159, 159, AsConfig::Global_Scale);
-const AColor AsConfig::Unbreakable_Blue_Hightlight_Color(AsConfig::Blue_Color, AsConfig::Global_Scale); 
-const AColor AsConfig::Unbreakable_Red_Hightlight_Color(AsConfig::Red_Color, 2 * AsConfig::Global_Scale);
-const AColor AsConfig::Cornea_Color(AsConfig::BG_Color, AsConfig::Global_Scale - 1, AsConfig::White_Color);
-const AColor AsConfig::Iris_Color(AsConfig::BG_Color, AsConfig::Global_Scale * 2 / 3, AsConfig::Blue_Color);
-const AColor AsConfig::Cornea_Arc_Color(AsConfig::BG_Color, AsConfig::Global_Scale * 2 / 3);
-const AColor AsConfig::Explodive_Red_Color(AsConfig::White_Color, 0, AsConfig::Red_Color);
-const AColor AsConfig::Explodive_Blue_Color(AsConfig::White_Color, 0, AsConfig::Blue_Color);
+const AColor AsConfig::Letter_Color(White_Color,Global_Scale);
+const AColor AsConfig::Laser_Color(White_Color, Global_Scale);
+const AColor AsConfig::Paraschute_Color(Blue_Color, 3, Red_Color);
+const AColor AsConfig::Teleport_Color(Blue_Color, 3, BG_Color);
+const AColor AsConfig::Advertisement_Blue_Table_Color(0, 159, 159, Global_Scale);
+const AColor AsConfig::Unbreakable_Blue_Hightlight_Color(Blue_Color, Global_Scale); 
+const AColor AsConfig::Unbreakable_Red_Hightlight_Color(Red_Color, 2 * Global_Scale);
+const AColor AsConfig::Cornea_Color(BG_Color, Global_Scale - 1, White_Color);
+const AColor AsConfig::Iris_Color(BG_Color, Global_Scale * 2 / 3, Blue_Color);
+const AColor AsConfig::Cornea_Arc_Color(BG_Color, Global_Scale * 2 / 3);
+const AColor AsConfig::Explodive_Red_Color(White_Color, 0, Red_Color);
+const AColor AsConfig::Explodive_Blue_Color(White_Color, 0, Blue_Color);
+const AColor AsConfig::Comet_Color(Monster_Dark_Red_Color, Global_Scale);
 
 HWND AsConfig::Hwnd;
 
