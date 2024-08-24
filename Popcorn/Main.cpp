@@ -17,8 +17,6 @@ HDC AsFrame_DC::Get_DC(HWND hwnd, HDC hdc)
 
 	GetClientRect(hwnd, &window_rect);
 
-	
-
 	dc_weight = window_rect.right - window_rect.left;
 	dc_height = window_rect.bottom - window_rect.top;
 
@@ -37,6 +35,9 @@ HDC AsFrame_DC::Get_DC(HWND hwnd, HDC hdc)
 		Height = dc_height;
 
 		SelectObject(DC, Bitmap);
+
+		++window_rect.right;
+		++window_rect.bottom;
 
 		AsCommon::Rect(DC, window_rect, AsConfig::BG_Color);
 
@@ -224,7 +225,7 @@ LRESULT CALLBACK AsMain_Window::Window_Proc(HWND hwnd, UINT message, WPARAM w_pa
 		break;
 
 	case WM_TIMER:
-		if (w_param == Timer_ID)
+		if (w_param == Self->Engine.Timer_ID)
 			return Self->Engine.On_Timer();
 		break;
 

@@ -23,6 +23,7 @@ public:
 	AsMain_Window();
 	int APIENTRY Main(HINSTANCE instance, int cmdshow);
 
+   
 private:
 	ATOM My_Register_Class(HINSTANCE hInstance);
 	BOOL Init_Instance(HINSTANCE instance, int nCmdShow);
@@ -38,5 +39,4 @@ private:
 	HINSTANCE Instance;                                // current instance
 	WCHAR Size_Title[Max_Load_String];                  // The title bar text
 	WCHAR Size_Window_Class[Max_Load_String];            // the main window class name
-
 };

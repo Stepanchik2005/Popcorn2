@@ -1,10 +1,96 @@
 ﻿#include "Engine.h"
 
+AsInfo_Panel::AsInfo_Panel()
+	: Logo_Pop_Font(0), Logo_Corn_Font(0)
+{
+	Choose_Font();
+}
+void AsInfo_Panel::Advance(double max_speed)
+{
 
+}
+double AsInfo_Panel::Get_Speed()
+{
+	return 0.0;
+}
+void AsInfo_Panel::Start_Movement()
+{
+}
+void AsInfo_Panel::End_Movement()
+{
+}
+
+void AsInfo_Panel::Act()
+{
+}
+bool AsInfo_Panel::Is_Finished()
+{
+	return false;
+}
+void AsInfo_Panel::Choose_Font()
+{
+    LOGFONT logo_font{}; 
+   
+ 
+	 logo_font.lfHeight = -128;
+	 logo_font.lfWeight = 900;
+	 logo_font.lfOutPrecision = 3;
+	 logo_font.lfClipPrecision = 2;
+	 logo_font.lfQuality = 1;
+	 logo_font.lfPitchAndFamily = 34;
+	 wcscpy_s(logo_font.lfFaceName, L"Arial Black");
+
+	 Logo_Pop_Font = CreateFontIndirect(&logo_font); 
+
+	 logo_font.lfHeight = -96;
+	 Logo_Corn_Font = CreateFontIndirect(&logo_font); 
+
+}
+void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
+{
+	const int scale = AsConfig::Global_Scale;
+	int logo_x_pos = 212 * scale;
+	int logo_y_pos =  0;
+	int shadow_x_offset = 5 * scale;
+	int shadow_y_offset = 5 * scale;
+   const wchar_t *pop = L"POP";
+	const wchar_t *corn = L"CORN";
+
+
+	AsCommon::Rect(hdc, 211, 5, 104, 100, AsConfig::Blue_Color);
+
+	SetBkMode(hdc, TRANSPARENT);
+
+	SelectObject(hdc, Logo_Pop_Font);
+
+	SetTextColor(hdc, AsConfig::BG_Color.Get_RGB()); // POP
+	TextOutW(hdc, logo_x_pos + shadow_x_offset, logo_y_pos + shadow_y_offset, pop, 3);
+
+	SetTextColor(hdc, AsConfig::Red_Color.Get_RGB()); // POP
+	TextOutW(hdc, logo_x_pos, logo_y_pos, pop, 3);
+	
+
+
+	SelectObject(hdc, Logo_Corn_Font);
+
+	SetTextColor(hdc, AsConfig::BG_Color.Get_RGB()); //CORN
+	TextOutW(hdc, logo_x_pos + shadow_x_offset - 5 * scale, logo_y_pos + shadow_x_offset + 48 * scale, corn, 4);
+	SetTextColor(hdc, AsConfig::Red_Color.Get_RGB()); //CORN
+	TextOutW(hdc, logo_x_pos - 5 * scale, logo_y_pos + 48 * scale, corn, 4);
+
+	AsCommon::Rect(hdc, 208, 108, 110, 100, AsConfig::Red_Color);
+}
+void AsInfo_Panel::Clear(HDC hdc, RECT &paint_area)
+{
+}
+void AsInfo_Panel::Draw_Logo()
+{
+	
+}
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
-	: Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Life_Count(5), Modules{}
+	: Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Life_Count(5), Modules{}, Timer_ID(WM_USER + 1)
 {
 }
 //------------------------------------------------------------------------------------------------------------
@@ -41,11 +127,6 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	Level.Set_Current_Level(ALevel::Level_01);
 
- 	/*Ball.Set_State(EBall_State::Normal, Platform.X_Pos + Platform.Width / 2);*/
-
-	/*Platform.Set_State(EPS_Glue_Init);*/
-	//Platform.Set_State(EPlatform_State::Laser);
-
 	Platform.Redraw_Platform();
 
 	memset(Modules, 0, AsConfig::Max_Modules_Count);
@@ -56,12 +137,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Add_New_Module(index, &Ball_Set);
 	Add_New_Module(index, &Laser_Beam_Set);
 	Add_New_Module(index, &Monster_Set);
-
-	//Border.Open_Gate(AsConfig::Gates_Count - 4, false);
-
-	//Monster_Set.Emit_At_Gate(5);
-
-	
+	Add_New_Module(index, &Info_Panel);
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
 }
