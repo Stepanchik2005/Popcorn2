@@ -42,6 +42,7 @@ public:
 
 	static void Init();
 	static ELetter_Type Get_Random_Letter_Type();
+	void Show_Fill_Size();
 	const ELetter_Type Letter_Type;
 	const EBrick_Type Brick_Type;
 	EFalling_Letter_State Falling_Letter_State;

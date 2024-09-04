@@ -123,6 +123,10 @@ ELetter_Type AFalling_Letter::Get_Random_Letter_Type()
 
 	return ELetter_Type::O;
 }
+void AFalling_Letter::Show_Fill_Size()
+{
+	Rotation_Step = 8;
+}
 //------------------------------------------------------------------------------------------------------------
 void AFalling_Letter::Draw_Brick_Letter(HDC hdc)
 {// Вывод падающей буквы

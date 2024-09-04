@@ -25,6 +25,7 @@ const AColor AsConfig::Explodive_Red_Color(White_Color, 0, Red_Color);
 const AColor AsConfig::Explodive_Blue_Color(White_Color, 0, Blue_Color);
 const AColor AsConfig::Comet_Color(Monster_Dark_Red_Color, Global_Scale);
 
+
 HWND AsConfig::Hwnd;
 
 const double AsConfig::Moving_Size_Step = 1.0 / AsConfig::Global_Scale;
