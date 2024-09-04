@@ -79,6 +79,7 @@ private:
 	AsLaser_Beam_Set *Laser_Beam_Set; // UNO
 	
 
+
 	static const int Meltdown_Speed = 3;
 	static const int Max_Rolling_Step = 16;
 	static const int Roll_In_Platform_End_X_Pos = 99;

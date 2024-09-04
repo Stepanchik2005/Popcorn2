@@ -222,6 +222,8 @@ void AsInfo_Panel::Draw_Extra_Life(HDC hdc, int x_offset, int y_offset)
 	int ball_size = 4 * scale;
 	int platform_width = 8 * scale + 1;
 
+
+
 	rect.left = x_offset + 5 * scale;
 	rect.top = y_offset + 5 * scale;
 	rect.right = rect.left + ball_size;
