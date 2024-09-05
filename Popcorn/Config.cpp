@@ -4,6 +4,8 @@
 bool AsConfig::Level_Has_Floor = false;
 int AsConfig::Current_Timer_Tick = 0;
 const double AsConfig::Ball_Radius = 2.0 - 0.5 / AsConfig::Global_Scale;
+int AsConfig::Score = 0;
+int AsConfig::Availiable_Extra_Lifes = 4;
 
 const AColor AsConfig::BG_Color(15, 63, 31);
 const AColor AsConfig::Red_Color(255, 85, 85);
