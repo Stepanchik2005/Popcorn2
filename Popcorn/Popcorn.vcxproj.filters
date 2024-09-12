@@ -103,6 +103,9 @@
     <Filter Include="#Screen\Active_Brick">
       <UniqueIdentifier>{63e4d4d8-864f-4cdb-9635-a2888618aef0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Indicator">
+      <UniqueIdentifier>{8e9d55b8-e572-4d70-97f2-74be4d8dc315}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -182,6 +185,9 @@
     </ClInclude>
     <ClInclude Include="Info_Panel.h">
       <Filter>#Screen\Info_Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="Indicator.h">
+      <Filter>Indicator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -266,6 +272,9 @@
     </ClCompile>
     <ClCompile Include="Info_Panel.cpp">
       <Filter>#Screen\Info_Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="Indicator.cpp">
+      <Filter>Indicator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

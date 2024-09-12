@@ -70,7 +70,7 @@ private:
 	double Speed;
 	int *Normal_Platform_Image; 
 
-	int Meltdown_Platform_Y_Pos[AsConfig::Platform_Normal_Width * AsConfig::Global_Scale];
+	int Meltdown_Platform_Y_Pos[AsConfig::Platform_Normal_Width * AsConfig::Global_Scale]; 
 
 	RECT Platform_Rect, Prev_Platform_Rect;
 

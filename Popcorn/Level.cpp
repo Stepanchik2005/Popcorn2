@@ -13,7 +13,7 @@ char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -50,7 +50,7 @@ ALevel::~ALevel()
 //------------------------------------------------------------------------------------------------------------
 
 ALevel::ALevel()
-: Level_Rect{}, Active_Brick_Counter(0), Falling_Letters_Counter(0), Teleport_Counter(0), Teleport_Pos(0), Advertisement(0), Need_To_Stop_All_Activity(false)
+: Level_Rect{}, Teleport_Counter(0), Teleport_Pos(0), Advertisement(0), Need_To_Stop_All_Activity(false)
   
 {
 	Level = this;
@@ -119,6 +119,7 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
 			{
 				 if(On_Hit(j, i, ball, true))
 				 {
+
 				    if (vertical_reflection_pos < horizontal_reflection_pos)
 				    	ball->Reflect(true);
 				    else
@@ -197,8 +198,8 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos)
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Act()
 {
-	Act_Objects((AGraphics_Objects**)&Active_Bricks, Active_Brick_Counter, AsConfig::Max_Active_Brick_Size);
-	Act_Objects((AGraphics_Objects**)&Falling_Letters, Falling_Letters_Counter, AsConfig::Max_Falling_Letters_Size);
+	Act_Objects(Active_Bricks);
+	Act_Objects(Falling_Letters);
 
 	if(Advertisement != 0)
 		Advertisement->Act();
@@ -234,17 +235,15 @@ void ALevel::Draw(HDC hdc, RECT &paint_area)
 			}
 
 	
-		Draw_Objects(hdc, paint_area, (AGraphics_Objects**)&Active_Bricks, AsConfig::Max_Active_Brick_Size);
+		Draw_Objects(hdc, paint_area, Active_Bricks);
 	}
 
-	Draw_Objects(hdc, paint_area, (AGraphics_Objects**)&Falling_Letters, AsConfig::Max_Falling_Letters_Size);
-
-	
+	Draw_Objects(hdc, paint_area, Falling_Letters);
 }
 void ALevel::Clear(HDC hdc, RECT &paint_area)
 {
 	// 1. Очищаем движущиеся объекты
-	Clear_Objects(hdc, paint_area, (AGraphics_Objects**)&Falling_Letters, AsConfig::Max_Falling_Letters_Size);
+	Clear_Objects(hdc, paint_area, Falling_Letters);
 	
 	if(Advertisement != 0)
 		Advertisement->Clear(hdc, paint_area);
@@ -274,8 +273,6 @@ void ALevel::Init()
 	Level_Rect.bottom = Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height * AsConfig::Global_Scale;
 
 	memset(Current_Level, 0, sizeof(Current_Level) );
-	memset(Active_Bricks, 0, sizeof(Active_Bricks) );
-   memset(Falling_Letters, 0, sizeof(Falling_Letters) );
 
 }
 //------------------------------------------------------------------------------------------------------------
@@ -325,33 +322,24 @@ void ALevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Leve
 			}
 		}
 	}
-
 	//Advertisement = new AAdvertisement(9, 5, 2, 3);
-	
-
 }
 //------------------------------------------------------------------------------------------------------------
 bool ALevel::Get_Next_Falling_Letter(int& index, AFalling_Letter **falling_letter)
 {
-	AFalling_Letter *current_letter;
-	if(Falling_Letters_Counter == 0)
+
+	if(Falling_Letters.size() == 0)
 		return false;
 
-	if(index < 0 || index >= AsConfig::Max_Falling_Letters_Size)
+	if(index >= Falling_Letters.size())
 		return false;
-  
-	*falling_letter = Falling_Letters[index];
 
-	while(index < AsConfig::Max_Falling_Letters_Size)
+	//*falling_letter = (AFalling_Letter *)Falling_Letters[index];
+
+	while(index < Falling_Letters.size())
 	{
-		current_letter = Falling_Letters[index++];
-
-		if(current_letter != 0)
-		{
-			*falling_letter = current_letter;
-			return true;
-		}
-
+		*falling_letter = (AFalling_Letter *)Falling_Letters[index++]; 
+		return true;
 	}
 
 	return false;
@@ -434,20 +422,17 @@ bool ALevel::On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool got_verti
 	
 	Redraw_Brick(brick_x, brick_y);	
 
+	AsInfo_Panel::Update_Score(EHit_Type::Hit_Brick);
+
 	return can_reflect;
 } 
 //------------------------------------------------------------------------------------------------------------
-void ALevel::Clear_Objects(HDC hdc, RECT &paint_area, AGraphics_Objects** object_for_drawing,  int max_size)
+void ALevel::Clear_Objects(HDC hdc, RECT &paint_area, std::vector<AGraphics_Objects *> &object_for_drawing)
 {
-	int i;
-	for(i = 0; i < max_size; ++i)
-	{
-		if(object_for_drawing[i] != 0)
-			object_for_drawing[i]->Clear(hdc, paint_area);
-	}
-	
+	for(auto *it : object_for_drawing)
+			it->Clear(hdc, paint_area);
 }
-
+ 
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Redraw_Brick(int brick_x, int brick_y)
 {
@@ -534,45 +519,42 @@ bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 	if(AsCommon::Rand(AsConfig::Max_Random_Number_For_Letter) != 0) // рандом: или буква или нет
 		return false;
 		
-	if(Falling_Letters_Counter >= AsConfig::Max_Falling_Letters_Size - 1) // падающих букв слишком много
+	if(Falling_Letters.size() >= AsConfig::Max_Falling_Letters_Size - 1) // падающих букв слишком много
 		return false;
 			
-	for(i = 0; i < AsConfig::Max_Falling_Letters_Size; ++i)
-		{
-			if(Falling_Letters[i] == 0)
-			{
-				letter_x = (AsConfig::Level_X_Offset + brick_x * AsConfig::Cell_Width) * AsConfig::Global_Scale;
-				letter_y = (AsConfig::Level_Y_Offset + brick_y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
 
-				/*letter_type = AFalling_Letter::Get_Random_Letter_Type();
+	letter_x = (AsConfig::Level_X_Offset + brick_x * AsConfig::Cell_Width) * AsConfig::Global_Scale;
+	letter_y = (AsConfig::Level_Y_Offset + brick_y * AsConfig::Cell_Height) * AsConfig::Global_Scale;
 
-				switch(AsCommon::Rand(3))
-				{
-				case 0:
-					letter_type = ELetter_Type::K;
-					break;
-				case 1:
-					letter_type = ELetter_Type::Sh;
-					break;
-				case 2:
-					letter_type = ELetter_Type::L;
-					break;
-				}*/
-				/*if(AsCommon::Rand(2) == 0)
-					letter_type = ELetter_Type::Sh;
-				else
-					letter_type = ELetter_Type::L;*/
+	letter_type = AFalling_Letter::Get_Random_Letter_Type();
 
-			letter_type = ELetter_Type::K;
-
-				falling_letter = new AFalling_Letter (letter_type, letter_x, letter_y, brick_type);
-				Falling_Letters[i] = falling_letter;
-				Falling_Letters_Counter++;
-				return true;
-			}
+	switch(AsCommon::Rand(4))
+	{
+	case 0:
+		letter_type = ELetter_Type::K;
+		break;
+	case 1:
+		letter_type = ELetter_Type::Sh;
+		break;
+	case 2:
+		letter_type = ELetter_Type::L;
+		break;
+	case 3:
+		letter_type = ELetter_Type::O;
+		break;
 	}
+	/*if(AsCommon::Rand(2) == 0)
+		letter_type = ELetter_Type::O;
+	else
+		letter_type = ELetter_Type::M;*/
 
-	return false;
+	//letter_type = ELetter_Type::O;
+
+	falling_letter = new AFalling_Letter (letter_type, letter_x, letter_y, brick_type);
+	Falling_Letters.push_back(falling_letter);
+
+	return true;
+
 }
 //------------------------------------------------------------------------------------------------------------
 bool ALevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type, ABall_Object *ball, bool got_vertical_hit)
@@ -582,7 +564,7 @@ bool ALevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_typ
 	AActive_Brick *active_brick = 0;
 	AActive_Brick_Teleport *destination_teleport = 0;
 
-	if(Active_Brick_Counter > AsConfig::Max_Active_Brick_Size - 1)
+	if(Active_Bricks.size() > AsConfig::Max_Active_Brick_Size - 1)
 		return is_teleport;//Активных кирпичей слишком много
 
 	switch(brick_type)
@@ -629,25 +611,11 @@ bool ALevel::Create_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_typ
 	}
 
 	if(active_brick != 0)
-		Add_Active_Brick(active_brick); 
+		Active_Bricks.push_back(active_brick);
 	
   return is_teleport;
 }
-//------------------------------------------------------------------------------------------------------------
-void ALevel::Add_Active_Brick(AActive_Brick *active_brick)
-{
-	int i;
 
-	for(i = 0; i < AsConfig::Max_Active_Brick_Size; ++i) // добавление активного кирпича в массив активных кирпичей
-	{
-		if(Active_Bricks[i] == 0)
-		{
-			Active_Bricks[i] = active_brick;
-			++Active_Brick_Counter;
-			break;
-		}
-	}
-}
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Add_Active_Brick_Teleport(int brick_x, int brick_y, ABall_Object *ball, bool got_vertical_hit)
 {
@@ -725,8 +693,8 @@ void ALevel::Add_Active_Brick_Teleport(int brick_x, int brick_y, ABall_Object *b
 
 	destination_teleport->Release_Direction_State = direction;
 
-	Add_Active_Brick(source_teleport);
-	Add_Active_Brick(destination_teleport);
+	Active_Bricks.push_back(source_teleport);
+	Active_Bricks.push_back(destination_teleport);
 }
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Teleport* ALevel::Select_Destination_Teleport(int brick_x, int brick_y)
@@ -749,23 +717,22 @@ AActive_Brick_Teleport* ALevel::Select_Destination_Teleport(int brick_x, int bri
 	return destination_teleport;
 }
 //------------------------------------------------------------------------------------------------------------
-void ALevel::Act_Objects(AGraphics_Objects** object_for_drawing, int &object_count, int max_size)
+void ALevel::Act_Objects(std::vector<AGraphics_Objects *> &object_for_drawing)
 {
-	int i;
-	for(i = 0; i < max_size; ++i)
+	auto it = object_for_drawing.begin();
+	while(it != object_for_drawing.end())
 	{
-		if(object_for_drawing[i] != 0)
-		{
-		  object_for_drawing[i]->Act();
+		 (*it)->Act();
 		  
-		  if(object_for_drawing[i]->Is_Finished())
-		  {
-		  	delete object_for_drawing[i];
-		  	object_for_drawing[i] = 0;
-			--object_count;
-		  }
-		}
-	} 
+		 if((*it)->Is_Finished())
+		 {
+		  	delete *it;
+		  	it = object_for_drawing.erase(it);
+		 }
+		 else
+			 it++;
+	}
+
 }
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Draw_Brick(HDC hdc, RECT brick_rect, int level_x, int level_y)
@@ -815,14 +782,10 @@ void ALevel::Draw_Brick(HDC hdc, RECT brick_rect, int level_x, int level_y)
 	}
 }
 //------------------------------------------------------------------------------------------------------------
-void ALevel::Draw_Objects(HDC hdc, RECT &paint_area, AGraphics_Objects** object_for_drawing, int max_size)
+void ALevel::Draw_Objects(HDC hdc, RECT &paint_area, std::vector<AGraphics_Objects *> &object_for_drawing)
 {
-	int i;
-	for(i = 0; i < max_size; ++i)
-	{
-		if(object_for_drawing[i] != 0)
-	   object_for_drawing[i]->Draw(hdc, paint_area);
-	}
+	for(auto *obj : object_for_drawing)
+			obj->Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Draw_Paraschute_In_Level(HDC hdc, RECT &brick_rect)
@@ -853,25 +816,21 @@ void ALevel::Draw_Part_Paraschute(HDC hdc, RECT &brick_rect, double offset, int 
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Delete()
 {
-	Delete_Objects((AGraphics_Objects**)&Active_Bricks, Active_Brick_Counter, AsConfig::Max_Active_Brick_Size);
-	Delete_Objects((AGraphics_Objects**)&Falling_Letters, Falling_Letters_Counter, AsConfig::Max_Falling_Letters_Size);
+	Delete_Objects(Active_Bricks);
+	Delete_Objects(Falling_Letters);
 
 	Need_To_Stop_All_Activity = false;
 }
 //------------------------------------------------------------------------------------------------------------
-void ALevel::Delete_Objects(AGraphics_Objects** object_for_drawing, int &object_count, int max_size)
+void ALevel::Delete_Objects(std::vector<AGraphics_Objects *> &object_for_drawing)
 {
-	int i;
-	for(i = 0; i < max_size; ++i)
-	{
-		if(object_for_drawing[i] != 0)
-		{
-		  	delete object_for_drawing[i];
-		  	object_for_drawing[i] = 0;
-			--object_count;
-		  
-		}
-	} 
+	auto it = object_for_drawing.begin();
+    while (it != object_for_drawing.end())
+    {
+        delete *it;  // Удаляем объект
+        it = object_for_drawing.erase(it);  // erase возвращает итератор на следующий элемент
+    }
+		
 }
 
 //------------------------------------------------------------------------------------------------------------

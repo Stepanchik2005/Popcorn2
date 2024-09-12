@@ -1,11 +1,11 @@
 ﻿#include "Config.h"
 
 // AsConfig
-bool AsConfig::Level_Has_Floor = false;
+bool AsConfig::Level_Has_Floor = true;
 int AsConfig::Current_Timer_Tick = 0;
 const double AsConfig::Ball_Radius = 2.0 - 0.5 / AsConfig::Global_Scale;
-int AsConfig::Score = 0;
-int AsConfig::Availiable_Extra_Lifes = 4;
+
+
 
 const AColor AsConfig::BG_Color(15, 63, 31);
 const AColor AsConfig::Red_Color(255, 85, 85);
@@ -36,11 +36,118 @@ const double AsConfig::Accelerate_Ball_Speed = 1.001;
 const double AsConfig::Initial_Ball_Speed = 3.0;
 const double AsConfig::Min_Ball_Angle = M_PI / 8.0;
 
+
+//------------------------------------------------------------------------------------------------------------
+// AColor
+AColor::~AColor()
+{
+	/*if(Pen != 0)
+		DeleteObject(Pen);
+
+	if(Brush != 0)
+		DeleteObject(Brush);*/
+}
+//------------------------------------------------------------------------------------------------------------
+AColor::AColor()
+: R(0), G(0), B(0), Pen(0), Brush(0)
+{
+}
+//------------------------------------------------------------------------------------------------------------
+AColor::AColor(unsigned char r, unsigned char g, unsigned char b)
+: R(r), G(g), B(b), Pen(0), Brush(0)
+{
+	Pen = CreatePen(PS_SOLID, 0, RGB(r,g,b));
+	Brush = CreateSolidBrush(RGB (r,g,b));
+}
+//------------------------------------------------------------------------------------------------------------
+AColor::AColor(const AColor &color, int pen_size)
+: R(color.R), G(color.G), B(color.B), Pen(0), Brush(0)
+{
+	Pen = CreatePen(PS_SOLID, pen_size, color.Get_RGB());
+}
+//------------------------------------------------------------------------------------------------------------
+AColor::AColor(const AColor &pen_color, int pen_size, const AColor &brush_color)
+: R(0), G(0), B(0), Pen(0), Brush(0)
+{
+	Pen = CreatePen(PS_SOLID, pen_size, pen_color.Get_RGB());
+	Brush = CreateSolidBrush(brush_color.Get_RGB());
+}
+//------------------------------------------------------------------------------------------------------------
+AColor::AColor(unsigned char r, unsigned char g, unsigned char b,int pen_size)
+: R(r), G(g), B(b), Pen(0), Brush(0)
+{
+	Pen = CreatePen(PS_SOLID, pen_size, RGB(r, g, b));
+}
+//------------------------------------------------------------------------------------------------------------
+void AColor::operator=(const AColor& other_color)
+{
+	AsConfig::Throw();
+}
+void AColor::Set_As(unsigned char r, unsigned char g, unsigned char b)
+{
+	this->R = r;
+	this->G = g;
+	this->B = b;
+
+	// если нужно очищаем ресурсы
+	 if (Pen != 0)
+         DeleteObject(Pen);
+    if (Brush != 0)
+         DeleteObject(Brush);
+
+	 Pen = CreatePen(PS_SOLID, 0, RGB(R, G, B));
+	 Brush = CreateSolidBrush(RGB (R, G, B));
+	
+}
+//------------------------------------------------------------------------------------------------------------
+void AColor::Select(HDC hdc) const
+{
+	SelectObject(hdc, Pen);
+	SelectObject(hdc, Brush); 
+}
+//------------------------------------------------------------------------------------------------------------
+HBRUSH AColor::Get_Brush() const
+{
+	return Brush;
+}
+//------------------------------------------------------------------------------------------------------------
+HPEN AColor::Get_Pen() const
+{
+	return Pen;
+}
+
+//------------------------------------------------------------------------------------------------------------
+int AColor::Get_RGB() const
+{
+	return RGB(R, G, B);
+}
+//------------------------------------------------------------------------------------------------------------
+
+void AColor::Set_Brush(HBRUSH brush)
+{
+	Brush = brush;
+}
+//------------------------------------------------------------------------------------------------------------
+
+void AColor::Set_Pen(HPEN pen)
+{
+	Pen = pen;
+}
+void AColor::Select_Pen(HDC hdc) const
+{
+	SelectObject(hdc, Pen);
+}
+
+
+
+
+
 //------------------------------------------------------------------------------------------------------------
 void AsConfig::Throw()
 {
 	throw 13;
 }
+
 
 
 
@@ -57,7 +164,7 @@ void AsCommon::Round_Rect(HDC hdc, RECT &brick_rect, int corner_radius)
 
 	RoundRect(hdc, brick_rect.left, brick_rect.top, brick_rect.right - 1, brick_rect.bottom - 1, radius, radius);
 }
-void AsCommon::Rect(HDC hdc, int x, int y, int width, int height, AColor color)
+void AsCommon::Rect(HDC hdc, int x, int y, int width, int height, const AColor &color)
 {
 	RECT rect = {};
 	const int scale = AsConfig::Global_Scale;
@@ -70,13 +177,13 @@ void AsCommon::Rect(HDC hdc, int x, int y, int width, int height, AColor color)
 
 	Rectangle(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 }
-void AsCommon::Rect(HDC hdc, RECT &rect, AColor color)
+void AsCommon::Rect(HDC hdc, RECT &rect, const AColor &color)
 {
 	color.Select(hdc);
 
 	Rectangle(hdc, rect.left, rect.top, rect.right - 1, rect.bottom - 1);
 }
-void AsCommon::Ellipse(HDC hdc, RECT &rect, AColor color)
+void AsCommon::Ellipse(HDC hdc, RECT &rect, const AColor &color)
 {
 	color.Select(hdc);
 
@@ -100,7 +207,7 @@ void AsCommon::Get_Fading_Color(const AColor &origin_color, int step, int max_fa
 	g = Get_Fading_Channel(origin_color.G, AsConfig::BG_Color.G, step, max_fade_step);
 	b = Get_Fading_Channel(origin_color.B, AsConfig::BG_Color.B, step, max_fade_step);
 
-	result_color = AColor(r,g,b);
+	result_color.Set_As(r, g, b);
 }
 //------------------------------------------------------------------------------------------------------------
 bool AsCommon::Reflect_On_Circle(double next_x_pos, double next_y_pos, double x_pos, double y_pos, double width, ABall_Object *ball)
@@ -149,4 +256,34 @@ bool AsCommon::Reflect_On_Circle(double next_x_pos, double next_y_pos, double x_
    }
    return false;
 }
-//------------------------------------------------------------------------------------------------------------
+
+
+
+
+//AMessage
+AMessage::AMessage(EMessage_Type message_type)
+	: Message_Type(message_type)
+{
+}
+
+
+
+// AMessage_Manager
+std::queue<AMessage *> AsMessage_Manager::Messages;
+
+void AsMessage_Manager::Add_Message(AMessage *message)
+{
+	if(message != 0)
+		Messages.push(message);
+}
+
+bool AsMessage_Manager::Get_Message(AMessage **message)
+{
+	if(Messages.size() == 0)
+		return false;
+
+	*message = Messages.front();
+	Messages.pop();
+
+	return true;
+}

@@ -3,7 +3,8 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
-
+#include <vector>
+#include <queue>
 //------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------
 enum class EBall_State: unsigned char
@@ -70,31 +71,6 @@ class AGame_Object: public AMover, public AGraphics_Objects
 
 };
 
-//------------------------------------------------------------------------------------------------------------
-class AColor
-{
-public:
-	//~AColor();
-	AColor();
-	AColor(unsigned char r, unsigned char g, unsigned char b);
-	AColor(const AColor &color,int pen_size);
-	AColor(const AColor &pen_color, int pen_size, const AColor &brush_color);
-	AColor(unsigned char r, unsigned char g, unsigned char b,int pen_size);
-
-	int Get_RGB() const;
-	void Select(HDC hdc) const;
-	HBRUSH Get_Brush() const;
-	HPEN Get_Pen() const;
-	void Set_Brush(HBRUSH brush);
-	void Set_Pen(HPEN pen);
-	void Select_Pen(HDC hdc) const;
-	
-	unsigned char R, G, B;
-private:
-	HPEN Pen;
-	HBRUSH Brush;
-	
-};
 
 class AsGame_Objects_Set: public AGame_Object
 {

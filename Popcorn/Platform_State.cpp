@@ -76,13 +76,6 @@ EPlatform_State AsPlatform_State::Set_State(EPlatform_Substate_Regular new_regul
       if(*transformation_state == EPlatform_Transformation::Unknown)
       {//Финализация закончилась		
          return Set_New_Or_Regular_State(new_regular_state);
-
-         //if(next_state == EPlatform_State::Unknown) // если нету отложенного состояния, то выходим, иначе - переводим
-         //   return;
-            
-     
-
-          /*Set_State(next_state);     */
       }
       else
       {// Финализация начинается	
@@ -104,17 +97,15 @@ EPlatform_State AsPlatform_State::Set_New_Or_Regular_State(EPlatform_Substate_Re
 
    Current_State = EPlatform_State::Regular;
 
-   
    next_state = Get_Next_State();
 
-   //if(next_state != EPlatform_State::Unknown)// Если есть отложенное состояние, то переводим в него
-   //  
-   //   //Set_State(next_state);
-   //else
+   // если есть отложенное состояние, то переводим его в него, а не в Regular
    if(next_state == EPlatform_State::Unknown)
       Regular = new_state;		
 
-    return next_state;
+   Next_State = EPlatform_State::Unknown;
+
+   return next_state;
 }
 //------------------------------------------------------------------------------------------------------------
 AsPlatform_State::operator EPlatform_State() const

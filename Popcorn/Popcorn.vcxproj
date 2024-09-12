@@ -163,6 +163,7 @@
     <ClInclude Include="Ball_Set.h" />
     <ClInclude Include="Gate.h" />
     <ClInclude Include="Hit_Checker_List.h" />
+    <ClInclude Include="Indicator.h" />
     <ClInclude Include="Info_Panel.h" />
     <ClInclude Include="Laser_Beam.h" />
     <ClInclude Include="Laser_Beam_Set.h" />
@@ -190,6 +191,7 @@
     <ClCompile Include="Falling_Letter.cpp" />
     <ClCompile Include="Gate.cpp" />
     <ClCompile Include="Hit_Checker_List.cpp" />
+    <ClCompile Include="Indicator.cpp" />
     <ClCompile Include="Info_Panel.cpp" />
     <ClCompile Include="Laser_Beam.cpp" />
     <ClCompile Include="Laser_Beam_Set.cpp" />

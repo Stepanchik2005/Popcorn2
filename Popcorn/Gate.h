@@ -20,7 +20,7 @@ enum class EGate_Transformation : unsigned char
 class AGate: public AGraphics_Objects
 {
 public:
-	AGate(int x_pos, int y_pos, int level_x = -1, int level_y = -1); // -1 означает отсутсвие кирпичей
+	AGate(int x_pos, double y_pos, int level_x = -1, int level_y = -1); // -1 означает отсутсвие кирпичей
 
 	virtual void Act();
 	virtual bool Is_Finished();

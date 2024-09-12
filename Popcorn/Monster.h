@@ -39,7 +39,8 @@ public:
 
 	void Activate(double x_pos, double y_pos, bool is_left_gate);
 	void Destroy();
-	
+	void Set_Freeze_State(bool is_freeze);
+
 	const int Emitting_Timeout = AsConfig::FPS * 2;
 	int Time_Of_Emitting;
 
@@ -51,9 +52,14 @@ protected:
 	int Start_Animation;
 	EMonster_State Monster_State;
 	static const int Explodive_Balls_Count = 10; 
-	AExplodive_Ball Explodive_Balls[Explodive_Balls_Count];
+
+	std::vector<AExplodive_Ball> Explodive_Balls;
+
 	double X_Pos, Y_Pos;
-		double Speed;
+	double Speed;
+	double Prev_Speed;
+	bool Need_To_Freeze;
+
 	static const int Width = 16;
 	static const int Height = 16;
 private:

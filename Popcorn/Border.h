@@ -36,8 +36,7 @@ private:
 	void Draw_Element(HDC hdc, RECT &paint_area, int x, int y, bool top_border);
 	void Draw_Floor(HDC hdc, RECT &paint_area);
 
-
 	RECT Floor_Rect;
-	AGate *Gate[8];
+	std::vector<AGate *>Gate;
 };
 //------------------------------------------------------------------------------------------------------------

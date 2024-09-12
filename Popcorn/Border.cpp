@@ -6,9 +6,11 @@
 
 AsBorder::~AsBorder()
 {
-	int i; 
-	for (i = 0; i < AsConfig::Gates_Count; ++i)
-		delete Gate[i];
+	for (auto it = Gate.begin(); it != Gate.end(); it++)
+		delete *it;
+
+	Gate.erase(Gate.begin(), Gate.end());
+	
 }
 //------------------------------------------------------------------------------------------------------------
 AsBorder::AsBorder()
@@ -19,17 +21,15 @@ AsBorder::AsBorder()
 	  Floor_Rect.right = AsConfig::Max_X_Pos * AsConfig::Global_Scale;
 	  Floor_Rect.bottom = AsConfig::Max_Y_Pos * AsConfig::Global_Scale;
 
-	  Gate[0] = new AGate(1, 29, 0, 3);
-	  Gate[1] = new AGate(AsConfig::Max_X_Pos, 29, AsConfig::Level_Width - 1, 3);
+	  Gate.push_back(new AGate(1, 29.0, 0, 3));
+	  Gate.push_back(new AGate(AsConfig::Max_X_Pos, 29.0, AsConfig::Level_Width - 1, 3));
+	  Gate.push_back(new AGate(1, 77.0, 0, 9));
+	  Gate.push_back(new AGate(AsConfig::Max_X_Pos, 77.0, AsConfig::Level_Width - 1, 9));
+	  Gate.push_back(new AGate(1, 129.0));
+	  Gate.push_back(new AGate(AsConfig::Max_X_Pos, 129.0));
+	  Gate.push_back(new AGate(1, 178.0));
+	  Gate.push_back(new AGate(AsConfig::Max_X_Pos, 178.0));
 
-	  Gate[2] = new AGate(1, 77, 0, 9);
-	  Gate[3] = new AGate(AsConfig::Max_X_Pos, 77, AsConfig::Level_Width - 1, 9);
-
-	  Gate[4] = new AGate(1, 129);
-	  Gate[5] = new AGate(AsConfig::Max_X_Pos, 129);
-
-	  Gate[6] = new AGate(1, 178);
-	  Gate[7] = new AGate(AsConfig::Max_X_Pos, 178);
 
 }
 //------------------------------------------------------------------------------------------------------------
@@ -77,8 +77,8 @@ bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *bal
 void AsBorder::Act()
 {
 	int i;
-	for(i = 0; i < AsConfig::Gates_Count; ++i)
-		Gate[i]->Act();
+	for(auto *gate : Gate)
+		gate->Act();
 }
 bool AsBorder::Is_Finished()
 {
@@ -103,14 +103,14 @@ void AsBorder::Draw(HDC hdc, RECT &paint_area)
 	if(AsConfig::Level_Has_Floor)
 		Draw_Floor(hdc, paint_area);
 
-	for (i = 0; i < AsConfig::Gates_Count; i++)
-		Gate[i]->Draw(hdc, paint_area);
+	for (auto *it : Gate)
+		it->Draw(hdc, paint_area);
 }
 void AsBorder::Clear(HDC hdc, RECT &paint_area)
 {
 	int i;
-	for (i = 0; i < AsConfig::Gates_Count; i++)
-		Gate[i]->Clear(hdc, paint_area);
+	for (auto *gate : Gate)
+		gate->Clear(hdc, paint_area);
 
 	if(AsConfig::Level_Has_Floor)
 		AsCommon::Rect(hdc, Floor_Rect, AsConfig::BG_Color);
@@ -159,14 +159,14 @@ int AsBorder::Open_Long_Gate()
 
 void AsBorder::Get_Gate_Pos(int index, double &x_pos, double &y_pos)
 {
-	if(index < 0 || index > AsConfig::Gates_Count)
-		AsConfig::Throw();
+	if(index < 0 || index > Gate.size())
+		AsConfig::Throw(); // ???
 
 	Gate[index]->Get_Pos(x_pos, y_pos);
 }
 void AsBorder::Open_Gate(int gate_index, bool is_open_short)
 {
-	if(gate_index >= 0 && gate_index < AsConfig::Gates_Count)
+	if(gate_index >= 0 && gate_index < Gate.size())
 		Gate[gate_index]->Open_Gate(is_open_short);
 	else
 		AsConfig::Throw();
@@ -180,7 +180,7 @@ void AsBorder::Redraw_Floor()
 }
 bool AsBorder::Is_Gate_Opened(int gate_index)
 {
-	if(gate_index >= 0 && gate_index < AsConfig::Gates_Count)
+	if(gate_index >= 0 && gate_index < Gate.size())
 		return Gate[gate_index]->Is_Opened();
 	else
 		AsConfig::Throw();
@@ -189,7 +189,7 @@ bool AsBorder::Is_Gate_Opened(int gate_index)
 }
 bool AsBorder::Is_Gate_Closed(int gate_index)
 {
-	if(gate_index >= 0 && gate_index < AsConfig::Gates_Count)
+	if(gate_index >= 0 && gate_index < Gate.size())
 		return Gate[gate_index]->Is_Closed();
 	else
 		AsConfig::Throw();

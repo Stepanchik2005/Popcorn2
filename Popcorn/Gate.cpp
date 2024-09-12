@@ -6,7 +6,7 @@ const double AGate::Gap_Short_Gate_Expanding_Step = Max_Gap_Short_Height / (doub
 const double AGate::Max_Gap_Long_Height = 18.0;
 const double AGate::Gap_Long_Gate_Expanding_Step = Max_Gap_Long_Height / (double)AsConfig::FPS * 1.5;
 
-AGate::AGate(int x_pos, int y_pos, int level_x, int level_y) // !!! поменять на дабл y_pos
+AGate::AGate(int x_pos, double y_pos, int level_x, int level_y)
 	: Level_X(level_x), Level_Y(level_y),  X_Pos(x_pos), Y_Pos(y_pos), Original_Y_Pos(y_pos),
 	  Gap_Height(0.0), Gate_Close_Tick(0), Gate_State(EGate_State::Closed), Gate_Transformation(EGate_Transformation::Unknown)
 {
@@ -312,15 +312,16 @@ void AGate::Draw_Long_Edges(HDC hdc)
 //------------------------------------------------------------------------------------------------------------
 void AGate::Draw_One_Edge(HDC hdc, int edge_offset, bool is_blue) 
 { //!!! Отрефакторить
+	int i;
 	const int scale = AsConfig::Global_Scale;
 
+	static int x_positions[] = {0, 1, 3, 4, 5};
+	static int width[] = {1, 2, 1, 1, 1};
+	static AColor colors[] = {AsConfig::BG_Color, AsConfig::Blue_Color, AsConfig::BG_Color, AsConfig::Blue_Color, AsConfig::BG_Color};
 	if(is_blue)
 	{
-		AsCommon::Rect(hdc,0   ,  0 + edge_offset, 1, 1, AsConfig::BG_Color);
-		AsCommon::Rect(hdc,0 + 1, 0 + edge_offset, 2, 1, AsConfig::Blue_Color);
-		AsCommon::Rect(hdc,0 + 3, 0 + edge_offset, 1, 1, AsConfig::BG_Color);
-		AsCommon::Rect(hdc,0 + 4, 0 + edge_offset, 1, 1, AsConfig::Blue_Color);
-		AsCommon::Rect(hdc,0 + 5, 0 + edge_offset, 1, 1, AsConfig::BG_Color);
+		for(i = 0; i < 5; ++i)
+			AsCommon::Rect(hdc,0 + x_positions[i], 0 + edge_offset,width[i], 1, colors[i]);
 	}									  
 	else
 	{
@@ -331,8 +332,8 @@ void AGate::Draw_One_Edge(HDC hdc, int edge_offset, bool is_blue)
 //------------------------------------------------------------------------------------------------------------
 void AGate::Draw_Red_Edge(HDC hdc, int edge_offset, bool has_blick, bool is_long)
 {
-	
 	const int scale = AsConfig::Global_Scale;
+
 	if(is_long)
 	{
 		AsCommon::Rect(hdc, 0, 0 + edge_offset, 6, 1, AsConfig::Red_Color);
@@ -342,9 +343,6 @@ void AGate::Draw_Red_Edge(HDC hdc, int edge_offset, bool has_blick, bool is_long
 	}
 	else
 		AsCommon::Rect(hdc, 0 + 1, 0 + edge_offset, 4, 1, AsConfig::Red_Color);
-	
-
-	
 }
 //------------------------------------------------------------------------------------------------------------
 bool AGate::Act_For_Open(bool &correct_pos)

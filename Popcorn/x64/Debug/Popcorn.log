@@ -1,11 +1,4 @@
-﻿  Info_Panel.cpp
-D:\Popcorn_Git_2\Popcorn\Info_Panel.cpp(115,109): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-D:\Popcorn_Git_2\Popcorn\Info_Panel.cpp(118,73): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-D:\Popcorn_Git_2\Popcorn\Info_Panel.cpp(123,135): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-D:\Popcorn_Git_2\Popcorn\Info_Panel.cpp(125,99): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-D:\Popcorn_Git_2\Popcorn\Info_Panel.cpp(263,83): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-D:\Popcorn_Git_2\Popcorn\Info_Panel.cpp(270,117): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-D:\Popcorn_Git_2\Popcorn\Info_Panel.cpp(273,93): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+﻿  Platform_State.cpp
   Popcorn.vcxproj -> D:\Popcorn_Git_2\x64\Debug\Popcorn.exe
   'pwsh.exe' is not recognized as an internal or external command,
   operable program or batch file.

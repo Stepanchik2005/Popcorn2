@@ -4,7 +4,7 @@
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
-	: Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Life_Count(5), Modules{}, Timer_ID(WM_USER + 1)
+	: Game_State(EGame_State::Lost_Ball), Rest_Distance(0.0), Modules{}, Timer_ID(WM_USER + 1)
 {
 }
 //------------------------------------------------------------------------------------------------------------
@@ -45,35 +45,29 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	Platform.Redraw_Platform();
 
-	memset(Modules, 0, AsConfig::Max_Modules_Count);
-
-	Add_New_Module(index, &Level);
-	Add_New_Module(index, &Border);
-	Add_New_Module(index, &Platform);
-	Add_New_Module(index, &Ball_Set);
-	Add_New_Module(index, &Laser_Beam_Set);
-	Add_New_Module(index, &Monster_Set);
-	Add_New_Module(index, &Info_Panel);
+	Modules.push_back(&Level);
+	Modules.push_back(&Border);
+	Modules.push_back(&Platform);
+	Modules.push_back(&Ball_Set);
+	Modules.push_back(&Laser_Beam_Set);
+	Modules.push_back(&Monster_Set);
+	Modules.push_back(&Info_Panel);
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Draw_Frame(HDC hdc, RECT &paint_area)
 {// Отрисовка экрана игры
-	int i;
-
 	SetGraphicsMode(hdc, GM_ADVANCED);
 
 	// очистка экрана за кадр
-	for(i = 0; i < AsConfig::Max_Modules_Count;++i)
-		if(Modules[i] != 0)
-			Modules[i]->Clear(hdc, paint_area);
+	for(auto it = Modules.begin(); it != Modules.end(); it++)
+			(*it)->Clear(hdc, paint_area);
 		
 		
 	// отрисовка экрана за кадр
-	for(i = 0; i < AsConfig::Max_Modules_Count;++i)
-		if(Modules[i] != 0)
-			Modules[i]->Draw(hdc, paint_area);
+	for(auto it = Modules.begin(); it != Modules.end(); it++)
+			(*it)->Draw(hdc, paint_area);
 }
 //------------------------------------------------------------------------------------------------------------
 int AsEngine::On_Key(EKey_Type key_type, bool key_down)
@@ -119,6 +113,9 @@ int AsEngine::On_Timer()
 	case EGame_State::Lost_Ball:
 		if (Platform.Has_Substate_Regular(EPlatform_Substate_Regular::Missing) )
 		{
+			if(! Info_Panel.Decrease_Life_Count())
+				Game_Over();		
+
 			Game_State = EGame_State::Restart_Level;
 			Restart_Level();
 		}
@@ -127,14 +124,21 @@ int AsEngine::On_Timer()
 
 
 	case EGame_State::Restart_Level:
+
 		if(Platform.Has_Substate_Regular(EPlatform_Substate_Regular::Ready))
 		{
 		  Game_State = EGame_State::Play_Level;
 		  Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos());
 		  Monster_Set.Activate();
+
 		}
-		if (Border.Is_Gate_Opened(AsConfig::Gates_Count - 1) )
+		if (Border.Is_Gate_Opened(AsConfig::Gates_Count - 1) && Platform.Get_State() != EPlatform_State::Rolling)
+		{
 			Platform.Set_State(EPlatform_State::Rolling);
+		}
+
+		
+
 		break;
 	}
 	
@@ -147,37 +151,33 @@ int AsEngine::On_Timer()
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Advance_Mover()
 {
-	int i;
 	double max_speed = 0.0;
 	double mover_speed;
 	// 1. Определяем макс скорость среди всех объектов
-	for(i = 0; i < AsConfig::Max_Movers_Count;++i)
-		if(Modules[i] != 0)
-		{
-			Modules[i]->Start_Movement();
+	for(auto it = Modules.begin(); it != Modules.end();it++)
+	{
+			(*it)->Start_Movement();
 
-			mover_speed = Modules[i]->Get_Speed();
+			mover_speed = (*it)->Get_Speed();
 
 			if(fabs(mover_speed) > max_speed)
 				max_speed = fabs(mover_speed);
-		}
-
+	}
+		
 	Rest_Distance = max_speed;
 
 	// 2. Продвигаем все объекты 
 	while(Rest_Distance > 0.0)
 	{
-		for(i = 0; i < AsConfig::Max_Movers_Count;++i)
-			if(Modules[i] != 0)
-				Modules[i]->Advance(max_speed);
+		for(auto it = Modules.begin(); it != Modules.end();it++)
+				(*it)->Advance(max_speed);
 	
 		Rest_Distance -= AsConfig::Moving_Size_Step;
 	}
 
 	// 3. Заказываем перерисовку для всех Mover
-	for(i = 0; i < AsConfig::Max_Movers_Count;++i)
-		if(Modules[i] != 0)
-			Modules[i]->End_Movement();
+	for(auto it = Modules.begin(); it != Modules.end();it++)
+			(*it)->End_Movement();
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Play_Level()
@@ -205,24 +205,26 @@ void AsEngine::Play_Level()
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Restart_Level()
 {
-	
 	if(Border.Is_Gate_Closed(AsConfig::Gates_Count - 1))
  		Border.Open_Gate(AsConfig::Gates_Count - 1, true);
-
 	
+}
+//------------------------------------------------------------------------------------------------------------
+void AsEngine::Game_Over()
+{
+	// !!! Надо сделать
 }
 //------------------------------------------------------------------------------------------------------------
 
 void AsEngine::Act()
 {
 	int index = 0;
-	int i;
 	AFalling_Letter *falling_letter;
+	
 
 	// Анимация для всех граф объектов по таймеру
-	for(i = 0; i < AsConfig::Max_Modules_Count;++i)
-		if(Modules[i] != 0)
-			Modules[i]->Act();
+	for(auto it = Modules.begin(); it != Modules.end(); it++)
+			(*it)->Act();
 
 	while(Level.Get_Next_Falling_Letter(index, &falling_letter))
 	{
@@ -230,6 +232,30 @@ void AsEngine::Act()
 			On_Falling_Letter(falling_letter);
 	}
 
+	Handle_Message();
+}
+
+void AsEngine::Handle_Message()
+{
+	AMessage *message;
+
+	if(AsMessage_Manager::Get_Message(&message))
+	{
+		switch(message->Message_Type)
+		{
+			case EMessage_Type::Floor_Is_Over:
+				AsConfig::Level_Has_Floor = false;
+				Border.Redraw_Floor();
+				break;
+
+			case EMessage_Type::Unfreeze_Monsters:
+				 Monster_Set.Set_Freeze_State(false);
+				break;
+
+			default:
+				AsConfig::Throw();
+		}
+	}
 }
 void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 {
@@ -240,6 +266,8 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 	{
 	case ELetter_Type::O: 
 		Platform.Set_State(EPlatform_Substate_Regular::Normal); // только для отмены клея	
+		Info_Panel.Floor_Indicator.Cancel();
+		Info_Panel.Monster_Indicator.Cancel();
 		break;
 	case ELetter_Type::I:
 		Ball_Set.Inverse_Balls();
@@ -252,11 +280,12 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 		break;
 
 	case ELetter_Type::M:  
-		
+		Monster_Set.Set_Freeze_State(true);
+		Info_Panel.Monster_Indicator.Restart();
 		break;
 	case ELetter_Type::G:  
-		if(Life_Count < AsConfig::Max_Life_Count)
-			++Life_Count; // !!! Добавить метод добавления жизни
+		
+		Info_Panel.Increase_Life_Count();
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
 
@@ -270,6 +299,7 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 
 	case ELetter_Type::P:  
 		AsConfig::Level_Has_Floor = true;
+		Info_Panel.Floor_Indicator.Restart();
 		Border.Redraw_Floor();
 		Platform.Set_State(EPlatform_Substate_Regular::Normal);
 		break;
@@ -291,13 +321,13 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 		AsConfig::Throw();
 	}
 
-		falling_letter->Finalize();
+	AsInfo_Panel::Update_Score(EHit_Type::Catch_Letter);
+
+	falling_letter->Finalize();
 }
 //------------------------------------------------------------------------------------------------------------
-void AsEngine::Add_New_Module(int &index, AGame_Object *obj)
-{
-	if(index >= 0 && index < AsConfig::Max_Modules_Count)
-		Modules[index++] = obj;
-	else
-		AsConfig::Throw();	
-}
+
+
+	
+
+

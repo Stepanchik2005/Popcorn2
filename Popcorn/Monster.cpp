@@ -3,7 +3,7 @@
 //AMonster---------------------------------------------------------
 AMonster::AMonster()
 	: X_Pos(0.0), Y_Pos(0.0), Monster_Rect{},Prev_Monster_Rect{}, Next_Direction_Switch_Tick(AsCommon::Rand(AsConfig::FPS)), 
-	  Monster_State(EMonster_State::Idle), Speed(0.0), Direction(0.0), Start_Animation(0)
+	  Monster_State(EMonster_State::Idle), Speed(0.0), Prev_Speed(0.0), Need_To_Freeze(false) ,Direction(0.0), Start_Animation(0), Explodive_Balls(10)
 {
 
 }
@@ -91,11 +91,18 @@ void AMonster::Act()
 
 	case EMonster_State::Emitting:
 		Act_For_Alive_State();
+
 		if(Time_Of_Emitting < AsConfig::Current_Timer_Tick)
 			Monster_State = EMonster_State::Alive;
 		break;
 
 	case EMonster_State::Alive:
+		if(Need_To_Freeze)
+		{
+			Prev_Speed = Speed;
+			Speed = 0.0;
+			Need_To_Freeze = false;
+		}
 		Act_For_Alive_State();
 		break;
 
@@ -192,8 +199,6 @@ bool AMonster::Check_Hit(RECT& rect)
 
 void AMonster::Destroy()
 {
-	int i;
-	
 	int rest_size;
 	int x_offset, y_offset;
 	int max_size, half_size;
@@ -212,7 +217,7 @@ void AMonster::Destroy()
 	if(half_height < half_size)
 		half_size = half_height;
 
-	for(i = 0; i < Explodive_Balls_Count; ++i)
+	for(auto &ball : Explodive_Balls)
 	{
 		max_size = AsCommon::Rand(20) + 10;
 		time_offset = AsCommon::Rand(AsConfig::FPS);
@@ -235,13 +240,22 @@ void AMonster::Destroy()
 
 		is_red = AsCommon::Rand(2);
 
-		Explodive_Balls[i].Explode(x_pos + x_offset, y_pos + y_offset, time_offset, max_size * 2, 10, is_red);
+		ball.Explode(x_pos + x_offset, y_pos + y_offset, time_offset, max_size * 2, 10, is_red);
 
 	}
+
+	AsInfo_Panel::Update_Score(EHit_Type::Hit_Monster);
 
 	Monster_State = EMonster_State::Destroying;
 }
 
+void AMonster::Set_Freeze_State(bool is_freeze)
+{
+	if(! is_freeze)
+		Speed = Prev_Speed; 
+
+	Need_To_Freeze = is_freeze;
+}
 void AMonster::Activate(double x_pos, double y_pos, bool is_left_gate)
 {
 	Monster_State = EMonster_State::Emitting;
@@ -267,13 +281,12 @@ void AMonster::Activate(double x_pos, double y_pos, bool is_left_gate)
 
 void AMonster::Act_For_Destroying_State()
 {
-	int i;
 	int count = 0; 
-	for(i = 0; i < Explodive_Balls_Count; ++i)
+	for(auto &ball : Explodive_Balls)
 	{
-		Explodive_Balls[i].Act();
+		ball.Act();
 
-		if(Explodive_Balls[i].Explodive_Ball_State == EExplodive_Ball_State::Idle)
+		if(ball.Explodive_Ball_State == EExplodive_Ball_State::Idle)
 			count++;
 	}
 	
@@ -282,10 +295,8 @@ void AMonster::Act_For_Destroying_State()
 }
 void AMonster::Draw_For_Destroying_State(HDC hdc, RECT &paint_area)
 {
-	int i;
-
-	for(i = 0; i < Explodive_Balls_Count;++i)
-		Explodive_Balls[i].Draw(hdc, paint_area);
+	for(auto &ball : Explodive_Balls)
+		ball.Draw(hdc, paint_area);
 }
 void AMonster::Get_Monster_Rect(double x_pos, double y_pos, RECT& monster_rect)
 {

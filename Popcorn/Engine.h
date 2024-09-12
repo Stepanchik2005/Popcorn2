@@ -41,12 +41,13 @@ private:
 	void Advance_Mover();
 	void Play_Level();
 	void Restart_Level();
+	void Game_Over();
 	void Act();
+	void Handle_Message();
 	void On_Falling_Letter(AFalling_Letter *falling_letter);
-	void Add_New_Module(int &index, AGame_Object *obj);
 
 	double Rest_Distance;
-	int Life_Count;
+	
 
 	EGame_State Game_State;
 	AsBall_Set Ball_Set;
@@ -57,6 +58,8 @@ private:
 	AsMonster_Set Monster_Set;
 	AsInfo_Panel Info_Panel;
 
-	AGame_Object *Modules[AsConfig::Max_Modules_Count];
+	std::vector<AGame_Object *> Modules;
+
+
 };
 //------------------------------------------------------------------------------------------------------------

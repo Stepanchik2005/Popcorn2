@@ -1,54 +1,39 @@
-d:\visual studio\popcorn_project\popcorn\popcorn\x64\debug\vc143.pdb
-d:\visual studio\popcorn_project\popcorn\popcorn\x64\debug\vc143.idb
-d:\visual studio\popcorn_project\popcorn\popcorn\x64\debug\main.obj
-d:\visual studio\popcorn_project\popcorn\popcorn\x64\debug\level.obj
-d:\visual studio\popcorn_project\popcorn\popcorn\x64\debug\engine.obj
-d:\visual studio\popcorn_project\popcorn\popcorn\x64\debug\config.obj
-d:\visual studio\popcorn_project\popcorn\popcorn\x64\debug\ball.obj
-d:\visual studio\popcorn_project\popcorn\popcorn\x64\debug\active_brick.obj
-d:\visual studio\popcorn_project\popcorn\popcorn\x64\debug\border.obj
-d:\visual studio\popcorn_project\popcorn\popcorn\x64\debug\platform.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\vc143.pdb
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\vc143.idb
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\platform.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\main.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\engine.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\ball_set.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\level.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\falling_letter.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\config.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\border.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\ball.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\active_brick.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\hit_checker_list.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\tools.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\laser_beam.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\laser_beam_set.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\platform_state.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\platform_laser.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\platform_expanding.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\platform_glue.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\gate.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\monster.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\monster_set.obj
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\explodive_ball.obj
-d:\visual studio\popcorn_project\popcorn\x64\debug\popcorn.exe
-d:\visual studio\popcorn_project\popcorn\popcorn\x64\debug\popcorn.ilk
-d:\visual studio\popcorn_project\popcorn\x64\debug\popcorn.pdb
-d:\visual studio\popcorn_git_2\x64\debug\popcorn.exe
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\popcorn.ilk
-d:\visual studio\popcorn_git_2\x64\debug\popcorn.pdb
-d:\visual studio\popcorn_project\popcorn\popcorn\x64\debug\popcorn.res
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\popcorn.res
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\border.obj.enc
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\monster.obj.enc
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\platform.obj.enc
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\cl.command.1.tlog
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\cl.read.1.tlog
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\cl.write.1.tlog
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\link.command.1.tlog
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\link.read.1.tlog
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\link.write.1.tlog
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\rc.command.1.tlog
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\rc.read.1.tlog
-d:\visual studio\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\rc.write.1.tlog
+d:\popcorn_git_2\popcorn\x64\debug\vc143.pdb
+d:\popcorn_git_2\popcorn\x64\debug\vc143.idb
+d:\popcorn_git_2\popcorn\x64\debug\platform_expanding.obj
+d:\popcorn_git_2\popcorn\x64\debug\platform.obj
+d:\popcorn_git_2\popcorn\x64\debug\monster_set.obj
+d:\popcorn_git_2\popcorn\x64\debug\monster.obj
+d:\popcorn_git_2\popcorn\x64\debug\main.obj
+d:\popcorn_git_2\popcorn\x64\debug\level.obj
+d:\popcorn_git_2\popcorn\x64\debug\laser_beam_set.obj
+d:\popcorn_git_2\popcorn\x64\debug\laser_beam.obj
+d:\popcorn_git_2\popcorn\x64\debug\info_panel.obj
+d:\popcorn_git_2\popcorn\x64\debug\indicator.obj
+d:\popcorn_git_2\popcorn\x64\debug\hit_checker_list.obj
+d:\popcorn_git_2\popcorn\x64\debug\gate.obj
+d:\popcorn_git_2\popcorn\x64\debug\falling_letter.obj
+d:\popcorn_git_2\popcorn\x64\debug\explodive_ball.obj
+d:\popcorn_git_2\popcorn\x64\debug\engine.obj
+d:\popcorn_git_2\popcorn\x64\debug\config.obj
+d:\popcorn_git_2\popcorn\x64\debug\border.obj
+d:\popcorn_git_2\popcorn\x64\debug\ball_set.obj
+d:\popcorn_git_2\popcorn\x64\debug\ball.obj
+d:\popcorn_git_2\popcorn\x64\debug\active_brick.obj
+d:\popcorn_git_2\popcorn\x64\debug\tools.obj
+d:\popcorn_git_2\popcorn\x64\debug\platform_state.obj
+d:\popcorn_git_2\popcorn\x64\debug\platform_laser.obj
+d:\popcorn_git_2\popcorn\x64\debug\platform_glue.obj
+d:\popcorn_git_2\popcorn\x64\debug\popcorn.ilk
+d:\popcorn_git_2\x64\debug\popcorn.exe
+d:\popcorn_git_2\x64\debug\popcorn.pdb
+d:\popcorn_git_2\popcorn\x64\debug\popcorn.res
+d:\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\cl.command.1.tlog
+d:\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\cl.read.1.tlog
+d:\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\cl.write.1.tlog
+d:\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\link.command.1.tlog
+d:\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\link.read.1.tlog
+d:\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\link.write.1.tlog
+d:\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\rc.command.1.tlog
+d:\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\rc.read.1.tlog
+d:\popcorn_git_2\popcorn\x64\debug\popcorn.tlog\rc.write.1.tlog

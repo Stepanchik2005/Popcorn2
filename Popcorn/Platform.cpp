@@ -394,8 +394,6 @@ void AsPlatform::Redraw_Platform()
       Last_Timer_Tick = AsConfig::Current_Timer_Tick;
    }
 
-      
-
    platform_width = Get_Platform_Width();
 
    Platform_Rect.left = (int) ( X_Pos * AsConfig::D_Global_Scale);
@@ -657,8 +655,6 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT &paint_area)
    }
 
 
-
-
    if (moved_columns_count == 0)
    {
       Platform_State.Set_State(EPlatform_Substate_Regular::Missing);  // Вся платформа сдвинулась за пределы окна
@@ -749,7 +745,9 @@ bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, AColor &color, in
       color.Set_Pen(AsPlatform::Platform_Inner_Color.Get_Pen()); 
 
    else if(image_color == AsConfig::BG_Color.Get_RGB())
+   {   
        color.Set_Pen(AsConfig::BG_Color.Get_Pen()); 
+   }
       
    return true;
 }

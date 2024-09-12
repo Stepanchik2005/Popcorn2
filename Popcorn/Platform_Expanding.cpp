@@ -53,9 +53,6 @@ bool AsPlatform_Expanding::Act_For_Expanding_State(double &x_pos, bool &is_corre
          Platform_State->Expanding = EPlatform_Transformation::Unknown;
          next_state = Platform_State->Set_State(EPlatform_Substate_Regular::Normal);
       }
-
-     /* Redraw_Platform();
-      break;*/
       return true;
    }
 

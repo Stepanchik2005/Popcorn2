@@ -109,7 +109,7 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 	RECT intersection_rect;
 
 	if(Ball_State == EBall_State::Disabled)
-		return;
+			return;
 
 	if( (Ball_State == EBall_State::Teleporting || Ball_State == EBall_State::Lost) && Prev_Ball_State == Ball_State)
 		return;

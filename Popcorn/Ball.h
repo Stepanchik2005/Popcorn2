@@ -30,27 +30,16 @@ public:
 	virtual void Set_On_Paraschute(int brick_x, int brick_y);
 	virtual void Draw_Teleporting(HDC hdc, int step);
 
-
-
 	void Set_Speed(double ball_speed);
 	void Set_For_Test();
 	bool Is_Test_Finished();
-	
-	
-	
-	
 	void Forced_Advance(double direction, double speed, double max_speed);
 	void Release();
 	
-	
-
-	
-   
-
 	static AHit_Checker_List Hit_Checker_List;
 	int Release_Timer_Tick;
-
 	static const double Start_Ball_Y_Pos;
+
 private:
 	void Redraw_Ball();
 	void Draw_Paraschute(HDC hdc, RECT &paint_area);
@@ -75,5 +64,6 @@ private:
 
 	static const int Paraschute_Size = 15;
 	static const int On_Platform_Timeout = 3 * AsConfig::FPS;
+	
 };
 //------------------------------------------------------------------------------------------------------------
