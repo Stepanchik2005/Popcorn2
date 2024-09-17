@@ -106,6 +106,9 @@
     <Filter Include="Indicator">
       <UniqueIdentifier>{8e9d55b8-e572-4d70-97f2-74be4d8dc315}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Level_Data">
+      <UniqueIdentifier>{bc4e4f38-a81a-4597-aa90-37ec0dcda7f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -188,6 +191,9 @@
     </ClInclude>
     <ClInclude Include="Indicator.h">
       <Filter>Indicator</Filter>
+    </ClInclude>
+    <ClInclude Include="Level_Data.h">
+      <Filter>Level_Data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -275,6 +281,9 @@
     </ClCompile>
     <ClCompile Include="Indicator.cpp">
       <Filter>Indicator</Filter>
+    </ClCompile>
+    <ClCompile Include="Level_Data.cpp">
+      <Filter>Level_Data</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

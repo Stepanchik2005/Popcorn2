@@ -24,7 +24,7 @@ void AMonster::Advance(double max_speed)
 	origin_direction = Direction;
 
 	// сменить направление
-	for(i = 0; i < 16; ++i)
+	for(i = 0; i < 64; ++i)
 	{
 		next_x_pos = X_Pos + step * cos(Direction);
 		next_y_pos = Y_Pos - step * sin(Direction);
@@ -32,7 +32,7 @@ void AMonster::Advance(double max_speed)
 		Get_Monster_Rect(next_x_pos, next_y_pos ,monster_rect);
 
 		if(ALevel::Has_Brick_At(monster_rect))
-			Direction += M_PI / 8.0;
+			Direction += M_PI / 32.0;
 		else
 		{
 			is_direction_chagned = true;
@@ -320,9 +320,9 @@ void AMonster::On_Change_Direction()
 	// рандомная корректировка направления
 	if(AsConfig::Current_Timer_Tick > Next_Direction_Switch_Tick && Monster_State == EMonster_State::Alive)
 	{
-		Next_Direction_Switch_Tick += AsCommon::Rand(AsConfig::FPS);
+		Next_Direction_Switch_Tick += AsConfig::FPS;
 
-		Direction += (double)(AsCommon::Rand(90) - 45) * M_PI / 180;
+		Direction += (double)(AsCommon::Rand(90) - 45) * M_PI / 180.0;
 	}
 }
 

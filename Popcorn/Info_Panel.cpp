@@ -33,19 +33,17 @@ RECT AsInfo_Panel::Data_Rect;
 
 AsInfo_Panel::~AsInfo_Panel()
 {
-	delete Shadow_Color;
-	delete Highlight_Color;
 	delete Dark_Blue;
 	delete Platform_Inner_Color;
 }
 AsInfo_Panel::AsInfo_Panel()
 	:Availiable_Extra_Lifes(AsConfig::Initiall_Extra_Lives),
 	 Floor_Indicator(Score_X + 8, Score_Y + Indicator_Y_Offset, EMessage_Type::Floor_Is_Over), Monster_Indicator(Score_X + 90, Score_Y + Indicator_Y_Offset, EMessage_Type::Unfreeze_Monsters),
-	 Logo_Pop_Font(0), Logo_Corn_Font(0), Score_Font(0), Player_Name(L"COMPUTER"),Shadow_Color(0), Highlight_Color(0), Dark_Blue(0), Dark_Red(0), Platform_Inner_Color(0),
+	 Logo_Pop_Font(0), Logo_Corn_Font(0), Score_Font(0), Player_Name(L"COMPUTER"),Dark_Blue(0), Dark_Red(0), Platform_Inner_Color(0),
 	 Letter_P (ELetter_Type::P, 215 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale, EBrick_Type::Blue),
 	 Letter_G (ELetter_Type::G, 256 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale, EBrick_Type::Blue),
 	 Letter_M (ELetter_Type::M, 296 * AsConfig::Global_Scale + 1, 153 * AsConfig::Global_Scale , EBrick_Type::Blue)
-	{
+{
 	const int scale = AsConfig::Global_Scale;
 
 	Choose_Font();
@@ -134,12 +132,12 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 		AsCommon::Rect(hdc, Score_X + 2 , Score_Y + 2, Score_Width - 4, Score_Height - 4, *Dark_Blue);
 
 		// 2.1 Линии
-		Highlight_Color->Select(hdc);
+		AsConfig::Highlight_Color.Select(hdc);
 		MoveToEx(hdc, (Score_X + 2) * scale, (Score_Y + Score_Height - 2) * scale, 0); 
 		LineTo(hdc, (Score_X + 2) * scale, (Score_Y + 2) * scale); // левая
 		LineTo(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + 2) * scale); // верхняя
 
-		Shadow_Color->Select(hdc);
+		AsConfig::Shadow_Color.Select(hdc);
 		MoveToEx(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + 2) * scale, 0);
 		LineTo(hdc, (Score_X + Score_Width - 2) * scale, (Score_Y + Score_Height - 2) * scale);
 		LineTo(hdc, (Score_X + 2) * scale, (Score_Y + Score_Height - 2) * scale);
@@ -184,8 +182,7 @@ void AsInfo_Panel::Clear(HDC hdc, RECT &paint_area)
 }
 void AsInfo_Panel::Init()
 {
-	Shadow_Color = new AColor(AsConfig::BG_Color, AsConfig::Global_Scale);
-	Highlight_Color = new AColor(AsConfig::White_Color, AsConfig::Global_Scale);
+	
 	Dark_Blue = new AColor(0, 170, 170);
 	Dark_Red = new AColor(151, 0, 0);
 	Platform_Inner_Color = new AColor(0, 128, 192);

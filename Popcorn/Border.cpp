@@ -23,8 +23,8 @@ AsBorder::AsBorder()
 
 	  Gate.push_back(new AGate(1, 29.0, 0, 3));
 	  Gate.push_back(new AGate(AsConfig::Max_X_Pos, 29.0, AsConfig::Level_Width - 1, 3));
-	  Gate.push_back(new AGate(1, 77.0, 0, 9));
-	  Gate.push_back(new AGate(AsConfig::Max_X_Pos, 77.0, AsConfig::Level_Width - 1, 9));
+	  Gate.push_back(new AGate(1, 76.0, 0, 9));
+	  Gate.push_back(new AGate(AsConfig::Max_X_Pos, 76.0, AsConfig::Level_Width - 1, 9));
 	  Gate.push_back(new AGate(1, 129.0));
 	  Gate.push_back(new AGate(AsConfig::Max_X_Pos, 129.0));
 	  Gate.push_back(new AGate(1, 178.0));
@@ -76,13 +76,12 @@ bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *bal
 //------------------------------------------------------------------------------------------------------------
 void AsBorder::Act()
 {
-	int i;
 	for(auto *gate : Gate)
 		gate->Act();
 }
 bool AsBorder::Is_Finished()
 {
-	return false;
+	return false; // заглушка, так как у рамки нету своей анимации
 }
 void AsBorder::Draw(HDC hdc, RECT &paint_area)
 {// Рисует рамку уровня
@@ -108,7 +107,6 @@ void AsBorder::Draw(HDC hdc, RECT &paint_area)
 }
 void AsBorder::Clear(HDC hdc, RECT &paint_area)
 {
-	int i;
 	for (auto *gate : Gate)
 		gate->Clear(hdc, paint_area);
 

@@ -62,7 +62,7 @@ private:
 
 	HFONT Logo_Pop_Font, Logo_Corn_Font, Name_Font, Score_Font;
 	AString Player_Name;
-	AColor *Shadow_Color, *Highlight_Color, *Dark_Blue, *Dark_Red, *Platform_Inner_Color;
+	AColor *Dark_Blue, *Dark_Red, *Platform_Inner_Color;
 
 	AFalling_Letter Letter_P, Letter_G, Letter_M;
 	static RECT Logo_Rect;

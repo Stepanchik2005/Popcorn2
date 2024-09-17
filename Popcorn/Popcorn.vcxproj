@@ -168,6 +168,7 @@
     <ClInclude Include="Laser_Beam.h" />
     <ClInclude Include="Laser_Beam_Set.h" />
     <ClInclude Include="Level.h" />
+    <ClInclude Include="Level_Data.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="Monster_Set.h" />
@@ -196,6 +197,7 @@
     <ClCompile Include="Laser_Beam.cpp" />
     <ClCompile Include="Laser_Beam_Set.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="Level_Data.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Monster_Set.cpp" />

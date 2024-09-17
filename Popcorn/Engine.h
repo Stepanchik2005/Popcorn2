@@ -57,6 +57,7 @@ private:
 	AsBorder Border;
 	AsMonster_Set Monster_Set;
 	AsInfo_Panel Info_Panel;
+	AsMop Mop;
 
 	std::vector<AGame_Object *> Modules;
 

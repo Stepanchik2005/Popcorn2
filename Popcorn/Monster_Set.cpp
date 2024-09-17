@@ -40,6 +40,7 @@ void AsMonster_Set::Act()
       break;
       
    case EMonster_Set_State::Waiting_Gate_Opening: 
+      
       if(Border->Is_Gate_Opened(Current_Gate_Index))
       {
          Emit_At_Gate(Current_Gate_Index);
@@ -135,7 +136,7 @@ void AsMonster_Set::Emit_At_Gate(int gate_index)
 
    Border->Get_Gate_Pos(gate_index, x_pos, y_pos);
 
-   new_monster->Activate(x_pos, y_pos, gate_pos_index);
+   new_monster->Activate(x_pos, y_pos + 1.0 / 3.0, gate_pos_index);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsMonster_Set::Activate()

@@ -25,7 +25,7 @@ public:
 
 	void Redraw_Ball();
 		
-	static void Setup_Colors();
+	//static void Setup_Colors();
 	int Start_Expanding_Tick;
 	EExplodive_Ball_State Explodive_Ball_State;
 private:
@@ -41,8 +41,8 @@ private:
 	static const int Max_Fade_Step = AsConfig::FPS;
 	static const int Fading_Timeout = 30;
 
-	static AColor Fading_Red_Colors[Max_Fade_Step];
-	static AColor Fading_Blue_Colors[Max_Fade_Step];
+	static AColor_Fade Fading_Red_Colors;
+	static AColor_Fade Fading_Blue_Colors;
 
 	
 	RECT Exploding_Ball_Rect;

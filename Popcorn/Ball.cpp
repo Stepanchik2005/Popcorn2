@@ -160,9 +160,11 @@ void ABall::Clear(HDC hdc, RECT &paint_area)
 		return;
 
 	// 1. Очищаем фон
+	if(Ball_State == EBall_State::On_Paraschute)
+		Clean_Up_Paraschute(hdc);
+
 	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect) )
 		AsCommon::Ellipse(hdc, Prev_Ball_Rect, AsConfig::BG_Color);
-	
 }
 //------------------------------------------------------------------------------------------------------------
 double ABall::Get_Direction()
@@ -172,6 +174,7 @@ double ABall::Get_Direction()
 void ABall::Set_Direction(double new_direction)
 {
 	const double pi_2 = 2.0 * M_PI;
+	double min_angle = AsConfig::Min_Ball_Angle;
 
 	while (new_direction > pi_2) // устанавливаем мячик в диапозон [0..pi_2]
 		new_direction -= pi_2;
@@ -179,23 +182,43 @@ void ABall::Set_Direction(double new_direction)
 	while (new_direction < 0.0)
 		new_direction += pi_2;
 
+	// Не позволим приближаться к горизонтальной оси ближе, чем на угол AsConfig::Min_Ball_Angle
 	// 1. Справа
 	// 1.1 Сверху
-	if(new_direction < AsConfig::Min_Ball_Angle)
-		new_direction = AsConfig::Min_Ball_Angle;
+	if(new_direction < min_angle)
+		new_direction = min_angle;
 
 	//1.2 Снизу
-	if(new_direction > pi_2 - AsConfig::Min_Ball_Angle)
-		new_direction = pi_2 - AsConfig::Min_Ball_Angle;
+	if(new_direction > pi_2 - min_angle)
+		new_direction = pi_2 - min_angle;
 	
 	// 2. Слева
 	// 2.1 Сверху
-	if(new_direction < M_PI && new_direction > M_PI - AsConfig::Min_Ball_Angle)
-		new_direction = M_PI - AsConfig::Min_Ball_Angle;
+	if(new_direction < M_PI && new_direction > M_PI - min_angle)
+		new_direction = M_PI -min_angle;
 
 	// 2.2 Снизу
-	if(new_direction > M_PI && new_direction < M_PI + AsConfig::Min_Ball_Angle)
-		new_direction = M_PI + AsConfig::Min_Ball_Angle;
+	if(new_direction > M_PI && new_direction < M_PI + min_angle)
+		new_direction = M_PI + min_angle;
+
+	// 3. Не позволим приближаться к вертикальной оси ближе, чем на угол AsConfig::Min_Ball_Angle
+	// 3.1. Сверху
+	// 3.1.1. Справа
+	if (new_direction < M_PI_2 - min_angle && new_direction < M_PI_2)
+		new_direction = M_PI_2 - min_angle;
+
+	// 3.1.1. Слева
+	if (new_direction > M_PI_2 && new_direction < M_PI_2 + min_angle)
+		new_direction = M_PI_2 + min_angle;
+
+	// 3.2. Снизу
+	// 3.2.1. Слева
+	if (new_direction > M_PI + M_PI_2 - min_angle && new_direction <= M_PI + M_PI_2)
+		new_direction = M_PI + M_PI_2 - min_angle;
+
+	// 3.2.1. Справа
+	if (new_direction >= M_PI + M_PI_2 && new_direction < M_PI + M_PI_2 + min_angle)
+		new_direction = M_PI + M_PI_2 + min_angle;
 
 	Ball_Direction = new_direction;
 }
@@ -439,8 +462,7 @@ void ABall::Draw_Paraschute(HDC hdc, RECT &paint_area)
 	if (! IntersectRect(&intersection_rect, &paint_area, &Paraschute_Rect) )
 	 return;
 
-	// 1. Очистить фон
-	Clean_Up_Paraschute(hdc);
+	
 
 	// 2. Купол
 	AsConfig::Blue_Color.Select(hdc);

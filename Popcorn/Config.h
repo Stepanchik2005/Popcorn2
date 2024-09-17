@@ -31,6 +31,22 @@ private:
 	
 };
 //------------------------------------------------------------------------------------------------------------
+class AColor_Fade
+{
+public:
+	~AColor_Fade();
+	AColor_Fade();
+	AColor_Fade(const AColor &origin_color, int max_fade_step);
+	AColor_Fade(const AColor &origin_color, int max_fade_step, const AColor& dest_color);
+	AColor* Get_Color(int index);
+
+   void Init(const AColor &origin_color, const AColor& dest_color, int max_fade_step);
+private:
+	int Max_Fade_Step;
+
+	std::vector<AColor *> Fading_Colors;
+};
+//------------------------------------------------------------------------------------------------------------
 class AsConfig
 {
 public:
@@ -39,11 +55,10 @@ public:
 	static bool Level_Has_Floor;
 	static int Current_Timer_Tick;
 
-
-
 	static const AColor BG_Color, Red_Color, Blue_Color, White_Color, Monster_Dark_Red_Color,  Letter_Color, Laser_Color,Paraschute_Color;
 	static const AColor Teleport_Color, Advertisement_Blue_Table_Color, Unbreakable_Blue_Hightlight_Color, Unbreakable_Red_Hightlight_Color;;
 	static const AColor Cornea_Color, Iris_Color, Cornea_Arc_Color, Explodive_Red_Color, Explodive_Blue_Color, Comet_Color;
+	static const AColor Shadow_Color, Highlight_Color;
 
 	static HWND Hwnd;
 
@@ -89,7 +104,7 @@ public:
 	static const int Gate_Height = 19;
 	static const int Gates_Count = 8;
 };
-//------------------------------------------------------------------------------------------------------------
+
 class AsCommon
 {
 public:
@@ -102,8 +117,9 @@ public:
 	static void Invalidate_Rect(RECT &rect);
 
 	static unsigned char Get_Fading_Channel(unsigned char color, unsigned char bg_color, int step, int max_fade_step);
-	static void Get_Fading_Color(const AColor &color, int step, int max_fade_step, AColor &result_color);
-
+	static AColor* Get_Fading_Color(const AColor &origin_color, int step, int max_fade_step);
+	static AColor* Get_Fading_Color(const AColor &origin_color,const AColor &dest_color,  int step, int max_fade_step);
+	
 
 	static bool Reflect_On_Circle(double next_x_pos, double next_y_pos, double x_pos, double y_pos, double width, ABall_Object *ball);
 };

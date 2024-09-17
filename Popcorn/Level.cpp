@@ -1,56 +1,178 @@
 ﻿#include "Level.h"
 
-
-
-//-ALevel--------------------------------------------------------------------------------------------------------
-char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
+// APoint
+APoint::APoint()
 {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
-
-char ALevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
+}
+APoint::APoint(int x_pos, int y_pos)
+	: X(x_pos), Y(y_pos)
 {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
+}
 
-ALevel *ALevel::Level = 0;
+//AMop_Indicator------------------------------------------------------------------------------------
+//AColor_Fade AMop_Indicator::Fading_Blue_Colors(AColor(255, 85, 85), Max_Fade_Step, AColor(85, 255, 255)); // инициализируем так, потому что 
+AColor_Fade AMop_Indicator::Fading_Blue_Colors;
+
+AMop_Indicator::AMop_Indicator(int x_pos, int y_pos, int time_offset)
+	: X_Pos(x_pos), Y_Pos(y_pos), Time_Offset(time_offset), Current_Color(&AsConfig::Red_Color)
+{
+	const int scale = AsConfig::Global_Scale;
+
+	Mop_Indicator_Rect.left = X_Pos * scale;
+	Mop_Indicator_Rect.top = Y_Pos * scale;
+	Mop_Indicator_Rect.right = (X_Pos + Width) * scale;
+	Mop_Indicator_Rect.bottom = (Y_Pos + Height) * scale;
+}
+//------------------------------------------------------------------------------------
+AMop_Indicator::AMop_Indicator(int x_pos, int y_pos, const AColor& dest_color)
+	: X_Pos(x_pos), Y_Pos(y_pos), Current_Color(&dest_color)
+{
+	const int scale = AsConfig::Global_Scale;
+
+	Mop_Indicator_Rect.left = X_Pos * scale;
+	Mop_Indicator_Rect.top = Y_Pos * scale;
+	Mop_Indicator_Rect.right = (X_Pos + Width) * scale;
+	Mop_Indicator_Rect.bottom = (Y_Pos + Height) * scale;
+	
+}
+//------------------------------------------------------------------------------------
+void AMop_Indicator::Act()
+{
+	int total_timeout = Normal_Timeout + Max_Fade_Step;
+	int current_offset;
+	int curr_tick = (AsConfig::Current_Timer_Tick + Time_Offset) % total_timeout;
+
+	if(curr_tick < Normal_Timeout)
+		Current_Color = &AsConfig::Red_Color;
+	else
+	{
+		current_offset = curr_tick - Normal_Timeout;
+
+		if(current_offset < 0 || current_offset >= Max_Fade_Step)
+			AsConfig::Throw();
+
+		Current_Color = Fading_Blue_Colors.Get_Color(current_offset);
+	}
+	AsCommon::Invalidate_Rect(Mop_Indicator_Rect);
+}
+//------------------------------------------------------------------------------------
+bool AMop_Indicator::Is_Finished()
+{
+	return false;
+}
+void AMop_Indicator::Draw(HDC hdc, RECT &paint_area)
+{
+	RECT intersection_rect;
+
+	const int scale = AsConfig::Global_Scale;
+
+	if(IntersectRect(&intersection_rect, &paint_area, &Mop_Indicator_Rect))
+	{	
+		AsCommon::Rect(hdc, X_Pos, Y_Pos, Width, Height, *Current_Color);
+
+		AsConfig::Highlight_Color.Select(hdc);
+		MoveToEx(hdc, X_Pos * scale, (Y_Pos + Height) * scale, 0); 
+		LineTo(hdc, X_Pos * scale, Y_Pos * scale); 
+		LineTo(hdc, (X_Pos + Width) * scale, Y_Pos * scale); 
+
+		AsConfig::Shadow_Color.Select(hdc);
+		MoveToEx(hdc, (X_Pos + Width) * scale, Y_Pos * scale, 0);
+		LineTo(hdc, (X_Pos + Width) * scale, (Y_Pos + Height) * scale);
+		LineTo(hdc, X_Pos * scale, (Y_Pos + Height) * scale);
+	}
+	
+}
+//------------------------------------------------------------------------------------
+void AMop_Indicator::Clear(HDC hdc, RECT &paint_area)
+{
+}
+//------------------------------------------------------------------------------------
+void AMop_Indicator::Init()
+{
+  AMop_Indicator::Fading_Blue_Colors.Init(AsConfig::Red_Color, AsConfig::Blue_Color, Max_Fade_Step); // используем метод отложенной инициализации, т.к. цвета в конфиге инициализируются позже,
+																																	  // чем AColor_Fade AMop_Indicator::Fading_Blue_Colors;
+}
+
+
+
+//AsMop-------------------------------------------------------------------------------------------------------
+AsMop::~AsMop()
+{
+	for(auto indicator : Mop_Indicators)
+		delete indicator;
+
+	Mop_Indicators.erase(Mop_Indicators.begin(), Mop_Indicators.end());
+
+}
+AsMop::AsMop()
+{
+	int i;
+	AMop_Indicator *indicator;
+	for(i = 0; i < Max_Indicators_Count; ++i)
+	{
+		indicator = new AMop_Indicator(AsConfig::Level_X_Offset + 2 + i * 19, AsConfig::Level_Y_Offset + 1, i * 80);
+		Mop_Indicators.push_back(indicator);
+	}
+	
+	
+}
+void AsMop::Advance(double max_speed)
+{
+}
+double AsMop::Get_Speed()
+{
+	return 0.0;
+}
+void AsMop::Start_Movement()
+{
+}
+void AsMop::End_Movement()
+{
+}
+
+void AsMop::Act()
+{
+	for(auto indicator : Mop_Indicators)
+		indicator->Act();
+}
+bool AsMop::Is_Finished()
+{
+	return true;
+}
+void AsMop::Draw(HDC hdc, RECT &paint_area)
+{
+	const int scale = AsConfig::Global_Scale;
+	int x_pos = AsConfig::Level_X_Offset;
+	int y_pos = AsConfig::Level_Y_Offset;
+	int width = (AsConfig::Level_Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width;
+	int height = AsConfig::Brick_Height;
+
+	AsCommon::Rect(hdc, x_pos, y_pos, width, height, AsConfig::Red_Color);
+
+	for(auto indicator : Mop_Indicators)
+		indicator->Draw(hdc, paint_area);
+
+}
+void AsMop::Clear(HDC hdc, RECT &paint_area)
+{
+}
+void AsMop::Init()
+{
+	AMop_Indicator::Init();
+}
 
 // ALevel
 //------------------------------------------------------------------------------------------------------------
+ALevel *ALevel::Level = 0;
+//------------------------------------------------------------------------------------------------------------
 ALevel::~ALevel()
 {
-	delete[] Teleport_Pos;
+	
 }
 //------------------------------------------------------------------------------------------------------------
 
 ALevel::ALevel()
-: Level_Rect{}, Teleport_Counter(0), Teleport_Pos(0), Advertisement(0), Need_To_Stop_All_Activity(false)
+: Level_Rect{}, Teleport_Pos(0), Advertisement(0), Need_To_Stop_All_Activity(false), Mop()
   
 {
 	Level = this;
@@ -67,6 +189,9 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
 	int min_level_y, max_level_y;
 	bool got_horizontal_hit, got_vertical_hit;
 	double horizontal_reflection_pos, vertical_reflection_pos;
+
+	if(ball->Get_State() == EBall_State::On_Paraschute)
+		return false;
 
 	if (next_y_pos + AsConfig::Ball_Radius > AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)
 		return false;
@@ -239,6 +364,8 @@ void ALevel::Draw(HDC hdc, RECT &paint_area)
 	}
 
 	Draw_Objects(hdc, paint_area, Falling_Letters);
+
+	Mop.Draw(hdc, paint_area);
 }
 void ALevel::Clear(HDC hdc, RECT &paint_area)
 {
@@ -266,6 +393,8 @@ void ALevel::End_Movement()
 
 void ALevel::Init()
 {
+	int i;
+	ALevel_Data *level_data;
 
 	Level_Rect.left = AsConfig::Level_X_Offset * AsConfig::Global_Scale;
 	Level_Rect.top = AsConfig::Level_Y_Offset * AsConfig::Global_Scale;
@@ -274,15 +403,35 @@ void ALevel::Init()
 
 	memset(Current_Level, 0, sizeof(Current_Level) );
 
+	for(i = 0; i < ALevel_Data::Max_Level_Count; ++i)
+	{
+		level_data = new ALevel_Data(i + 1);
+		Levels_Data.push_back(level_data);
+
+		if(i == 7)
+			level_data->Advertisement = new AAdvertisement(4, 7, 2, 3);
+
+		if(i == 9)
+			level_data->Advertisement = new AAdvertisement(1, 9, 2, 3);
+		
+	}
+		
 }
 //------------------------------------------------------------------------------------------------------------
-void ALevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Level_Width])
+void ALevel::Set_Current_Level(int level_index)
 {
 	int i,j;
-	int index;
 	EBrick_Type brick_type;
+	ALevel_Data *level_data;
 
-	memcpy(Current_Level, level, sizeof(Current_Level) );
+	if(level_index < 1 || level_index > Levels_Data.size())
+		AsConfig::Throw;
+
+	level_data = Levels_Data[level_index - 1];
+
+	memcpy(Current_Level, level_data->Level, sizeof(Current_Level) );
+	
+	Advertisement = level_data->Advertisement;
 
 	// 1. Считаем телепорты (только для того, чтобы задать размер массива)
 	for(i = 0; i < AsConfig::Level_Height; ++i)
@@ -291,21 +440,22 @@ void ALevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Leve
 		{
 			brick_type = (EBrick_Type)ALevel::Current_Level[i][j];
 			if(brick_type == EBrick_Type::Teleport)
-				Teleport_Counter++;
+				Teleport_Pos.emplace_back(j, i);
+			
 		}
-		if(Teleport_Counter > ALevel::Max_Teleports_In_Level)
-			Teleport_Counter = ALevel::Max_Teleports_In_Level;
+		if(Teleport_Pos.size() > ALevel::Max_Teleports_In_Level)
+			Teleport_Pos.resize(ALevel::Max_Teleports_In_Level);
 	}
-	if(Teleport_Counter < 2 && Teleport_Counter != 0)
+	if(Teleport_Pos.size() == 1)
 		AsConfig::Throw();
 
 	// 2. Записать телепорты в массив
-	delete[] Teleport_Pos;
-	Teleport_Pos = 0;
+	/*delete[] Teleport_Pos;
+	Teleport_Pos = 0;*/
 
-	Teleport_Pos = new SPoint[Teleport_Counter];
+	//Teleport_Pos = new SPoint[Teleport_Counter];
 
-	if(Teleport_Pos != 0)
+	/*if(Teleport_Pos != 0)
 	{
 		index = 0;
 		for(i = 0; i < AsConfig::Level_Height; ++i)
@@ -321,7 +471,7 @@ void ALevel::Set_Current_Level(char level[AsConfig::Level_Height][AsConfig::Leve
 				}
 			}
 		}
-	}
+	}*/
 	//Advertisement = new AAdvertisement(9, 5, 2, 3);
 }
 //------------------------------------------------------------------------------------------------------------
@@ -370,15 +520,52 @@ bool ALevel::Has_Brick_At(RECT &monster_rect)
 	int i, j;
 	int min_x_index, min_y_index;
 	int max_x_index, max_y_index;
-	int width = AsConfig::Cell_Width * scale;
-	int height = AsConfig::Cell_Height * scale;
+	int cell_width = AsConfig::Cell_Width * scale;
+	int cell_height = AsConfig::Cell_Height * scale;
 	int x_offset = AsConfig::Level_X_Offset * scale;
 	int y_offset = AsConfig::Level_Y_Offset * scale;
+	int max_cell_y, max_cell_x;
+	int min_cell_y, min_cell_x;
 
-	min_x_index = (monster_rect.left - x_offset) / width;
-	min_y_index = (monster_rect.top - y_offset) / height;
-	max_x_index = (monster_rect.right - x_offset) / width;
-	max_y_index = (monster_rect.bottom - y_offset) / height;
+	if(monster_rect.top > x_offset + ( (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)  * scale)
+		return false;
+
+	min_x_index = (monster_rect.left - x_offset) / cell_width;
+	max_x_index = (monster_rect.right - x_offset) / cell_width;
+
+	min_y_index = (monster_rect.top - y_offset) / cell_height;
+	max_y_index = (monster_rect.bottom - y_offset) / cell_height;
+
+	if(min_x_index >= AsConfig::Level_Width)
+		min_x_index = AsConfig::Level_Width - 1;
+
+	if(max_x_index >= AsConfig::Level_Width)
+		max_x_index = AsConfig::Level_Width - 1;
+
+	if(min_y_index >= AsConfig::Level_Height)
+		min_y_index = AsConfig::Level_Height - 1;
+
+	if(max_y_index >= AsConfig::Level_Height)
+		max_y_index = AsConfig::Level_Height - 1;
+
+	
+
+	// Т.к. ячейка уровня больше кипича (хотя и начинается в одинаковых с кирпичом координатах),
+	// то она имеет правую и нижнюю пустую полосу, в которой может находиться монстр.
+	// Игнорируем ряд (или столбец) кирпичей, если монстр попал в ячейку, но не попал в кирпич.
+
+	max_cell_y = max_y_index * cell_height + y_offset;
+	max_cell_x = max_x_index * cell_width + x_offset;
+
+	min_cell_y = min_y_index * cell_height + y_offset;
+	min_cell_x = min_x_index * cell_width + x_offset;
+
+	if(monster_rect.top > min_cell_y + AsConfig::Brick_Height * scale
+		&& monster_rect.top < min_cell_y + cell_height)
+		++min_y_index;
+	if(monster_rect.left > min_cell_x + AsConfig::Brick_Width * scale
+		&& monster_rect.left < min_cell_x + cell_width)
+		++min_x_index;
 
 	for(i = min_y_index; i <= max_y_index; ++i)
 		for(j = min_x_index; j <= max_x_index; ++j)
@@ -403,6 +590,7 @@ bool ALevel::On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool got_verti
 		{
 			ball->Set_On_Paraschute(brick_x, brick_y);
 			Current_Level[brick_y][brick_x] = (char)EBrick_Type::None;
+			can_reflect = false;
 		}
 		else
 		{
@@ -457,7 +645,7 @@ bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_
 		if (Hit_Circle_On_Line(next_y_pos - Current_Brick_Low_Y, next_x_pos, Current_Brick_Left_X, Current_Brick_Right_X, AsConfig::Ball_Radius, reflection_pos) )
 		{
 			// Проверяем возможность отскока вниз
-			if (level_y < AsConfig::Level_Height - 1 && Current_Level[level_y + 1][level_x] == 0)
+			if (level_y == AsConfig::Level_Height - 1 || (level_y < AsConfig::Level_Height - 1 && Current_Level[level_y + 1][level_x] == 0))
 				return true;
 			else
 				return false;
@@ -509,7 +697,6 @@ bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int leve
 //------------------------------------------------------------------------------------------------------------
 bool ALevel::Add_Falling_Letter(EBrick_Type brick_type,int brick_x, int brick_y)
 {
-	int i;
 	ELetter_Type letter_type;
 	AFalling_Letter *falling_letter;
 	int letter_x, letter_y;
@@ -704,7 +891,7 @@ AActive_Brick_Teleport* ALevel::Select_Destination_Teleport(int brick_x, int bri
 	int rand_index;
 	while(1) // рандомный выбор телепорта
 	{
-		rand_index = AsCommon::Rand(ALevel::Teleport_Counter);
+		rand_index = AsCommon::Rand(Teleport_Pos.size());
 
 		if( !(Teleport_Pos[rand_index].X == brick_x && Teleport_Pos[rand_index].Y == brick_y))
 	        break;

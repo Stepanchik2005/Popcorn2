@@ -21,15 +21,12 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	AsConfig::Hwnd = hwnd;
 
-	AActive_Brick_Red_Blue::Setup_Colors();
-	AExplodive_Ball::Setup_Colors();
-
-	
 	Level.Init();
 	Platform.Init(&Ball_Set, &Laser_Beam_Set); 
 	AFalling_Letter::Init();
 	Monster_Set.Init(&Border);
 	Info_Panel.Init();
+	AsMop::Init();
 
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Border);
 	ABall::Hit_Checker_List.Add_Hit_Checker(&Level);
@@ -41,7 +38,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 
 	AsPlatform::Hit_Checker_List.Add_Hit_Checker(&Monster_Set);
 
-	Level.Set_Current_Level(ALevel::Level_01);
+	Level.Set_Current_Level(4);
 
 	Platform.Redraw_Platform();
 
@@ -52,6 +49,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Modules.push_back(&Laser_Beam_Set);
 	Modules.push_back(&Monster_Set);
 	Modules.push_back(&Info_Panel);
+	Modules.push_back(&Mop);
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
 }

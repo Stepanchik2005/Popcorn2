@@ -103,7 +103,7 @@ void AFalling_Letter::Init()
 	int i;
 	All_Letter_Popularity = 0;
 
-	for ( i = 0; i < (int)ELetter_Type::Max; i++)
+	for (i = 0; i < (int)ELetter_Type::Max; i++)
 		All_Letter_Popularity += Letters_Popularity[i];
 	
 }

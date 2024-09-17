@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Ball.h"
 
 //------------------------------------------------------------------------------------------------------------
@@ -51,20 +50,14 @@ public:
 	virtual void Act();
 	virtual bool Is_Finished();
 
-	static void Setup_Colors();
-
 	static void Draw_In_Level(HDC hdc, RECT &brick_rect, EBrick_Type brick_type);
 	
 private:
 	int Fade_Step;
 
-
-	
-
 	static const int Max_Fade_Step = AsConfig::FPS;
-
-	static AColor Fading_Blue_Colors[Max_Fade_Step];	
-	static AColor Fading_Red_Colors[Max_Fade_Step];	
+	static AColor_Fade Fading_Blue_Colors;	
+	static AColor_Fade Fading_Red_Colors;	
 };
 //------------------------------------------------------------------------------------------------------------
 

@@ -1,10 +1,5 @@
 #include "Active_Brick.h"
 
-
-
-
-
-
 // AActive_Brick
 AActive_Brick::AActive_Brick(EBrick_Type brick_type, int level_x, int level_y)
 	: Level_X(level_x),Level_Y(level_y), Brick_Type(brick_type), Brick_Rect{}
@@ -30,8 +25,8 @@ void AActive_Brick::Clear(HDC hdc, RECT &paint_area)
 //------------------------------------------------------------------------------------------------------------
 // AActive_Brick_Red_Blue
 
-AColor AActive_Brick_Red_Blue::Fading_Blue_Colors[Max_Fade_Step];	
-AColor AActive_Brick_Red_Blue::Fading_Red_Colors[Max_Fade_Step];	
+AColor_Fade AActive_Brick_Red_Blue::Fading_Blue_Colors(AsConfig::Blue_Color, Max_Fade_Step);	
+AColor_Fade AActive_Brick_Red_Blue::Fading_Red_Colors(AsConfig::Red_Color, Max_Fade_Step);	
 
 //------------------------------------------------------------------------------------------------------------
 AActive_Brick_Red_Blue::~AActive_Brick_Red_Blue()
@@ -59,11 +54,11 @@ void AActive_Brick_Red_Blue::Draw(HDC hdc, RECT &paint_area)
 	switch (Brick_Type)
 	{
 	case EBrick_Type::Red:
-		color = &AActive_Brick_Red_Blue::Fading_Red_Colors[Fade_Step];	
+		color = AActive_Brick_Red_Blue::Fading_Red_Colors.Get_Color(Fade_Step);	
 		break;
 
 	case EBrick_Type::Blue:
-		color = &AActive_Brick_Red_Blue::Fading_Blue_Colors[Fade_Step];
+		color = AActive_Brick_Red_Blue::Fading_Blue_Colors.Get_Color(Fade_Step);
 		break;
 	}
 
@@ -87,17 +82,6 @@ bool AActive_Brick_Red_Blue::Is_Finished()
 		return false;
 }
 
-//------------------------------------------------------------------------------------------------------------
-void AActive_Brick_Red_Blue::Setup_Colors()
-{
-	int i;
-
-	for (i = 0; i < Max_Fade_Step; i++)
-	{
-		AsCommon::Get_Fading_Color(AsConfig::Red_Color, i, Max_Fade_Step ,Fading_Red_Colors[i]);
-		AsCommon::Get_Fading_Color(AsConfig::Blue_Color, i, Max_Fade_Step, Fading_Blue_Colors[i]);
-	}
-}
 //------------------------------------------------------------------------------------------------------------
 void AActive_Brick_Red_Blue::Draw_In_Level(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
 {
