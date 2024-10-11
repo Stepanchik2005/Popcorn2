@@ -1,9 +1,36 @@
 ﻿#include "Config.h"
 
+//AFont-----------------------------------------------------------------------------------------------------------
+AFont::AFont()
+{
+}
+AFont::AFont(int height, int weight, int family, const wchar_t *name)
+{
+	LOGFONT logo_font{}; 
+   
+	// задаем параметры шрифта
+	logo_font.lfHeight = height;
+	logo_font.lfWeight = weight;
+	logo_font.lfOutPrecision = 3;
+	logo_font.lfClipPrecision = 2;
+	logo_font.lfQuality = 1;
+	logo_font.lfPitchAndFamily = family;
+	wcscpy_s(logo_font.lfFaceName, name);
+
+	// создаем шрифт
+   Content = CreateFontIndirect(&logo_font); 
+}
+void AFont::Select(HDC hdc) const
+{
+	SelectObject(hdc, Content);
+}
 
 
-//------------------------------------------------------------------------------------------------------------
-// AColor
+
+
+
+//AColor-----------------------------------------------------------------------------------------------------------
+
 AColor::~AColor()
 {
 	/*if(Pen != 0)
@@ -106,8 +133,49 @@ void AColor::Select_Pen(HDC hdc) const
 
 
 
+//AsConfig--------------------------------------------------------------------------------------------------------
+bool AsConfig::Level_Has_Floor = false;
+int AsConfig::Current_Timer_Tick = 0;
+HWND AsConfig::Hwnd;
 
-//------------------------------------------------------------------------------------------------------------
+const double AsConfig::Ball_Radius = 2.0 - 0.5 / AsConfig::Global_Scale;
+
+const AColor AsConfig::BG_Color(15, 63, 31);
+const AColor AsConfig::Red_Color(255, 85, 85);
+const AColor AsConfig::Blue_Color(85, 255, 255);
+const AColor AsConfig::White_Color(255, 255, 255);
+const AColor AsConfig::Monster_Dark_Red_Color(200, 0, 32);
+
+const AFont AsConfig::Name_Font(-48, 700, 49, L"Consolas");
+const AFont AsConfig::Score_Font(-44, 700, 49, L"Consolas");
+const AFont AsConfig::Logo_Pop_Font(-128, 900, 34, L"Arial Black");
+const AFont AsConfig::Logo_Corn_Font(-96, 900, 34, L"Arial Black");
+
+
+
+const AColor AsConfig::Letter_Color(White_Color,Global_Scale);
+const AColor AsConfig::Laser_Color(White_Color, Global_Scale);
+const AColor AsConfig::Paraschute_Color(Blue_Color, 3, Red_Color);
+const AColor AsConfig::Teleport_Color(Blue_Color, 3, BG_Color);
+const AColor AsConfig::Advertisement_Blue_Table_Color(0, 159, 159, Global_Scale);
+const AColor AsConfig::Unbreakable_Blue_Hightlight_Color(Blue_Color, Global_Scale); 
+const AColor AsConfig::Unbreakable_Red_Hightlight_Color(Red_Color, 2 * Global_Scale);
+const AColor AsConfig::Cornea_Color(BG_Color, Global_Scale - 1, White_Color);
+const AColor AsConfig::Iris_Color(BG_Color, Global_Scale * 2 / 3, Blue_Color);
+const AColor AsConfig::Cornea_Arc_Color(BG_Color, Global_Scale * 2 / 3);
+const AColor AsConfig::Explodive_Red_Color(White_Color, 0, Red_Color);
+const AColor AsConfig::Explodive_Blue_Color(White_Color, 0, Blue_Color);
+const AColor AsConfig::Comet_Color(Monster_Dark_Red_Color, Global_Scale);
+const AColor AsConfig::Shadow_Color = AColor(AsConfig::BG_Color, AsConfig::Global_Scale);
+const AColor AsConfig::Highlight_Color = AColor(AsConfig::White_Color, AsConfig::Global_Scale);
+
+
+const double AsConfig::Moving_Size_Step = 1.0 / AsConfig::Global_Scale;
+const double AsConfig::D_Global_Scale = 3.0;
+const double AsConfig::Accelerate_Ball_Speed = 1.001;
+const double AsConfig::Initial_Ball_Speed = 3.0;
+const double AsConfig::Min_Ball_Angle = M_PI / 8.0;
+
 
 void AsConfig::Throw()
 {
@@ -116,6 +184,7 @@ void AsConfig::Throw()
 
 
 
+//AColor_Fade--------------------------------------------------------------------------------------------------------
 AColor_Fade::AColor_Fade()
 {
 }
@@ -164,7 +233,6 @@ void AColor_Fade::Init(const AColor &origin_color, const AColor& dest_color, int
 	int i;	
 	AColor *curr_color;
 
-
 	Max_Fade_Step = max_fade_step;
 	for (i = 0; i < Max_Fade_Step; i++)
 	{
@@ -173,41 +241,6 @@ void AColor_Fade::Init(const AColor &origin_color, const AColor& dest_color, int
 		
 	}
 }
-// AsConfig
-bool AsConfig::Level_Has_Floor = true;
-int AsConfig::Current_Timer_Tick = 0;
-const double AsConfig::Ball_Radius = 2.0 - 0.5 / AsConfig::Global_Scale;
-
-const AColor AsConfig::BG_Color(15, 63, 31);
-const AColor AsConfig::Red_Color(255, 85, 85);
-const AColor AsConfig::Blue_Color(85, 255, 255);
-const AColor AsConfig::White_Color(255, 255, 255);
-const AColor AsConfig::Monster_Dark_Red_Color(200, 0, 32);
-
-const AColor AsConfig::Letter_Color(White_Color,Global_Scale);
-const AColor AsConfig::Laser_Color(White_Color, Global_Scale);
-const AColor AsConfig::Paraschute_Color(Blue_Color, 3, Red_Color);
-const AColor AsConfig::Teleport_Color(Blue_Color, 3, BG_Color);
-const AColor AsConfig::Advertisement_Blue_Table_Color(0, 159, 159, Global_Scale);
-const AColor AsConfig::Unbreakable_Blue_Hightlight_Color(Blue_Color, Global_Scale); 
-const AColor AsConfig::Unbreakable_Red_Hightlight_Color(Red_Color, 2 * Global_Scale);
-const AColor AsConfig::Cornea_Color(BG_Color, Global_Scale - 1, White_Color);
-const AColor AsConfig::Iris_Color(BG_Color, Global_Scale * 2 / 3, Blue_Color);
-const AColor AsConfig::Cornea_Arc_Color(BG_Color, Global_Scale * 2 / 3);
-const AColor AsConfig::Explodive_Red_Color(White_Color, 0, Red_Color);
-const AColor AsConfig::Explodive_Blue_Color(White_Color, 0, Blue_Color);
-const AColor AsConfig::Comet_Color(Monster_Dark_Red_Color, Global_Scale);
-const AColor AsConfig::Shadow_Color = AColor(AsConfig::BG_Color, AsConfig::Global_Scale);
-const AColor AsConfig::Highlight_Color = AColor(AsConfig::White_Color, AsConfig::Global_Scale);
-
-HWND AsConfig::Hwnd;
-
-const double AsConfig::Moving_Size_Step = 1.0 / AsConfig::Global_Scale;
-const double AsConfig::D_Global_Scale = 3.0;
-const double AsConfig::Accelerate_Ball_Speed = 1.001;
-const double AsConfig::Initial_Ball_Speed = 3.0;
-const double AsConfig::Min_Ball_Angle = M_PI / 8.0;
-
 
 // AsCommon --------
 int AsCommon::Rand(int range)

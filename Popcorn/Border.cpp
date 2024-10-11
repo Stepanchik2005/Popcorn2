@@ -23,9 +23,9 @@ AsBorder::AsBorder()
 
 	  Gate.push_back(new AGate(1, 29.0, 0, 3));
 	  Gate.push_back(new AGate(AsConfig::Max_X_Pos, 29.0, AsConfig::Level_Width - 1, 3));
-	  Gate.push_back(new AGate(1, 76.0, 0, 9));
-	  Gate.push_back(new AGate(AsConfig::Max_X_Pos, 76.0, AsConfig::Level_Width - 1, 9));
-	  Gate.push_back(new AGate(1, 129.0));
+	  Gate.push_back(new AGate(1, 77.0, 0, 9));
+	  Gate.push_back(new AGate(AsConfig::Max_X_Pos, 77.0, AsConfig::Level_Width - 1, 9));
+	  Gate.push_back(new AGate(1, 129.0)); 
 	  Gate.push_back(new AGate(AsConfig::Max_X_Pos, 129.0));
 	  Gate.push_back(new AGate(1, 178.0));
 	  Gate.push_back(new AGate(AsConfig::Max_X_Pos, 178.0));
@@ -52,14 +52,14 @@ bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *bal
 		ball->Reflect(true);
 	}
 
-	// Нижний край
+	// Правый край
 	if (next_x_pos + AsConfig::Ball_Radius > AsConfig::Max_X_Pos)
 	{
 		got_hit = true;
 		ball->Reflect(false);
 	}
 
-	// Правый край
+	// Нижний край
 	if (next_y_pos + AsConfig::Ball_Radius > AsConfig::Floor_Y_Pos && AsConfig::Level_Has_Floor)
 	{
 		got_hit = true;

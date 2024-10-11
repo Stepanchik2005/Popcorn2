@@ -153,7 +153,7 @@ void ABall::Clear(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
-	if(Ball_State == EBall_State::Disabled)
+	if(Ball_State == EBall_State::Disabled && Prev_Ball_State != EBall_State::Lost)
 		return;
 
 	if( (Ball_State == EBall_State::Teleporting || Ball_State == EBall_State::Lost) && Prev_Ball_State == Ball_State)
@@ -164,7 +164,11 @@ void ABall::Clear(HDC hdc, RECT &paint_area)
 		Clean_Up_Paraschute(hdc);
 
 	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect) )
+	{
 		AsCommon::Ellipse(hdc, Prev_Ball_Rect, AsConfig::BG_Color);
+	/*	AsCommon::Ellipse(hdc, Ball_Rect, AsConfig::BG_Color);*/
+	}
+		
 }
 //------------------------------------------------------------------------------------------------------------
 double ABall::Get_Direction()
@@ -241,7 +245,7 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 	switch (new_state)
 	{
 	case EBall_State::Disabled:
-		Ball_Speed = 0.0;
+		Ball_Speed = 0.0; // !!! по сути это устанавливается в EBall_State::Lost
 		break;
 
 	case EBall_State::Normal:
@@ -254,7 +258,7 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 
 
 	case EBall_State::Lost:
-		if(! (Ball_State == EBall_State::Normal || Ball_State == EBall_State::On_Paraschute))
+		if(! (Ball_State == EBall_State::Normal || Ball_State == EBall_State::On_Paraschute) && Ball_State != EBall_State::Lost)
 			AsConfig::Throw();// только из EBall_State::Normal или EBall_State::On_Paraschute можно установить EBall_State::Lost
 
 		Redraw_Ball();
@@ -263,6 +267,7 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 			Redraw_Paraschute();
 
 		Ball_Speed = 0.0;
+
 		break;
 
 	case EBall_State::On_Platform:

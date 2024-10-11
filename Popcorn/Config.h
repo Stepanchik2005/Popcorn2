@@ -1,6 +1,18 @@
 ﻿#pragma once
 
 #include "Tools.h"
+class AFont
+{
+public:
+	AFont();
+	AFont(int height, int weight, int family, const wchar_t *name);
+
+	void Select(HDC hdc) const;
+
+private:
+	HFONT Content;
+};
+
 //------------------------------------------------------------------------------------------------------------
 class AColor
 {
@@ -30,22 +42,10 @@ private:
 	HBRUSH Brush;
 	
 };
-//------------------------------------------------------------------------------------------------------------
-class AColor_Fade
-{
-public:
-	~AColor_Fade();
-	AColor_Fade();
-	AColor_Fade(const AColor &origin_color, int max_fade_step);
-	AColor_Fade(const AColor &origin_color, int max_fade_step, const AColor& dest_color);
-	AColor* Get_Color(int index);
 
-   void Init(const AColor &origin_color, const AColor& dest_color, int max_fade_step);
-private:
-	int Max_Fade_Step;
 
-	std::vector<AColor *> Fading_Colors;
-};
+
+
 //------------------------------------------------------------------------------------------------------------
 class AsConfig
 {
@@ -54,13 +54,14 @@ public:
 
 	static bool Level_Has_Floor;
 	static int Current_Timer_Tick;
+	static HWND Hwnd;
 
 	static const AColor BG_Color, Red_Color, Blue_Color, White_Color, Monster_Dark_Red_Color,  Letter_Color, Laser_Color,Paraschute_Color;
 	static const AColor Teleport_Color, Advertisement_Blue_Table_Color, Unbreakable_Blue_Hightlight_Color, Unbreakable_Red_Hightlight_Color;;
 	static const AColor Cornea_Color, Iris_Color, Cornea_Arc_Color, Explodive_Red_Color, Explodive_Blue_Color, Comet_Color;
 	static const AColor Shadow_Color, Highlight_Color;
 
-	static HWND Hwnd;
+	static const AFont Name_Font, Score_Font, Logo_Pop_Font, Logo_Corn_Font;
 
 	static const double Moving_Size_Step;
 	static const double D_Global_Scale;
@@ -105,6 +106,28 @@ public:
 	static const int Gates_Count = 8;
 };
 
+
+
+
+//------------------------------------------------------------------------------------------------------------
+class AColor_Fade
+{
+public:
+	~AColor_Fade();
+	AColor_Fade();
+	AColor_Fade(const AColor &origin_color, int max_fade_step);
+	AColor_Fade(const AColor &origin_color, int max_fade_step, const AColor& dest_color);
+	AColor* Get_Color(int index);
+
+   void Init(const AColor &origin_color, const AColor& dest_color, int max_fade_step);
+private:
+	int Max_Fade_Step;
+
+	std::vector<AColor *> Fading_Colors;
+};
+//------------------------------------------------------------------------------------------------------------
+
+
 class AsCommon
 {
 public:
@@ -128,7 +151,8 @@ public:
 enum class EMessage_Type 
 {
 	Floor_Is_Over,
-	Unfreeze_Monsters
+	Unfreeze_Monsters,
+	Level_Done
 };
 
 class AMessage

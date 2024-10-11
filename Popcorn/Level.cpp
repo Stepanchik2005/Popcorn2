@@ -4,166 +4,98 @@
 APoint::APoint()
 {
 }
+//------------------------------------------------------------------------------------------------------------
 APoint::APoint(int x_pos, int y_pos)
 	: X(x_pos), Y(y_pos)
 {
 }
 
-//AMop_Indicator------------------------------------------------------------------------------------
-//AColor_Fade AMop_Indicator::Fading_Blue_Colors(AColor(255, 85, 85), Max_Fade_Step, AColor(85, 255, 255)); // инициализируем так, потому что 
-AColor_Fade AMop_Indicator::Fading_Blue_Colors;
 
-AMop_Indicator::AMop_Indicator(int x_pos, int y_pos, int time_offset)
-	: X_Pos(x_pos), Y_Pos(y_pos), Time_Offset(time_offset), Current_Color(&AsConfig::Red_Color)
+
+//AsLevel_Table-----------------------------------------------------------------------------------------------------------
+
+
+
+AsLevel_Table::AsLevel_Table(int x_pos, int y_pos)
+	: X_Pos(x_pos), Y_Pos(y_pos), Level_Table_State(ELevel_Table_State::Missing), Level_Label(X_Pos + 10, Y_Pos + 3, AsConfig::Max_X_Pos / 2 - Width / 2, Height - 5, AsConfig::Name_Font, AsConfig::White_Color),
+	  Level_Number_Label(X_Pos + Width - 25, Y_Pos + 3, 20, Height - 5, AsConfig::Name_Font, AsConfig::White_Color),
+	  Level_Number(0)
 {
 	const int scale = AsConfig::Global_Scale;
 
-	Mop_Indicator_Rect.left = X_Pos * scale;
-	Mop_Indicator_Rect.top = Y_Pos * scale;
-	Mop_Indicator_Rect.right = (X_Pos + Width) * scale;
-	Mop_Indicator_Rect.bottom = (Y_Pos + Height) * scale;
+	Level_Table_Rect.left = X_Pos * scale;
+	Level_Table_Rect.top = Y_Pos * scale;
+	Level_Table_Rect.right = Level_Table_Rect.left + Width * scale;
+	Level_Table_Rect.bottom = Level_Table_Rect.top + Height * scale;
 }
-//------------------------------------------------------------------------------------
-AMop_Indicator::AMop_Indicator(int x_pos, int y_pos, const AColor& dest_color)
-	: X_Pos(x_pos), Y_Pos(y_pos), Current_Color(&dest_color)
+
+void AsLevel_Table::Act()
 {
-	const int scale = AsConfig::Global_Scale;
-
-	Mop_Indicator_Rect.left = X_Pos * scale;
-	Mop_Indicator_Rect.top = Y_Pos * scale;
-	Mop_Indicator_Rect.right = (X_Pos + Width) * scale;
-	Mop_Indicator_Rect.bottom = (Y_Pos + Height) * scale;
-	
+	// заглушка, т.к нету своей анимации
 }
-//------------------------------------------------------------------------------------
-void AMop_Indicator::Act()
+bool AsLevel_Table::Is_Finished()
 {
-	int total_timeout = Normal_Timeout + Max_Fade_Step;
-	int current_offset;
-	int curr_tick = (AsConfig::Current_Timer_Tick + Time_Offset) % total_timeout;
-
-	if(curr_tick < Normal_Timeout)
-		Current_Color = &AsConfig::Red_Color;
-	else
-	{
-		current_offset = curr_tick - Normal_Timeout;
-
-		if(current_offset < 0 || current_offset >= Max_Fade_Step)
-			AsConfig::Throw();
-
-		Current_Color = Fading_Blue_Colors.Get_Color(current_offset);
-	}
-	AsCommon::Invalidate_Rect(Mop_Indicator_Rect);
+	return false; // заглушка, т.к нету своей анимации
 }
-//------------------------------------------------------------------------------------
-bool AMop_Indicator::Is_Finished()
-{
-	return false;
-}
-void AMop_Indicator::Draw(HDC hdc, RECT &paint_area)
+void AsLevel_Table::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
-	const int scale = AsConfig::Global_Scale;
+	if(Level_Table_State == ELevel_Table_State::Missing)
+		return;
 
-	if(IntersectRect(&intersection_rect, &paint_area, &Mop_Indicator_Rect))
-	{	
-		AsCommon::Rect(hdc, X_Pos, Y_Pos, Width, Height, *Current_Color);
-
-		AsConfig::Highlight_Color.Select(hdc);
-		MoveToEx(hdc, X_Pos * scale, (Y_Pos + Height) * scale, 0); 
-		LineTo(hdc, X_Pos * scale, Y_Pos * scale); 
-		LineTo(hdc, (X_Pos + Width) * scale, Y_Pos * scale); 
-
-		AsConfig::Shadow_Color.Select(hdc);
-		MoveToEx(hdc, (X_Pos + Width) * scale, Y_Pos * scale, 0);
-		LineTo(hdc, (X_Pos + Width) * scale, (Y_Pos + Height) * scale);
-		LineTo(hdc, X_Pos * scale, (Y_Pos + Height) * scale);
-	}
-	
-}
-//------------------------------------------------------------------------------------
-void AMop_Indicator::Clear(HDC hdc, RECT &paint_area)
-{
-}
-//------------------------------------------------------------------------------------
-void AMop_Indicator::Init()
-{
-  AMop_Indicator::Fading_Blue_Colors.Init(AsConfig::Red_Color, AsConfig::Blue_Color, Max_Fade_Step); // используем метод отложенной инициализации, т.к. цвета в конфиге инициализируются позже,
-																																	  // чем AColor_Fade AMop_Indicator::Fading_Blue_Colors;
-}
-
-
-
-//AsMop-------------------------------------------------------------------------------------------------------
-AsMop::~AsMop()
-{
-	for(auto indicator : Mop_Indicators)
-		delete indicator;
-
-	Mop_Indicators.erase(Mop_Indicators.begin(), Mop_Indicators.end());
-
-}
-AsMop::AsMop()
-{
-	int i;
-	AMop_Indicator *indicator;
-	for(i = 0; i < Max_Indicators_Count; ++i)
+	if(IntersectRect(&intersection_rect, &paint_area, &Level_Table_Rect))
 	{
-		indicator = new AMop_Indicator(AsConfig::Level_X_Offset + 2 + i * 19, AsConfig::Level_Y_Offset + 1, i * 80);
-		Mop_Indicators.push_back(indicator);
+		// 1. Рисуем плажку
+		AsCommon::Rect(hdc, Level_Table_Rect, AsConfig::Blue_Color);
+
+		Level_Label.Content = L"УРОВЕНЬ";
+
+		Level_Label.Draw(hdc);
+
+		Level_Number_Label.Content.Append(Level_Number, 2);
+
+		Level_Number_Label.Draw(hdc);
+
 	}
-	
-	
 }
-void AsMop::Advance(double max_speed)
+void AsLevel_Table::Clear(HDC hdc, RECT &paint_area)
 {
-}
-double AsMop::Get_Speed()
-{
-	return 0.0;
-}
-void AsMop::Start_Movement()
-{
-}
-void AsMop::End_Movement()
-{
+	RECT intersection_rect;
+
+	if(Level_Table_State != ELevel_Table_State::Hidding)
+		return;
+
+	if(IntersectRect(&intersection_rect, &paint_area, &Level_Table_Rect))
+	{
+		AsCommon::Rect(hdc, Level_Table_Rect, AsConfig::BG_Color);
+		Level_Table_State = ELevel_Table_State::Missing;
+		Level_Number_Label.Clear();
+	}
 }
 
-void AsMop::Act()
+void AsLevel_Table::Show(int level_number)
 {
-	for(auto indicator : Mop_Indicators)
-		indicator->Act();
-}
-bool AsMop::Is_Finished()
-{
-	return true;
-}
-void AsMop::Draw(HDC hdc, RECT &paint_area)
-{
-	const int scale = AsConfig::Global_Scale;
-	int x_pos = AsConfig::Level_X_Offset;
-	int y_pos = AsConfig::Level_Y_Offset;
-	int width = (AsConfig::Level_Width - 1) * AsConfig::Cell_Width + AsConfig::Brick_Width;
-	int height = AsConfig::Brick_Height;
+	Level_Table_State = ELevel_Table_State::Showing;
 
-	AsCommon::Rect(hdc, x_pos, y_pos, width, height, AsConfig::Red_Color);
+	Level_Number = level_number;
 
-	for(auto indicator : Mop_Indicators)
-		indicator->Draw(hdc, paint_area);
+	AsCommon::Invalidate_Rect(Level_Table_Rect);
+}
+void AsLevel_Table::Hide()
+{
+	Level_Table_State = ELevel_Table_State::Hidding;
 
+	AsCommon::Invalidate_Rect(Level_Table_Rect);
 }
-void AsMop::Clear(HDC hdc, RECT &paint_area)
-{
-}
-void AsMop::Init()
-{
-	AMop_Indicator::Init();
-}
+
+
+
 
 // ALevel
 //------------------------------------------------------------------------------------------------------------
 ALevel *ALevel::Level = 0;
+
 //------------------------------------------------------------------------------------------------------------
 ALevel::~ALevel()
 {
@@ -172,7 +104,8 @@ ALevel::~ALevel()
 //------------------------------------------------------------------------------------------------------------
 
 ALevel::ALevel()
-: Level_Rect{}, Teleport_Pos(0), Advertisement(0), Need_To_Stop_All_Activity(false), Mop()
+: Level_Rect{}, Next_Level_Number(0), Current_Level_Number(0), Teleport_Pos(0), Advertisement(0), Need_To_Stop_All_Activity(false), Active_Brick_Count(0), Mop(),
+  Level_Table(55, 145)
   
 {
 	Level = this;
@@ -328,6 +261,8 @@ void ALevel::Act()
 
 	if(Advertisement != 0)
 		Advertisement->Act();
+
+	Mop.Act();
 }
 bool ALevel::Is_Finished()
 {
@@ -366,14 +301,20 @@ void ALevel::Draw(HDC hdc, RECT &paint_area)
 	Draw_Objects(hdc, paint_area, Falling_Letters);
 
 	Mop.Draw(hdc, paint_area);
+	Level_Table.Draw(hdc, paint_area);
 }
 void ALevel::Clear(HDC hdc, RECT &paint_area)
 {
 	// 1. Очищаем движущиеся объекты
 	Clear_Objects(hdc, paint_area, Falling_Letters);
-	
+
+	Mop.Clear(hdc, paint_area);
+	Level_Table.Clear(hdc, paint_area);
+
 	if(Advertisement != 0)
 		Advertisement->Clear(hdc, paint_area);
+
+
 }
 	
 // нету реализации для методов AMover т.к. уровень не двигается
@@ -405,7 +346,7 @@ void ALevel::Init()
 
 	for(i = 0; i < ALevel_Data::Max_Level_Count; ++i)
 	{
-		level_data = new ALevel_Data(i + 1);
+		level_data = new ALevel_Data(i + 1); 
 		Levels_Data.push_back(level_data);
 
 		if(i == 7)
@@ -416,6 +357,7 @@ void ALevel::Init()
 		
 	}
 		
+	Mop.Erase_Level();
 }
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Set_Current_Level(int level_index)
@@ -473,6 +415,8 @@ void ALevel::Set_Current_Level(int level_index)
 		}
 	}*/
 	//Advertisement = new AAdvertisement(9, 5, 2, 3);
+	Current_Level_Number = level_index;
+	Active_Brick_Count = level_data->Get_Avaliable_Bricks_Count();
 }
 //------------------------------------------------------------------------------------------------------------
 bool ALevel::Get_Next_Falling_Letter(int& index, AFalling_Letter **falling_letter)
@@ -498,6 +442,44 @@ bool ALevel::Get_Next_Falling_Letter(int& index, AFalling_Letter **falling_lette
 void ALevel::Stop()
 {
 	Need_To_Stop_All_Activity = true;
+}
+void ALevel::Mop_Level(int next_level)
+{
+	if(next_level < 0 || next_level >= ALevel_Data::Max_Level_Count)
+		AsConfig::Throw();
+
+	Next_Level_Number = next_level;
+
+	Mop.Erase_Level();
+}
+void ALevel::Mop_Next_Level()
+{
+	if(! Can_Mop_Next_Level())
+		AsConfig::Throw();
+
+	Mop_Level(Current_Level_Number + 1);
+}
+bool ALevel::Can_Mop_Next_Level()
+{
+	if(Current_Level_Number + 1 >= (int)Levels_Data.size())
+		return false;
+	else
+		return true;
+}
+void ALevel::Show_Level_Table()
+{
+	Level_Table.Show(Current_Level_Number);
+}
+void ALevel::Hide_Level_Table()
+{
+	Level_Table.Hide();
+}
+bool ALevel::Is_Mopping_Done()
+{
+	if(Mop.Get_State() == EMop_State::Idle)
+		return true;
+	else
+		return false;
 }
 bool ALevel::Has_Brick_At(int brick_x, int brick_y)
 {
@@ -548,8 +530,6 @@ bool ALevel::Has_Brick_At(RECT &monster_rect)
 	if(max_y_index >= AsConfig::Level_Height)
 		max_y_index = AsConfig::Level_Height - 1;
 
-	
-
 	// Т.к. ячейка уровня больше кипича (хотя и начинается в одинаковых с кирпичом координатах),
 	// то она имеет правую и нижнюю пустую полосу, в которой может находиться монстр.
 	// Игнорируем ряд (или столбец) кирпичей, если монстр попал в ячейку, но не попал в кирпич.
@@ -580,6 +560,7 @@ bool ALevel::On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool got_verti
 {
 	EBrick_Type brick_type;
 	bool can_reflect = true;
+	AMessage *message;
 
 	brick_type = (EBrick_Type)Current_Level[brick_y][brick_x];
 
@@ -604,13 +585,21 @@ bool ALevel::On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool got_verti
 		Current_Level[brick_y][brick_x] = (char)EBrick_Type::None;
 	
 	else
-		if(Create_Active_Brick(brick_x, brick_y, brick_type, ball, got_vertical_hit))
-			can_reflect = false;
-		
-	
+		can_reflect = Create_Active_Brick(brick_x, brick_y, brick_type, ball, got_vertical_hit);
+			
 	Redraw_Brick(brick_x, brick_y);	
 
+
 	AsInfo_Panel::Update_Score(EHit_Type::Hit_Brick);
+	 
+	if(Current_Level[brick_y][brick_x] == (char)EBrick_Type::None)	
+		Active_Brick_Count--;
+	
+	if(Active_Brick_Count <= 0)
+	{
+		message = new AMessage(EMessage_Type::Level_Done);
+		AsMessage_Manager::Add_Message(message);
+	}
 
 	return can_reflect;
 } 

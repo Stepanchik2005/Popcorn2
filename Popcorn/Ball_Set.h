@@ -19,6 +19,8 @@ public:
 	void Inverse_Balls();
 	void Accelerate();
 	void Reset_Speed();
+	void Disable_All();
+
 
 	std::vector<ABall> Balls;
 private:

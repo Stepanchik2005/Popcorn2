@@ -195,6 +195,19 @@ void AsBall_Set::Reset_Speed()
 	}
 }
 
+void AsBall_Set::Disable_All()
+{
+	for (auto& ball : Balls)
+	{
+		if(ball.Get_State() != EBall_State::Disabled)
+		{
+			ball.Set_State(EBall_State::Lost);
+			ball.Set_State(EBall_State::Disabled);
+		}
+	}
+
+}
+
 bool AsBall_Set::Get_Next_Game_Object(int &index, AGame_Object **obj)
 {
    if(index >= 0 && index < Balls.size())

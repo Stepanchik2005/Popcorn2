@@ -27,6 +27,7 @@ public:
 	void Activate();
 	void Destroy_All();
 	void Set_Freeze_State(bool is_freeze);
+	bool Are_All_Destroyed();
 
 private:
 

@@ -1,12 +1,4 @@
-﻿  Border.cpp
-  Engine.cpp
-  Level.cpp
-D:\Popcorn_Git_2\Popcorn\Level.cpp(428,13): warning C4551: function call missing argument list
-D:\Popcorn_Git_2\Popcorn\Level.cpp(894,50): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-  Main.cpp
-  Monster.cpp
-  Monster_Set.cpp
-  Generating Code...
+﻿  Monster.cpp
   Popcorn.vcxproj -> D:\Popcorn_Git_2\x64\Debug\Popcorn.exe
   'pwsh.exe' is not recognized as an internal or external command,
   operable program or batch file.

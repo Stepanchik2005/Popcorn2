@@ -56,7 +56,7 @@ void AsMonster_Set::Act()
       break;
    }
 
-   if(Monster_Set_State != EMonster_Set_State::Idle)
+   if(Monsters.size() != 0) // очищаем массив монстров, если закончилась их анимация
    {
       auto monster = Monsters.begin();
       while(monster != Monsters.end())
@@ -157,6 +157,13 @@ void AsMonster_Set::Set_Freeze_State(bool is_freeze)
 
    for(auto *monster : Monsters)
        monster->Set_Freeze_State(Is_Frozen);
+}
+bool AsMonster_Set::Are_All_Destroyed()
+{
+   if(Monsters.size() != 0)
+      return false;
+   else
+      return true;
 }
 bool AsMonster_Set::Get_Next_Game_Object(int &index, AGame_Object **obj)
 {

@@ -17,9 +17,12 @@ enum class EGame_State: unsigned char
 {
 	Test_Ball,
 
+	Cleaning_Level,
+	Mopped_Level,
 	Play_Level,
 	Lost_Ball,
-	Restart_Level
+	Restart_Level,
+	Finish_Level
 };
 //------------------------------------------------------------------------------------------------------------
 
@@ -45,6 +48,8 @@ private:
 	void Act();
 	void Handle_Message();
 	void On_Falling_Letter(AFalling_Letter *falling_letter);
+	void Game_Won();
+	void Stop_Play();
 
 	double Rest_Distance;
 	
@@ -57,7 +62,6 @@ private:
 	AsBorder Border;
 	AsMonster_Set Monster_Set;
 	AsInfo_Panel Info_Panel;
-	AsMop Mop;
 
 	std::vector<AGame_Object *> Modules;
 

@@ -2,6 +2,7 @@
 #include "Falling_Letter.h"
 #include "Info_Panel.h"
 #include "Level_Data.h"
+#include "Mop.h"
 //------------------------------------------------------------------------------------------------------------
 class APoint
 {
@@ -12,55 +13,36 @@ public:
 	int X, Y;
 };
 //------------------------------------------------------------------------------------------------------------
-class AMop_Indicator
+enum class ELevel_Table_State
+{
+	Missing,
+	Showing,
+	Hidding
+};
+class AsLevel_Table: public AGraphics_Objects
 {
 public:
-	AMop_Indicator(int x_pos, int y_pos, int time_offset);
-	AMop_Indicator(int x_pos, int y_pos, const AColor& dest_color);
+	AsLevel_Table(int x_pos, int y_pos);
 
 	virtual void Act();
 	virtual bool Is_Finished();
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual void Clear(HDC hdc, RECT &paint_area);
 
-	static void Init();
+	void Show(int level_number);
+	void Hide();
 
 private:
 	int X_Pos, Y_Pos;
-	RECT Mop_Indicator_Rect;
-	const AColor *Current_Color;
-	int Time_Offset;
+	int Level_Number;
 
-	static AColor_Fade Fading_Blue_Colors;
-	static const int Width = 17;
-	static const int Height = 5;
-	static const int Max_Fade_Step = AsConfig::FPS * 4 / 10;
-	static const int Normal_Timeout = AsConfig::FPS;
+	RECT Level_Table_Rect;
+	ELevel_Table_State Level_Table_State;
 
-	
-};
-//------------------------------------------------------------------------------------------------------------
-class AsMop: public AGame_Object
-{
-public:
-	~AsMop();
-	AsMop();
+	ALabel Level_Label, Level_Number_Label;
 
-	virtual void Advance(double max_speed);
-	virtual double Get_Speed();
-	virtual void Start_Movement();
-	virtual void End_Movement();
-
-	virtual void Act();
-	virtual bool Is_Finished();
-	virtual void Draw(HDC hdc, RECT &paint_area);
-	virtual void Clear(HDC hdc, RECT &paint_area);
-
-	static void Init();
-private:
-	std::vector<AMop_Indicator *> Mop_Indicators;
-
-	static const int Max_Indicators_Count = 10;
+	static const int Width = 96;
+	static const int Height = 14;
 };
 //------------------------------------------------------------------------------------------------------------
 class ALevel: public AHit_Checker, public AGame_Object
@@ -86,10 +68,21 @@ public:
 	void Set_Current_Level(int level_index);
    bool Get_Next_Falling_Letter(int& index, AFalling_Letter **falling_letter);
 	void Stop();
+	void Mop_Level(int next_level);
+	void Mop_Next_Level();
+	bool Is_Mopping_Done();
+	bool Can_Mop_Next_Level();
+
+   void Show_Level_Table();
+	void Hide_Level_Table();
 
 	static bool Has_Brick_At(int brick_x, int brick_y);
 	static bool Has_Brick_At(RECT &monster_rect);
 
+	int Next_Level_Number, Current_Level_Number;
+	int Active_Brick_Count;
+
+	AsMop Mop;
 private:
 	bool On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool got_vertical_hit);
 	void Clear_Objects(HDC hdc, RECT &paint_area, std::vector<AGraphics_Objects *> &object_for_drawing);
@@ -108,12 +101,15 @@ private:
 	void Draw_Part_Paraschute(HDC hdc, RECT &brick_rect, double offet, int width);
 	void Delete();
 	void Delete_Objects(std::vector<AGraphics_Objects *> &object_for_drawing);
-	RECT Level_Rect;	
+
 	
+
+	RECT Level_Rect;	
+	AsLevel_Table Level_Table;
+
 	double Current_Brick_Left_X, Current_Brick_Right_X;
 	double Current_Brick_Top_Y, Current_Brick_Low_Y;
-	static const int Max_Teleports_In_Level = 6;
-	static const int Min_Teleports_In_Level = 2;
+
 	
 	char Current_Level[AsConfig::Level_Height][AsConfig::Level_Width];
 	std::vector<AGraphics_Objects *>Active_Bricks;
@@ -122,8 +118,11 @@ private:
 	std::vector<ALevel_Data *> Levels_Data;
 	AAdvertisement *Advertisement;
 	bool Need_To_Stop_All_Activity;
+
 	
 	static ALevel *Level;
-	AsMop Mop;
+
+	static const int Max_Teleports_In_Level = 6;
+	static const int Min_Teleports_In_Level = 2;
 };
 //------------------------------------------------------------------------------------------------------------

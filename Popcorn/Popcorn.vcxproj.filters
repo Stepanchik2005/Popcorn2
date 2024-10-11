@@ -109,6 +109,18 @@
     <Filter Include="Level_Data">
       <UniqueIdentifier>{bc4e4f38-a81a-4597-aa90-37ec0dcda7f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="#Mop">
+      <UniqueIdentifier>{4f914643-866a-48e8-a7f3-b095858f9d8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Mop\Mop">
+      <UniqueIdentifier>{361d6fc8-05fc-400b-b45b-a436b9c57a3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Mop\Mop_Indicator">
+      <UniqueIdentifier>{ff162b68-a82d-4da9-bf5e-9ba11557a9cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Mop\Mop_Cylinder">
+      <UniqueIdentifier>{7ab5fdf1-7ad3-4d63-9699-92931e75905f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -194,6 +206,15 @@
     </ClInclude>
     <ClInclude Include="Level_Data.h">
       <Filter>Level_Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Mop.h">
+      <Filter>#Mop\Mop</Filter>
+    </ClInclude>
+    <ClInclude Include="Mop_Indicator.h">
+      <Filter>#Mop\Mop_Indicator</Filter>
+    </ClInclude>
+    <ClInclude Include="Mop_Cylinder.h">
+      <Filter>#Mop\Mop_Cylinder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -284,6 +305,15 @@
     </ClCompile>
     <ClCompile Include="Level_Data.cpp">
       <Filter>Level_Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Mop.cpp">
+      <Filter>#Mop\Mop</Filter>
+    </ClCompile>
+    <ClCompile Include="Mop_Indicator.cpp">
+      <Filter>#Mop\Mop_Indicator</Filter>
+    </ClCompile>
+    <ClCompile Include="Mop_Cylinder.cpp">
+      <Filter>#Mop\Mop_Cylinder</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

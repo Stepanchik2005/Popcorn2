@@ -219,7 +219,7 @@ void AMonster::Destroy()
 
 	for(auto &ball : Explodive_Balls)
 	{
-		max_size = AsCommon::Rand(20) + 10;
+		//max_size = AsCommon::Rand(20) + 10;
 		time_offset = AsCommon::Rand(AsConfig::FPS);
 
 		while(true) // проверка попадает ли точка в круг
@@ -232,6 +232,8 @@ void AMonster::Destroy()
 		}
 
 		rest_size = half_size - (int)( sqrt( pow(x_offset, 2) + pow(y_offset, 2)));
+
+		
 
 		max_size = AsCommon::Rand(rest_size / 2) + rest_size / 2;
 
@@ -275,7 +277,7 @@ void AMonster::Activate(double x_pos, double y_pos, bool is_left_gate)
 		Direction = M_PI;
 	}
 
-	Y_Pos = y_pos + 1.0;
+	Y_Pos = y_pos;
 	Redraw_Monster();
 }
 
