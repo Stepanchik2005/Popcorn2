@@ -85,9 +85,6 @@
     <Filter Include="#Monster\Monster">
       <UniqueIdentifier>{7611ed56-be58-4bca-b5cd-0dcea77a2622}</UniqueIdentifier>
     </Filter>
-    <Filter Include="#Monster\ExplodiveBall">
-      <UniqueIdentifier>{eca0477c-2364-4942-b865-67d107eb61a8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="#Screen">
       <UniqueIdentifier>{a65a2661-094d-4501-836b-edd0795e36db}</UniqueIdentifier>
     </Filter>
@@ -120,6 +117,30 @@
     </Filter>
     <Filter Include="#Mop\Mop_Cylinder">
       <UniqueIdentifier>{7ab5fdf1-7ad3-4d63-9699-92931e75905f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Explosion">
+      <UniqueIdentifier>{439f1105-d235-4573-8052-4df3e29a9256}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Explosion\ExplodiveBall">
+      <UniqueIdentifier>{eca0477c-2364-4942-b865-67d107eb61a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Explosion\Explosion">
+      <UniqueIdentifier>{624271ce-dfa0-48ab-a110-e07bca377368}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Screen\Level_Title">
+      <UniqueIdentifier>{0b7affdf-2712-4335-bae2-a7cd5a6739a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Screen\#Final_Title">
+      <UniqueIdentifier>{ac06c631-7481-4b52-8fb9-b01c45030af4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Screen\#Final_Title\Final_Letter">
+      <UniqueIdentifier>{74d025bd-0c10-486b-8dbe-5e2b8bfc8b50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Screen\#Final_Title\Final_Title">
+      <UniqueIdentifier>{f2d3208c-73af-4402-a4bf-812d26fbd20d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="#Screen\Label">
+      <UniqueIdentifier>{c6edf026-18bf-4d38-b150-fbc47811c0ec}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -196,7 +217,7 @@
       <Filter>#Monster\Monster</Filter>
     </ClInclude>
     <ClInclude Include="Explodive_Balls.h">
-      <Filter>#Monster\ExplodiveBall</Filter>
+      <Filter>#Explosion\ExplodiveBall</Filter>
     </ClInclude>
     <ClInclude Include="Info_Panel.h">
       <Filter>#Screen\Info_Panel</Filter>
@@ -215,6 +236,21 @@
     </ClInclude>
     <ClInclude Include="Mop_Cylinder.h">
       <Filter>#Mop\Mop_Cylinder</Filter>
+    </ClInclude>
+    <ClInclude Include="Level_Title.h">
+      <Filter>#Screen\Level_Title</Filter>
+    </ClInclude>
+    <ClInclude Include="Label.h">
+      <Filter>#Screen\Label</Filter>
+    </ClInclude>
+    <ClInclude Include="Final_Title.h">
+      <Filter>#Screen\#Final_Title\Final_Title</Filter>
+    </ClInclude>
+    <ClInclude Include="Final_Letter.h">
+      <Filter>#Screen\#Final_Title\Final_Letter</Filter>
+    </ClInclude>
+    <ClInclude Include="Explosion.h">
+      <Filter>#Explosion\Explosion</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -295,7 +331,7 @@
       <Filter>#Monster\Monster</Filter>
     </ClCompile>
     <ClCompile Include="Explodive_Ball.cpp">
-      <Filter>#Monster\ExplodiveBall</Filter>
+      <Filter>#Explosion\ExplodiveBall</Filter>
     </ClCompile>
     <ClCompile Include="Info_Panel.cpp">
       <Filter>#Screen\Info_Panel</Filter>
@@ -314,6 +350,21 @@
     </ClCompile>
     <ClCompile Include="Mop_Cylinder.cpp">
       <Filter>#Mop\Mop_Cylinder</Filter>
+    </ClCompile>
+    <ClCompile Include="Levle_Title.cpp">
+      <Filter>#Screen\Level_Title</Filter>
+    </ClCompile>
+    <ClCompile Include="Label.cpp">
+      <Filter>#Screen\Label</Filter>
+    </ClCompile>
+    <ClCompile Include="Final_Title.cpp">
+      <Filter>#Screen\#Final_Title\Final_Title</Filter>
+    </ClCompile>
+    <ClCompile Include="Final_Letter.cpp">
+      <Filter>#Screen\#Final_Title\Final_Letter</Filter>
+    </ClCompile>
+    <ClCompile Include="Explosion.cpp">
+      <Filter>#Explosion\Explosion</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

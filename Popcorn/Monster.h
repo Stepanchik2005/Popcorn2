@@ -1,7 +1,6 @@
 #pragma once
-#include "Explodive_Balls.h"
 #include "Level.h"
-
+#include "Explosion.h"
 enum class EEye_State: unsigned char
 {
 	Closed,
@@ -18,7 +17,7 @@ enum class EMonster_State: unsigned char
 	Destroying
 };
 
-class AMonster: public AGame_Object
+class AMonster: public AGame_Object, public AsExplosion
 {
 public:
 	AMonster();
@@ -37,6 +36,7 @@ public:
 	virtual bool Check_Hit(double next_x_pos, double next_y_pos);
 	virtual bool Check_Hit(RECT &rect);
 
+
 	void Activate(double x_pos, double y_pos, bool is_left_gate);
 	void Destroy();
 	void Set_Freeze_State(bool is_freeze);
@@ -51,9 +51,6 @@ protected:
 	RECT Monster_Rect, Prev_Monster_Rect;
 	int Start_Animation;
 	EMonster_State Monster_State;
-	static const int Explodive_Balls_Count = 10; 
-
-	std::vector<AExplodive_Ball> Explodive_Balls;
 
 	double X_Pos, Y_Pos;
 	double Speed;
@@ -64,7 +61,6 @@ protected:
 	static const int Height = 16;
 private:
 	void Act_For_Destroying_State();
-	void Draw_For_Destroying_State(HDC hdc, RECT &paint_area);
 	void Get_Monster_Rect(double x_pos, double y_pos, RECT &monster_rect);
 	void Redraw_Monster();
 	void On_Change_Direction();

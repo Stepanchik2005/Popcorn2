@@ -2,50 +2,13 @@
 #include "Config.h"
 #include "Falling_Letter.h"
 #include "Indicator.h"
-#include <string>
+#include "Label.h"
 
 enum class EHit_Type
 {
 	Hit_Brick,
 	Hit_Monster,
 	Catch_Letter
-};
-
-
-
-
-class AString
-{
-public:
-	AString();
-	AString(const wchar_t *str);
-
-	const wchar_t *Get_Content();
-	void Append(int val, int digits);
-
-private:
-	std::wstring Content;
-
-};
-
-
-class ALabel
-{
-public:
-	ALabel();
-	ALabel(int x_pos, int y_pos, int width, int height,const AFont font,const AColor &color);
-
-	void Draw(HDC hdc);
-	void Clear();
-
-	AFont Font;
-	AColor Color;
-	AString Content;
-	RECT Content_Rect;
-
-private:
-	int X_Pos, Y_Pos;
-	int Width, Height;
 };
 
 
@@ -67,8 +30,10 @@ public:
 	virtual void Draw(HDC hdc, RECT &paint_area);
 	virtual void Clear(HDC hdc, RECT &paint_area);
 
+	void Choose_Font();
 	void Increase_Life_Count();
 	bool Decrease_Life_Count();
+	bool Edit_User_Name(wchar_t symbol);
 
 	static void Update_Score(EHit_Type hit_type);
 
@@ -77,7 +42,10 @@ private:
 	void Show_Extra_Lifes(HDC hdc);
 	void Draw_Extra_Life(HDC hdc, int x_offset, int y_offset);
 
+	bool Expecting_User_Name;
+
    int Availiable_Extra_Lifes;
+	int Start_Tick;
 
 	AColor Dark_Blue, Dark_Red, Platform_Inner_Color;
 	ALabel Player_Name_Label, Score_Label;
@@ -100,6 +68,7 @@ private:
 	static const int Shadow_X_Offset = 5;
 	static const int Shadow_Y_Offset = 5;
 	static const int Indicator_Y_Offset = 55;
+	static const int Blink_Timeout = AsConfig::FPS;
 };
 
 

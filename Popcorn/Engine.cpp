@@ -4,7 +4,7 @@
 // AsEngine
 //------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
-	: Game_State(EGame_State::Cleaning_Level), Rest_Distance(0.0), Modules{}, Timer_ID(WM_USER + 1)
+	: Game_State(EGame_State::Enter_User_Name), Rest_Distance(0.0), Modules{}, Timer_ID(WM_USER + 1), Got_Name(false)
 {
 }
 //------------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ void AsEngine::Init_Engine(HWND hwnd)
 	Modules.push_back(&Monster_Set);
 	Modules.push_back(&Info_Panel);
 	
-	Level.Mop_Level(1);
+
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000 / AsConfig::FPS, 0);
 }
@@ -100,7 +100,17 @@ int AsEngine::On_Timer()
 		Game_State = EGame_State::Play_Level;
 		break;
 
+	case EGame_State::Enter_User_Name:
+		if(Got_Name)
+		{
+			Level.Mop_Level(1);
+			Game_State = EGame_State::Cleaning_Level;
+			Level.Mop.Erase_Level();
+		}
+		break;
+
 	case EGame_State::Cleaning_Level:
+		
 		if(Level.Mop.Is_Level_Cleaning_Done() )
 			Level.Set_Current_Level(Level.Next_Level_Number);
 			
@@ -111,6 +121,7 @@ int AsEngine::On_Timer()
 
 
 	case EGame_State::Mopped_Level:
+		
 		if(Level.Is_Mopping_Done()) // если мы полностью закончили mopping, то рестартуем уровень
 		{
 			Level.Show_Level_Table();
@@ -126,46 +137,47 @@ int AsEngine::On_Timer()
 
 
 	case EGame_State::Lost_Ball:
+		
 		if (Platform.Has_Substate_Regular(EPlatform_Substate_Regular::Missing) )	
 		{
-			if(! Info_Panel.Decrease_Life_Count() )
-				Game_Over();		
-
-			Restart_Level();
+			if(Info_Panel.Decrease_Life_Count() )
+				Restart_Level();
+			else
+				Game_Over();	
+				/*Game_Won();*/
+			
 		}
 		
 		break;
 
 
 	case EGame_State::Restart_Level:
-
+		
 		if(Platform.Has_Substate_Regular(EPlatform_Substate_Regular::Ready))
 		{
 		  Game_State = EGame_State::Play_Level;
 		  Ball_Set.Set_On_Platform(Platform.Get_Middle_Pos());
 		  Monster_Set.Activate();
 		  Level.Hide_Level_Table();
-
 		}
 		if (Border.Is_Gate_Opened(AsConfig::Gates_Count - 1) && Platform.Get_State() != EPlatform_State::Rolling)
-		{
 			Platform.Set_State(EPlatform_State::Rolling);
 		  
-		}
 		break;
-
 
 
 	case EGame_State::Finish_Level:
 		if(Monster_Set.Are_All_Destroyed() && Platform.Has_Substate_Regular(EPlatform_Substate_Regular::Missing))
 		{
 			Level.Mop_Next_Level();
-			Game_State = EGame_State::Cleaning_Level;
-	     
+			Game_State = EGame_State::Cleaning_Level; 
 		}
 		break;
 
+	case EGame_State::Game_Over:
+	case EGame_State::Game_Won:
 
+		break;
 	default:
 		AsConfig::Throw();
 
@@ -177,6 +189,11 @@ int AsEngine::On_Timer()
 	//if (AsConfig::Current_Timer_Tick % 10 == 0)
 
 	return 0;
+}
+//------------------------------------------------------------------------------------------------------------
+void AsEngine::On_Char(wchar_t symbol)
+{
+	Got_Name = Info_Panel.Edit_User_Name(symbol);
 }
 //------------------------------------------------------------------------------------------------------------
 void AsEngine::Advance_Mover()
@@ -236,16 +253,8 @@ void AsEngine::Restart_Level()
 
 	if(Border.Is_Gate_Closed(AsConfig::Gates_Count - 1))
  		Border.Open_Gate(AsConfig::Gates_Count - 1, true);
-
-	
 }
 //------------------------------------------------------------------------------------------------------------
-void AsEngine::Game_Over()
-{
-	// !!! Надо сделать
-}
-//------------------------------------------------------------------------------------------------------------
-
 void AsEngine::Act()
 {
 	int index = 0;
@@ -283,13 +292,13 @@ void AsEngine::Handle_Message()
 				break;
 
 			case EMessage_Type::Level_Done:
-				if (! Level.Can_Mop_Next_Level() )
-					Game_Won();
-				else
+				if (Level.Can_Mop_Next_Level() )
 				{
 					Stop_Play(); // метод, который очищает все для след уровня
 					Game_State = EGame_State::Finish_Level;
 				}
+				else
+					Game_Over(); // !!! Временно
 
 				break;
 
@@ -366,10 +375,21 @@ void AsEngine::On_Falling_Letter(AFalling_Letter *falling_letter)
 
 	falling_letter->Finalize();
 }
+//------------------------------------------------------------------------------------------------------------
+void AsEngine::Game_Over()
+{
+	Level.Final_Title.Show(false);
+	Game_State = EGame_State::Game_Over;
+	Stop_Play();
+}
+//------------------------------------------------------------------------------------------------------------
 void AsEngine::Game_Won()
 {
-	// !!! Надо сделать
+	Level.Final_Title.Show(true);
+	Game_State = EGame_State::Game_Won;
+	Stop_Play();
 }
+//------------------------------------------------------------------------------------------------------------
 void AsEngine::Stop_Play()
 {
 	Level.Stop();

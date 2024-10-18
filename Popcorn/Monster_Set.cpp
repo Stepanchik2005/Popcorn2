@@ -43,7 +43,7 @@ void AsMonster_Set::Act()
       
       if(Border->Is_Gate_Opened(Current_Gate_Index))
       {
-         Emit_At_Gate(Current_Gate_Index);
+         //Emit_At_Gate(Current_Gate_Index);
          Monster_Set_State = EMonster_Set_State::Waiting_Gate_Closing;
       }
 

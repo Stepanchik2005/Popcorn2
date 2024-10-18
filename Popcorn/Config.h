@@ -5,7 +5,7 @@ class AFont
 {
 public:
 	AFont();
-	AFont(int height, int weight, int family, const wchar_t *name);
+	AFont(int height, int weight, int family, const wchar_t *name, bool is_italic = false);
 
 	void Select(HDC hdc) const;
 
@@ -61,7 +61,7 @@ public:
 	static const AColor Cornea_Color, Iris_Color, Cornea_Arc_Color, Explodive_Red_Color, Explodive_Blue_Color, Comet_Color;
 	static const AColor Shadow_Color, Highlight_Color;
 
-	static const AFont Name_Font, Score_Font, Logo_Pop_Font, Logo_Corn_Font;
+	static const AFont Name_Font, Score_Font, Logo_Pop_Font, Logo_Corn_Font, Final_Title_Font;
 
 	static const double Moving_Size_Step;
 	static const double D_Global_Scale;
@@ -91,7 +91,7 @@ public:
 	static const int Max_Balls_Count = 15;
 	static const int Max_Life_Count = 12;
 	static const int Floor_Y_Pos = AsConfig::Max_Y_Pos - 1;
-	static const int Initiall_Extra_Lives = 5;
+	static const int Initiall_Extra_Lives = 5; // !!! ДОЛЖНО БЫТЬ 5
 	
 	static const double Ball_Radius;
 
@@ -176,3 +176,24 @@ public:
 private:
 	static std::queue<AMessage *> Messages;
 };
+
+
+
+
+
+class AString
+{
+public:
+	AString();
+	AString(const wchar_t *str);
+
+	const wchar_t *Get_Content();
+	void Append(int val, int digits);
+	void Append(wchar_t symbol);
+	void Delete_Symbol();
+	int Get_Length();
+private:
+	std::wstring Content;
+
+};
+

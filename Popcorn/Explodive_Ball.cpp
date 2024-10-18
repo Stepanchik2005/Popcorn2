@@ -51,7 +51,11 @@ bool AExplodive_Ball::Is_Finished()
 }
 void AExplodive_Ball::Draw(HDC hdc, RECT &paint_area)
 {
-	
+	RECT intersection_rect;
+
+	if(!IntersectRect(&intersection_rect, &paint_area, &Exploding_Ball_Rect))
+		return;
+
 	switch(Explodive_Ball_State)
 	{
 	case EExplodive_Ball_State::Idle:
@@ -75,6 +79,7 @@ void AExplodive_Ball::Clear(HDC hdc, RECT &paint_area)
 
 void AExplodive_Ball::Explode(int x, int y, int time_offset, int max_size, int step_count, bool is_red)
 {
+	// проводим первичную базовую настройку каждого взрывающегося шарика
 
 	X_Pos = x; // координаты ЦЕНТРА МЯЧИКА
 	Y_Pos = y;

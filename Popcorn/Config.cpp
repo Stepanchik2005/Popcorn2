@@ -4,7 +4,7 @@
 AFont::AFont()
 {
 }
-AFont::AFont(int height, int weight, int family, const wchar_t *name)
+AFont::AFont(int height, int weight, int family, const wchar_t *name, bool is_italic)
 {
 	LOGFONT logo_font{}; 
    
@@ -16,6 +16,9 @@ AFont::AFont(int height, int weight, int family, const wchar_t *name)
 	logo_font.lfQuality = 1;
 	logo_font.lfPitchAndFamily = family;
 	wcscpy_s(logo_font.lfFaceName, name);
+
+	if(is_italic)
+		logo_font.lfItalic = 255;
 
 	// создаем шрифт
    Content = CreateFontIndirect(&logo_font); 
@@ -150,8 +153,7 @@ const AFont AsConfig::Name_Font(-48, 700, 49, L"Consolas");
 const AFont AsConfig::Score_Font(-44, 700, 49, L"Consolas");
 const AFont AsConfig::Logo_Pop_Font(-128, 900, 34, L"Arial Black");
 const AFont AsConfig::Logo_Corn_Font(-96, 900, 34, L"Arial Black");
-
-
+const AFont AsConfig::Final_Title_Font(-60, 700, 66, L"Comic Sans MS", true);
 
 const AColor AsConfig::Letter_Color(White_Color,Global_Scale);
 const AColor AsConfig::Laser_Color(White_Color, Global_Scale);
@@ -387,3 +389,45 @@ bool AsMessage_Manager::Get_Message(AMessage **message)
 }
 
 
+
+
+//AString
+AString::AString()
+{
+}
+AString::AString(const wchar_t *str)
+	: Content(str)
+{
+	
+}
+const wchar_t *AString::Get_Content()
+{
+	return Content.c_str();
+}
+
+void AString::Append(int val, int digits)
+{
+	wchar_t buf[32];
+	wchar_t format[32];
+
+	swprintf_s(format, L"%%.%ii", digits);
+
+	swprintf_s(buf, format, val);
+
+	Content += buf;
+}
+void AString::Append(wchar_t symbol)
+{
+	Content.append(1, symbol);
+}
+void AString::Delete_Symbol()
+{
+	int len = Content.size();
+
+	if(len > 0)
+		Content.resize(Content.size() - 1);
+}
+int AString::Get_Length()
+{
+	return Content.size();
+}

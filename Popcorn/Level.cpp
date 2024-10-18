@@ -12,84 +12,6 @@ APoint::APoint(int x_pos, int y_pos)
 
 
 
-//AsLevel_Table-----------------------------------------------------------------------------------------------------------
-
-
-
-AsLevel_Table::AsLevel_Table(int x_pos, int y_pos)
-	: X_Pos(x_pos), Y_Pos(y_pos), Level_Table_State(ELevel_Table_State::Missing), Level_Label(X_Pos + 10, Y_Pos + 3, AsConfig::Max_X_Pos / 2 - Width / 2, Height - 5, AsConfig::Name_Font, AsConfig::White_Color),
-	  Level_Number_Label(X_Pos + Width - 25, Y_Pos + 3, 20, Height - 5, AsConfig::Name_Font, AsConfig::White_Color),
-	  Level_Number(0)
-{
-	const int scale = AsConfig::Global_Scale;
-
-	Level_Table_Rect.left = X_Pos * scale;
-	Level_Table_Rect.top = Y_Pos * scale;
-	Level_Table_Rect.right = Level_Table_Rect.left + Width * scale;
-	Level_Table_Rect.bottom = Level_Table_Rect.top + Height * scale;
-}
-
-void AsLevel_Table::Act()
-{
-	// заглушка, т.к нету своей анимации
-}
-bool AsLevel_Table::Is_Finished()
-{
-	return false; // заглушка, т.к нету своей анимации
-}
-void AsLevel_Table::Draw(HDC hdc, RECT &paint_area)
-{
-	RECT intersection_rect;
-
-	if(Level_Table_State == ELevel_Table_State::Missing)
-		return;
-
-	if(IntersectRect(&intersection_rect, &paint_area, &Level_Table_Rect))
-	{
-		// 1. Рисуем плажку
-		AsCommon::Rect(hdc, Level_Table_Rect, AsConfig::Blue_Color);
-
-		Level_Label.Content = L"УРОВЕНЬ";
-
-		Level_Label.Draw(hdc);
-
-		Level_Number_Label.Content.Append(Level_Number, 2);
-
-		Level_Number_Label.Draw(hdc);
-
-	}
-}
-void AsLevel_Table::Clear(HDC hdc, RECT &paint_area)
-{
-	RECT intersection_rect;
-
-	if(Level_Table_State != ELevel_Table_State::Hidding)
-		return;
-
-	if(IntersectRect(&intersection_rect, &paint_area, &Level_Table_Rect))
-	{
-		AsCommon::Rect(hdc, Level_Table_Rect, AsConfig::BG_Color);
-		Level_Table_State = ELevel_Table_State::Missing;
-		Level_Number_Label.Clear();
-	}
-}
-
-void AsLevel_Table::Show(int level_number)
-{
-	Level_Table_State = ELevel_Table_State::Showing;
-
-	Level_Number = level_number;
-
-	AsCommon::Invalidate_Rect(Level_Table_Rect);
-}
-void AsLevel_Table::Hide()
-{
-	Level_Table_State = ELevel_Table_State::Hidding;
-
-	AsCommon::Invalidate_Rect(Level_Table_Rect);
-}
-
-
 
 
 // ALevel
@@ -105,7 +27,7 @@ ALevel::~ALevel()
 
 ALevel::ALevel()
 : Level_Rect{}, Next_Level_Number(0), Current_Level_Number(0), Teleport_Pos(0), Advertisement(0), Need_To_Stop_All_Activity(false), Active_Brick_Count(0), Mop(),
-  Level_Table(55, 145)
+  Level_Title(55, 145)
   
 {
 	Level = this;
@@ -115,6 +37,7 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
 {// Корректируем позицию мячика при отражении от кирпичей
 
 	int i, j;
+	int level_y_low_pos = AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height;
 	double direction;
 	double min_ball_x, max_ball_x;
 	double min_ball_y, max_ball_y;
@@ -126,7 +49,7 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall_Object *ball)
 	if(ball->Get_State() == EBall_State::On_Paraschute)
 		return false;
 
-	if (next_y_pos + AsConfig::Ball_Radius > AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)
+	if (next_y_pos - AsConfig::Ball_Radius > level_y_low_pos)
 		return false;
 
 	direction = ball->Get_Direction();
@@ -221,7 +144,6 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos)
 	if (next_y_pos > AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)
 		return false;
 
-
 	level_x = (int)( (next_x_pos - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width);
 
 	if(level_x > AsConfig::Level_Width - 1)
@@ -263,6 +185,7 @@ void ALevel::Act()
 		Advertisement->Act();
 
 	Mop.Act();
+	Final_Title.Act();
 }
 bool ALevel::Is_Finished()
 {
@@ -273,6 +196,7 @@ void ALevel::Draw(HDC hdc, RECT &paint_area)
 	int i, j;
 	RECT intersection_rect, brick_rect = {};
 
+	Final_Title.Draw(hdc, paint_area);
 	
 	if(Advertisement != 0)
 		Advertisement->Draw(hdc, paint_area);
@@ -300,8 +224,9 @@ void ALevel::Draw(HDC hdc, RECT &paint_area)
 
 	Draw_Objects(hdc, paint_area, Falling_Letters);
 
+
 	Mop.Draw(hdc, paint_area);
-	Level_Table.Draw(hdc, paint_area);
+	Level_Title.Draw(hdc, paint_area);
 }
 void ALevel::Clear(HDC hdc, RECT &paint_area)
 {
@@ -309,12 +234,11 @@ void ALevel::Clear(HDC hdc, RECT &paint_area)
 	Clear_Objects(hdc, paint_area, Falling_Letters);
 
 	Mop.Clear(hdc, paint_area);
-	Level_Table.Clear(hdc, paint_area);
+	Level_Title.Clear(hdc, paint_area);
+	Final_Title.Clear(hdc, paint_area);
 
 	if(Advertisement != 0)
 		Advertisement->Clear(hdc, paint_area);
-
-
 }
 	
 // нету реализации для методов AMover т.к. уровень не двигается
@@ -357,7 +281,7 @@ void ALevel::Init()
 		
 	}
 		
-	Mop.Erase_Level();
+	
 }
 //------------------------------------------------------------------------------------------------------------
 void ALevel::Set_Current_Level(int level_index)
@@ -445,7 +369,7 @@ void ALevel::Stop()
 }
 void ALevel::Mop_Level(int next_level)
 {
-	if(next_level < 0 || next_level >= ALevel_Data::Max_Level_Count)
+	if(next_level < 0 || next_level > ALevel_Data::Max_Level_Count)
 		AsConfig::Throw();
 
 	Next_Level_Number = next_level;
@@ -468,11 +392,11 @@ bool ALevel::Can_Mop_Next_Level()
 }
 void ALevel::Show_Level_Table()
 {
-	Level_Table.Show(Current_Level_Number);
+	Level_Title.Show(Current_Level_Number);
 }
 void ALevel::Hide_Level_Table()
 {
-	Level_Table.Hide();
+	Level_Title.Hide();
 }
 bool ALevel::Is_Mopping_Done()
 {
@@ -920,7 +844,7 @@ void ALevel::Draw_Brick(HDC hdc, RECT brick_rect, int level_x, int level_y)
 	switch (brick_type)
 	{
 	case EBrick_Type::None:
-		if(Advertisement != 0 && Advertisement->Has_Brick_At(level_x, level_y))
+		if( (Advertisement != 0 && Advertisement->Has_Brick_At(level_x, level_y)) || Final_Title.Is_Visible())
 			break;
 		// else - No break;
 	case EBrick_Type::Red:

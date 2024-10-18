@@ -3,7 +3,7 @@
 //AMonster---------------------------------------------------------
 AMonster::AMonster()
 	: X_Pos(0.0), Y_Pos(0.0), Monster_Rect{},Prev_Monster_Rect{}, Next_Direction_Switch_Tick(AsCommon::Rand(AsConfig::FPS)), 
-	  Monster_State(EMonster_State::Idle), Speed(0.0), Prev_Speed(0.0), Need_To_Freeze(false) ,Direction(0.0), Start_Animation(0), Explodive_Balls(10)
+	  Monster_State(EMonster_State::Idle), Speed(0.0), Prev_Speed(0.0), Need_To_Freeze(false) ,Direction(0.0), Start_Animation(0)
 {
 
 }
@@ -141,7 +141,7 @@ void AMonster::Draw(HDC hdc, RECT &paint_area)
 		break;
 
 	case EMonster_State::Destroying:
-		Draw_For_Destroying_State(hdc, paint_area);
+		Draw_Explosion(hdc, paint_area);
 		break;
 
 	default:
@@ -199,53 +199,11 @@ bool AMonster::Check_Hit(RECT& rect)
 
 void AMonster::Destroy()
 {
-	int rest_size;
-	int x_offset, y_offset;
-	int max_size, half_size;
-	int time_offset;
-	bool is_red;
-   
 	if(Monster_State == EMonster_State::Idle || Monster_State == EMonster_State::Destroying)
 		return;
 
-	int half_width = Width * AsConfig::Global_Scale / 2;
-	int half_height = Height * AsConfig::Global_Scale / 2;
-	int x_pos = (int)X_Pos * AsConfig::Global_Scale + half_width; // координаты центра глаза (эллипса)
-	int y_pos = (int)Y_Pos * AsConfig::Global_Scale + half_height;
-	half_size = half_width; // radius
-
-	if(half_height < half_size)
-		half_size = half_height;
-
-	for(auto &ball : Explodive_Balls)
-	{
-		//max_size = AsCommon::Rand(20) + 10;
-		time_offset = AsCommon::Rand(AsConfig::FPS);
-
-		while(true) // проверка попадает ли точка в круг
-		{
-			x_offset = AsCommon::Rand(half_width) - half_width / 2;
-			y_offset = AsCommon::Rand(half_height ) - half_height / 2;
-
-			if(sqrt(x_offset * x_offset + y_offset * y_offset) < half_size)
-				break;
-		}
-
-		rest_size = half_size - (int)( sqrt( pow(x_offset, 2) + pow(y_offset, 2)));
-
+	Activate_Explosion(Monster_Rect);
 		
-
-		max_size = AsCommon::Rand(rest_size / 2) + rest_size / 2;
-
-		if(max_size < AsConfig::Global_Scale)
-			max_size = AsConfig::Global_Scale;
-
-		is_red = AsCommon::Rand(2);
-
-		ball.Explode(x_pos + x_offset, y_pos + y_offset, time_offset, max_size * 2, 10, is_red);
-
-	}
-
 	AsInfo_Panel::Update_Score(EHit_Type::Hit_Monster);
 
 	Monster_State = EMonster_State::Destroying;
@@ -283,22 +241,12 @@ void AMonster::Activate(double x_pos, double y_pos, bool is_left_gate)
 
 void AMonster::Act_For_Destroying_State()
 {
-	int count = 0; 
-	for(auto &ball : Explodive_Balls)
-	{
-		ball.Act();
+	int count = 0;
 
-		if(ball.Explodive_Ball_State == EExplodive_Ball_State::Idle)
-			count++;
-	}
-	
-	if(count == Explodive_Balls_Count)
+	Act_Explosion(count);
+
+	if(count == Explodive_Balls_Count) // если все шарики отыграли свою анимацию, то состояния монстра перехоит в первичное
 		Monster_State = EMonster_State::Idle;
-}
-void AMonster::Draw_For_Destroying_State(HDC hdc, RECT &paint_area)
-{
-	for(auto &ball : Explodive_Balls)
-		ball.Draw(hdc, paint_area);
 }
 void AMonster::Get_Monster_Rect(double x_pos, double y_pos, RECT& monster_rect)
 {

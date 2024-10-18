@@ -3,6 +3,8 @@
 #include "Info_Panel.h"
 #include "Level_Data.h"
 #include "Mop.h"
+#include "Final_Title.h"
+#include "Level_Title.h"
 //------------------------------------------------------------------------------------------------------------
 class APoint
 {
@@ -12,38 +14,9 @@ public:
 
 	int X, Y;
 };
-//------------------------------------------------------------------------------------------------------------
-enum class ELevel_Table_State
-{
-	Missing,
-	Showing,
-	Hidding
-};
-class AsLevel_Table: public AGraphics_Objects
-{
-public:
-	AsLevel_Table(int x_pos, int y_pos);
 
-	virtual void Act();
-	virtual bool Is_Finished();
-	virtual void Draw(HDC hdc, RECT &paint_area);
-	virtual void Clear(HDC hdc, RECT &paint_area);
 
-	void Show(int level_number);
-	void Hide();
 
-private:
-	int X_Pos, Y_Pos;
-	int Level_Number;
-
-	RECT Level_Table_Rect;
-	ELevel_Table_State Level_Table_State;
-
-	ALabel Level_Label, Level_Number_Label;
-
-	static const int Width = 96;
-	static const int Height = 14;
-};
 //------------------------------------------------------------------------------------------------------------
 class ALevel: public AHit_Checker, public AGame_Object
 {
@@ -82,7 +55,10 @@ public:
 	int Next_Level_Number, Current_Level_Number;
 	int Active_Brick_Count;
 
+	
 	AsMop Mop;
+	AsFinal_Title Final_Title;
+
 private:
 	bool On_Hit(int brick_x, int brick_y, ABall_Object *ball, bool got_vertical_hit);
 	void Clear_Objects(HDC hdc, RECT &paint_area, std::vector<AGraphics_Objects *> &object_for_drawing);
@@ -101,11 +77,12 @@ private:
 	void Draw_Part_Paraschute(HDC hdc, RECT &brick_rect, double offet, int width);
 	void Delete();
 	void Delete_Objects(std::vector<AGraphics_Objects *> &object_for_drawing);
-
+	
 	
 
 	RECT Level_Rect;	
-	AsLevel_Table Level_Table;
+	AsLevel_Title Level_Title;
+	
 
 	double Current_Brick_Left_X, Current_Brick_Right_X;
 	double Current_Brick_Top_Y, Current_Brick_Low_Y;

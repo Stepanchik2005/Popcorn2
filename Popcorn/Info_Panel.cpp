@@ -1,75 +1,5 @@
 #include "Info_Panel.h"
 
-//AString
-AString::AString()
-{
-}
-AString::AString(const wchar_t *str)
-	: Content(str)
-{
-	
-}
-const wchar_t *AString::Get_Content()
-{
-	return Content.c_str();
-}
-
-void AString::Append(int val, int digits)
-{
-	wchar_t buf[32];
-	wchar_t format[32];
-
-	swprintf_s(format, L"%%.%ii", digits);
-
-	swprintf_s(buf, format, val);
-
-	Content += buf;
-}
-
-
-// ALabel---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-ALabel::ALabel()
-{
-}
-ALabel::ALabel(int x_pos, int y_pos, int width, int height, const AFont font, const AColor &color)
-	: X_Pos(x_pos), Y_Pos(y_pos), Width(width), Height(height), Font(font), Color(color)
-{
-	const int scale = AsConfig::Global_Scale;
-
-	Content_Rect.left = X_Pos * scale;
-	Content_Rect.top = Y_Pos * scale;
-	Content_Rect.right = Content_Rect.left + Width * scale;
-	Content_Rect.bottom = Content_Rect.top + Height * scale;
-}
-
-void ALabel::Draw(HDC hdc)
-{
-	// 1. Плажка с именем игрока
-	const int scale = AsConfig::Global_Scale;
-	int str_left_offset, str_top_offset;
-	SIZE str_size;
-
-	Font.Select(hdc);
-
-	GetTextExtentPoint32(hdc, Content.Get_Content(), wcslen(Content.Get_Content()), &str_size);
-
-	str_left_offset = Content_Rect.left + (Content_Rect.right - Content_Rect.left) / 2 - str_size.cx / 2;
-	str_top_offset = Content_Rect.top + (Content_Rect.bottom - Content_Rect.top) / 2  - str_size.cy / 2 - scale;
-
-	SetTextColor(hdc, AsConfig::BG_Color.Get_RGB());
-
-	TextOutW(hdc, str_left_offset + 2 * scale, str_top_offset + 2 * scale, Content.Get_Content(), wcslen(Content.Get_Content()));
-
-	SetTextColor(hdc, Color.Get_RGB()); 
-	TextOutW(hdc, str_left_offset, str_top_offset, Content.Get_Content(), wcslen(Content.Get_Content()));
-}
-void ALabel::Clear()
-{
-	Content = L""; // очищаем метку
-}
-
-
-	
 
 
 
@@ -80,22 +10,18 @@ RECT AsInfo_Panel::Data_Rect;
 
 
 AsInfo_Panel::AsInfo_Panel()
-	:Availiable_Extra_Lifes(AsConfig::Initiall_Extra_Lives),
+	:Expecting_User_Name(true),Availiable_Extra_Lifes(AsConfig::Initiall_Extra_Lives),Start_Tick(0),
 	 Floor_Indicator(Score_X + 8, Score_Y + Indicator_Y_Offset, EMessage_Type::Floor_Is_Over), Monster_Indicator(Score_X + 90, Score_Y + Indicator_Y_Offset, EMessage_Type::Unfreeze_Monsters),
 	 Dark_Blue(0, 170, 170), Dark_Red(151, 0, 0), Platform_Inner_Color(0, 128, 192), 
-	 Player_Name_Label (Score_X + 5, Score_Y + 5, Score_Width - 2 * 5, 16, AsConfig::Name_Font, AsConfig::Blue_Color),
-
+	 Player_Name_Label (Score_X + 5, Score_Y + 5, Score_Width - 2 * 5, 18, AsConfig::Name_Font, AsConfig::Blue_Color),
 	 Score_Label (Score_X + 5, Score_Y + 5 + Score_Y_Offset, Score_Width - 2 * 5, 16, AsConfig::Score_Font, AsConfig::White_Color),
-
-
-
 	 Letter_P (ELetter_Type::P, 215 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale, EBrick_Type::Blue),
 	 Letter_G (ELetter_Type::G, 256 * AsConfig::Global_Scale - 1, 153 * AsConfig::Global_Scale, EBrick_Type::Blue),
 	 Letter_M (ELetter_Type::M, 296 * AsConfig::Global_Scale + 1, 153 * AsConfig::Global_Scale , EBrick_Type::Blue)
 {
 	const int scale = AsConfig::Global_Scale;
 
-//	Choose_Font();
+	//Choose_Font();
 
 	Letter_P.Show_Fill_Size();
 	Letter_G.Show_Fill_Size();
@@ -129,8 +55,29 @@ void AsInfo_Panel::End_Movement()
 
 void AsInfo_Panel::Act()
 {
+	int curr_tick;
+
 	Floor_Indicator.Act();
 	Monster_Indicator.Act();
+
+	if(Expecting_User_Name)
+	{
+		curr_tick = AsConfig::Current_Timer_Tick - Start_Tick;
+
+		if(curr_tick > Blink_Timeout)
+		{
+			Start_Tick = AsConfig::Current_Timer_Tick;
+
+			if(Player_Name_Label.Content.Get_Length() == 0)
+				Player_Name_Label.Content = L"ВВЕДИТЕ ИМЯ";
+			else
+				Player_Name_Label.Content = L"";
+
+			AsCommon::Invalidate_Rect(Data_Rect);
+		}
+
+		
+	}
 }
 bool AsInfo_Panel::Is_Finished()
 {
@@ -194,7 +141,7 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 		// 3.1 Выводим плашку фона
 		AsCommon::Rect(hdc, Player_Name_Label.Content_Rect, Dark_Red);
 
-		Player_Name_Label.Content = L"COMPUTER";
+		
 		Player_Name_Label.Draw(hdc);
 	
 		AsCommon::Rect(hdc, Score_Label.Content_Rect, Dark_Red);
@@ -223,7 +170,19 @@ void AsInfo_Panel::Draw(HDC hdc, RECT &paint_area)
 void AsInfo_Panel::Clear(HDC hdc, RECT &paint_area)
 {
 }
+void AsInfo_Panel::Choose_Font()
+{
+	CHOOSEFONT cf{};
+	LOGFONT lf{};
 
+	cf.lStructSize = sizeof(CHOOSEFONT);
+	cf.lpLogFont = &lf;
+	cf.Flags = CF_SCREENFONTS;
+	cf.nFontType = SCREEN_FONTTYPE;
+
+	ChooseFont(&cf);
+
+}
 void AsInfo_Panel::Increase_Life_Count()
 {
 	if(Availiable_Extra_Lifes >= AsConfig::Max_Life_Count)
@@ -244,6 +203,22 @@ bool AsInfo_Panel::Decrease_Life_Count()
   AsCommon::Invalidate_Rect(Data_Rect);
 
   return true;
+}
+bool AsInfo_Panel::Edit_User_Name(wchar_t symbol)
+{
+	if(Expecting_User_Name)
+	{
+		Player_Name_Label.Content = L""; 
+		Expecting_User_Name = false;
+	}
+
+	if(Player_Name_Label.Append(symbol) )
+	  return true;
+	else
+	  return false;
+	
+
+	/*AsCommon::Invalidate_Rect(Data_Rect);*/
 }
 void AsInfo_Panel::Update_Score(EHit_Type hit_type)
 {
